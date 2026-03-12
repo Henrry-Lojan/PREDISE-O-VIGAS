@@ -203,71 +203,57 @@
       }
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 600px) {
+      header {
+        padding: 10px;
+        text-align: center;
+        align-items: center;
+      }
+      header h1 {
+        font-size: 15px;
+      }
+      header span {
+        display: none;
+      }
+      .norm-badge {
+        font-size: 10px;
+        padding: 2px 8px;
+      }
       .layout {
         grid-template-columns: 1fr;
-        height: auto;
-        min-height: auto;
       }
-
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 15px;
-      }
-
-      .norm-badge {
-        margin-left: 0;
-      }
-
       .inputs-panel {
-        border-right: none;
-        border-bottom: 2px solid var(--border);
-        height: auto;
-        max-height: none;
+        max-height: 40vh; /* Para que se pueda ver algo de resultados abajo */
+        overflow-y: auto;
       }
-
-      .inputs-body {
-        overflow: visible;
-        justify-content: flex-start;
-        display: block;
-      }
-
       .results-panel {
-        height: auto;
-        padding: 10px;
+        padding: 5px;
       }
-
       .results-row-wrap {
-        grid-template-columns: 1fr;
-        height: auto;
+        grid-template-columns: 1fr !important;
+        gap: 10px;
       }
-
-      .diagram-mini {
-        grid-row: auto;
+      .mini-card {
+        border-radius: 8px;
       }
-
-      .checks-card {
-        grid-column: 1;
+      .rv {
+        font-size: 12px;
+        min-width: 35px;
       }
-
-      .input-row {
-        flex-wrap: wrap;
+      .rl {
+        font-size: 11px;
       }
-
-      .input-row label {
-        min-width: 100%;
-        margin-bottom: 4px;
-      }
-
       .input-wrap {
-        width: 100%;
+        width: 100% !important;
       }
-
-      .btn-print {
+      .input-wrap input {
+        font-size: 14px;
+        height: 34px; /* Más fácil de tocar */
+      }
+      #beamSvg {
         width: 100%;
-        justify-content: center;
+        height: auto;
+        max-width: 280px;
       }
     }
 
