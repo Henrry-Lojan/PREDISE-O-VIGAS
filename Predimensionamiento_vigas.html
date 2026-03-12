@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diseño de Vigas — ACI 318</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- KaTeX for beautiful math equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --panel: rgba(20, 23, 32, 0.8);
+      --card: rgba(26, 30, 42, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #00e5ff;
+      --accent2: #ff6b35;
+      --accent3: #7fff6b;
+      --warn: #ffb830;
+      --bad: #ff4757;
+      --text: #e8eaf0;
+      --muted: #717b91;
+      --label: #a0aec0;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --display: 'Outfit', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid Background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(13, 15, 20, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #0080aa);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    header span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .norm-badge {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    .btn-print {
+      background: var(--accent);
+      border: none;
+      color: #000;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-print:hover {
+      background: #fff;
+      transform: scale(1.05);
+    }
+
+    @media print {
+
+      .inputs-panel,
+      .btn-print {
+        display: none !important;
+      }
+
+      .layout {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+      }
+
+      body::before {
+        display: none;
+      }
+
+      header {
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      header h1 {
+        color: #000 !important;
+      }
+
+      .results-panel {
+        padding: 0 !important;
+      }
+
+      .mini-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        background: #fff !important;
+        color: #000 !important;
+        backdrop-filter: none !important;
+      }
+
+      .rl,
+      .rv,
+      .ru,
+      header span {
+        color: #000 !important;
+      }
+    }
+
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(350px, 420px) 1fr;
+      height: calc(100vh - 52px);
+      min-height: 0;
+      /* Important for grid item overflow */
+    }
+
+    @media (max-width: 1280px) {
+      .layout {
+        grid-template-columns: 350px 1fr;
+      }
+
+      .results-row-wrap {
+        grid-template-columns: 1fr 1fr;
+        /* Stack results more on laptops */
+      }
+
+      .diagram-mini {
+        grid-column: 1 / -1;
+        /* Give more space to diagram */
+        grid-row: auto;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: auto;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px;
+      }
+
+      .norm-badge {
+        margin-left: 0;
+      }
+
+      .inputs-panel {
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+        height: auto;
+        max-height: none;
+      }
+
+      .inputs-body {
+        overflow: visible;
+        justify-content: flex-start;
+        display: block;
+      }
+
+      .results-panel {
+        height: auto;
+        padding: 10px;
+      }
+
+      .results-row-wrap {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .diagram-mini {
+        grid-row: auto;
+      }
+
+      .checks-card {
+        grid-column: 1;
+      }
+
+      .input-row {
+        flex-wrap: wrap;
+      }
+
+      .input-row label {
+        min-width: 100%;
+        margin-bottom: 4px;
+      }
+
+      .input-wrap {
+        width: 100%;
+      }
+
+      .btn-print {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* LEFT PANEL - INPUTS */
+    .inputs-panel {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: hidden;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .inputs-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding-bottom: 5px;
+    }
+
+    /* Custom scrollbar for Inputs */
+    .inputs-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .inputs-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .section-header {
+      padding: 4px 12px 3px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .section-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--label);
+    }
+
+    .input-group {
+      padding: 1px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .input-group-title {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1px;
+      gap: 8px;
+    }
+
+    .input-row label {
+      font-size: 12px;
+      color: var(--label);
+      flex: 1;
+      font-style: normal;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .input-wrap {
+      width: 140px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 65px 2px 10px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s;
+      text-align: right;
+      height: 30px;
+      appearance: none;
+      -moz-appearance: textfield;
+    }
+
+    /* Hide arrows Chrome, Safari, Edge, Opera */
+    .input-wrap input::-webkit-outer-spin-button,
+    .input-wrap input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+      background: rgba(0, 229, 255, 0.05);
+    }
+
+    .input-unit {
+      position: absolute;
+      right: 10px;
+      font-size: 10px;
+      color: var(--muted);
+      pointer-events: none;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    .input-wrap select {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 6px;
+      color: var(--accent);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      height: 28px;
+      transition: all 0.2s;
+    }
+
+    .input-wrap select:hover {
+      border-color: var(--accent);
+    }
+
+    /* RIGHT PANEL - RESULTS */
+    .results-panel {
+      overflow-y: auto;
+      padding: 8px;
+      background: var(--bg);
+    }
+
+    .results-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .results-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .results-panel::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+
+
+    .status-ok {
+      background: rgba(127, 255, 107, 0.15);
+      color: var(--accent3);
+      border: 1px solid rgba(127, 255, 107, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-no {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--bad);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-warn {
+      background: rgba(255, 184, 48, 0.15);
+      color: var(--warn);
+      border: 1px solid rgba(255, 184, 48, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .highlight-value {
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .highlight-value2 {
+      color: var(--accent2);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    /* Beam SVG diagram */
+    .diagram-card {
+      grid-column: 1 / -1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .diagram-svg-wrap {
+      flex-shrink: 0;
+    }
+
+    .diagram-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+      flex: 1;
+    }
+
+    .dc-indicator {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .dc-value {
+      font-size: 34px;
+      font-weight: 700;
+      font-family: var(--sans);
+    }
+
+    .dc-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Results row wrap */
+    .results-row-wrap {
+      display: grid;
+      grid-template-columns: 1.15fr 0.9fr 0.95fr;
+      grid-template-rows: auto auto;
+      gap: 7px;
+      height: 100%;
+      align-content: start;
+    }
+
+    .mini-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .mini-card:hover {
+      border-color: rgba(0, 229, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.1);
+    }
+
+    .diagram-mini {
+      grid-row: 1 / 3;
+    }
+
+    .checks-card {
+      grid-column: 2 / 4;
+    }
+
+    .mini-header {
+      padding: 4px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--label);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-body {
+      padding: 5px 10px;
+    }
+
+    .mini-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      padding: 1px 0;
+      border-bottom: 1px solid rgba(37, 43, 59, 0.3);
+    }
+
+    .mini-row:last-child {
+      border-bottom: none;
+    }
+
+    .rl {
+      font-size: 12px;
+      color: var(--label);
+      font-style: normal;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rv-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .rv {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+      white-space: nowrap;
+      min-width: 44px;
+    }
+
+    .ru {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 24px;
+    }
+
+    .accent-v {
+      color: var(--accent) !important;
+      font-weight: 700;
+    }
+
+    .accent2-v {
+      color: var(--accent2) !important;
+      font-weight: 700;
+    }
+
+    .mini-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+
+    /* Pulse animation for recalculating */
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .recalculating {
+      animation: pulse 0.4s ease;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--accent3);
+      margin-left: auto;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent3);
+      border-radius: 50%;
+      animation: livepulse 1.5s infinite;
+    }
+
+    @keyframes livepulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.7);
+      }
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+
+    .bar-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-right: 6px;
+      vertical-align: middle;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Interactive Equation Tooltip */
+    .eq-tooltip {
+      position: fixed;
+      z-index: 2000;
+      background: rgba(15, 18, 25, 0.98);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 229, 255, 0.15);
+      pointer-events: none;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 320px;
+      backdrop-filter: blur(4px);
+      transition: opacity 0.2s;
+      opacity: 0;
+    }
+
+    .eq-tooltip.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .eq-tooltip-title {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      padding-bottom: 4px;
+    }
+
+    .eq-tooltip-formula {
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .eq-tooltip-calc {
+      font-size: 13px;
+      color: var(--accent3);
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-top: 6px;
+      margin-top: 4px;
+    }
+
+    .eq-tooltip-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-align: center;
+      margin-top: 6px;
+      display: none;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .eq-tooltip-status.ok {
+      background: rgba(127, 255, 107, 0.2);
+      color: #7fff6b;
+      display: block;
+    }
+
+    .eq-tooltip-status.no {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+      display: block;
+    }
+
+    .clickable-label {
+      cursor: help;
+      text-decoration: underline dotted var(--muted);
+      transition: color 0.2s;
+    }
+
+    .clickable-label:hover {
+      color: var(--accent) !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-badge">⬛</div>
+    <div>
+      <h1>DISEÑO DE VIGAS DE HORMIGÓN ARMADO</h1>
+      <span>Cálculo estructural reactivo — actualización en tiempo real</span>
+    </div>
+    <div class="norm-badge">ACI 318 · NEC</div>
+    <button class="btn-print" onclick="window.print()">
+      <span style="font-size:16px">⎙</span> IMPRIMIR REPORTE
+    </button>
+  </header>
+
+  <div class="layout">
+
+    <!-- =================== INPUTS LEFT PANEL =================== -->
+    <div class="inputs-panel">
+      <div class="inputs-body">
+        <div class="section-header">
+          <div class="section-dot" style="background:var(--accent)"></div>
+          <h2>Datos de Entrada</h2>
+          <span class="live-badge">
+            <div class="live-dot"></div> EN VIVO
+          </span>
+        </div>
+
+        <!-- ARQUITECTÓNICOS -->
+        <div class="input-group">
+          <div class="input-group-title">
+            <span style="color:var(--accent)">◈</span> Datos Arquitectónicos
+          </div>
+
+          <div class="input-row">
+            <label>Longitud en eje x (L1)</label>
+            <div class="input-wrap">
+              <input type="number" id="L1" value="5.50" step="0.01" min="0.1">
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Longitud en eje x (L2)</label>
+            <div class="input-wrap">
+              <input type="number" id="L2" value="4.50" step="0.01" min="0.1">
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Longitud en eje y (L3)</label>
+            <div class="input-wrap">
+              <input type="number" id="L3" value="4.80" step="0.01" min="0.1">
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Longitud en eje y (L4)</label>
+            <div class="input-wrap">
+              <input type="number" id="L4" value="4.20" step="0.01" min="0.1">
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Número de pisos (N°)</label>
+            <div class="input-wrap">
+              <input type="number" id="pisos" value="2" step="1" min="1">
+              <span class="input-unit">u</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Altura entrepiso</label>
+            <div class="input-wrap">
+              <input type="number" id="He" value="2.60" step="0.05" min="1">
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Uso</label>
+            <div class="input-wrap">
+              <select id="uso">
+                <option value="Vivienda">Vivienda</option>
+                <option value="Oficina">Oficina</option>
+                <option value="Pesada">Pesada</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARGAS -->
+        <div class="input-group">
+          <div class="input-group-title">
+            <span style="color:var(--accent2)">◈</span> Cargas
+          </div>
+          <div class="input-row">
+            <label>Carga muerta (Cm)</label>
+            <div class="input-wrap">
+              <input type="number" id="Cm" value="0.70" step="0.001" min="0">
+              <span class="input-unit">t/m²</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Carga viva (Cv)</label>
+            <div class="input-wrap">
+              <input type="number" id="Cv" value="0.20" step="0.01" min="0">
+              <span class="input-unit">t/m²</span>
+            </div>
+          </div>
+          <div class="input-row" style="margin-top:2px;border-top:1px solid var(--border);padding-top:2px;">
+            <label style="color:var(--accent);font-weight:600;">Cu</label>
+            <div class="input-wrap" style="justify-content:flex-end;gap:6px;">
+              <span id="cu_display"
+                style="font-size:12px;font-weight:700;color:var(--accent);text-align:right;">—</span>
+              <span style="font-size:10px;color:var(--muted);">t/m²</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SISMICIDAD Y MATERIALES -->
+        <div class="input-group">
+          <div class="input-group-title">
+            <span style="color:var(--warn)">◈</span> Materiales y Sismicidad
+          </div>
+          <div class="input-row">
+            <label>Zona sísmica</label>
+            <div class="input-wrap">
+              <select id="zonaS">
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Resistencia del concreto (f'c)</label>
+            <div class="input-wrap">
+              <input type="number" id="fc" value="210" step="5" min="140">
+              <span class="input-unit">kg/cm²</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Resistencia del acero (fy)</label>
+            <div class="input-wrap">
+              <input type="number" id="fy" value="4200" step="100" min="2800">
+              <span class="input-unit">kg/cm²</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN VIGA -->
+        <div class="input-group">
+          <div class="input-group-title">
+            <span style="color:var(--accent3)">◈</span> Sección de Viga
+          </div>
+          <div class="input-row">
+            <label>Ancho viga (b) <span style="font-size:11px;color:var(--muted);font-weight:600">min 25cm
+                NEC-15</span></label>
+            <div class="input-wrap">
+              <input type="number" id="b" value="30" step="1" min="25">
+              <span class="input-unit">cm</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Recubrimiento (rec)</label>
+            <div class="input-wrap">
+              <input type="number" id="rec" value="2.5" step="0.5" min="1">
+              <span class="input-unit">cm</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Altura definida (hdef)</label>
+            <div class="input-wrap">
+              <input type="number" id="hdef" value="33" step="1" min="20">
+              <span class="input-unit">cm</span>
+            </div>
+            <span id="hdef_check"
+              style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:2px;">—</span>
+          </div>
+        </div>
+
+        <!-- ACERO NEGATIVO (tracción) -->
+        <div class="input-group">
+          <div class="input-group-title">
+            <span style="color:var(--accent2)">◈</span> Acero Negativo As(−)
+          </div>
+          <div class="input-row">
+            <label>Diám. varilla long. (Øl)</label>
+            <div class="input-wrap">
+              <input type="number" id="fi_neg" value="16" step="1" min="8">
+              <span class="input-unit">mm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACERO POSITIVO (compresión) -->
+        <div class="input-group">
+          <div class="input-group-title">
+            <span style="color:var(--accent3)">◈</span> Acero Positivo As(+)
+          </div>
+          <div class="input-row">
+            <label>Diám. varilla long. (Øl)</label>
+            <div class="input-wrap">
+              <input type="number" id="fi_pos" value="16" step="1" min="8">
+              <span class="input-unit">mm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESTRIBOS -->
+        <div class="input-group">
+          <div class="input-group-title">
+            <span style="color:var(--warn)">◈</span> Estribos
+          </div>
+          <div class="input-row">
+            <label>Diám. estribo (Øv)</label>
+            <div class="input-wrap">
+              <input type="number" id="fi_est" value="10" step="1" min="6">
+              <span class="input-unit">mm</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <label>Ancho columna (Bc)</label>
+            <div class="input-wrap">
+              <input type="number" id="bcol" value="30" step="1" min="20">
+              <span class="input-unit">cm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end inputs-body -->
+
+    <!-- =================== RESULTS RIGHT PANEL =================== -->
+    <div class="results-panel">
+
+      <!-- ===== ROW 1: DIAGRAM + D/C + CARGAS + PARAMETROS ===== -->
+      <div class="results-row-wrap">
+
+        <!-- DIAGRAMA SECCIÓN -->
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Sección Transversal</div>
+          <div class="mini-body"
+            style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px 6px 10px;">
+
+            <!-- FIGURA: SVG sección limpia sin cotas -->
+            <div style="display:flex;justify-content:center;width:100%;">
+              <svg id="beamSvg" width="230" height="215" viewBox="0 0 230 215">
+                <defs>
+                  <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(0,229,255,0.06)" stroke-width="1.5" />
+                  </pattern>
+                  <marker id="arr" markerWidth="7" markerHeight="7" refX="3" refY="3.5" orient="auto">
+                    <path d="M0,0.5 L6,3.5 L0,6.5 Z" fill="#5a6a7a" />
+                  </marker>
+                  <marker id="arrB" markerWidth="7" markerHeight="7" refX="3" refY="3.5" orient="auto-start-reverse">
+                    <path d="M0,0.5 L6,3.5 L0,6.5 Z" fill="#5a6a7a" />
+                  </marker>
+                  <marker id="arrC" markerWidth="7" markerHeight="7" refX="3" refY="3.5" orient="auto">
+                    <path d="M0,0.5 L6,3.5 L0,6.5 Z" fill="#00e5ff" />
+                  </marker>
+                  <marker id="arrCB" markerWidth="7" markerHeight="7" refX="3" refY="3.5" orient="auto-start-reverse">
+                    <path d="M0,0.5 L6,3.5 L0,6.5 Z" fill="#00e5ff" />
+                  </marker>
+                </defs>
+                <!-- Concrete fill + outline -->
+                <rect id="svgConcrete" x="11" y="11" width="178" height="178" rx="2" fill="url(#hatch)" stroke="none" />
+                <rect id="svgSection" x="10" y="10" width="180" height="180" rx="2" fill="none" stroke="#4a5568"
+                  stroke-width="2.5" />
+                <!-- Stirrup -->
+                <rect id="svgStirrup" x="22" y="22" width="156" height="156" rx="2" fill="none" stroke="#ffb830"
+                  stroke-width="2.5" stroke-linejoin="round" />
+                <line id="svgHook1" x1="0" y1="0" x2="0" y2="0" stroke="none" />
+                <line id="svgHook2" x1="0" y1="0" x2="0" y2="0" stroke="none" />
+                <!-- Steel bars -->
+                <g id="svgTopBars"></g>
+                <g id="svgBotBars"></g>
+                <!-- COTA b (inferior) -->
+                <line id="cB_ext_l" x1="10" y1="194" x2="10" y2="200" stroke="#5a6a7a" stroke-width="1" />
+                <line id="cB_ext_r" x1="190" y1="194" x2="190" y2="200" stroke="#5a6a7a" stroke-width="1" />
+                <line id="cB_arrow" x1="11" y1="197" x2="189" y2="197" stroke="#5a6a7a" stroke-width="1.2"
+                  marker-start="url(#arrB)" marker-end="url(#arr)" />
+                <text id="svgB" x="100" y="212" text-anchor="middle" fill="#00e5ff" font-size="12" font-family="Arial"
+                  font-weight="700">30 cm</text>
+                <text id="svgB_lbl" x="100" y="0" text-anchor="middle" fill="none" font-size="10"
+                  font-family="Arial"></text>
+                <!-- COTA h (derecha) -->
+                <line id="cH_ext_t" x1="193" y1="10" x2="200" y2="10" stroke="#5a6a7a" stroke-width="1" />
+                <line id="cH_ext_b" x1="193" y1="190" x2="200" y2="190" stroke="#5a6a7a" stroke-width="1" />
+                <line id="cH_arrow" x1="197" y1="11" x2="197" y2="189" stroke="#5a6a7a" stroke-width="1.2"
+                  marker-start="url(#arrCB)" marker-end="url(#arrC)" />
+                <text id="svgH" x="215" y="100" text-anchor="middle" fill="#00e5ff" font-size="12" font-family="Arial"
+                  font-weight="700" transform="rotate(90,215,100)">33 cm</text>
+                <text id="svgH_lbl" x="0" y="0" fill="none"></text>
+
+                <!-- Invisible elements kept for JS compatibility -->
+                <g style="display:none">
+                  <line id="cDp_ref_t" x1="0" y1="0" x2="0" y2="0" />
+                  <line id="cDp_ref_b" x1="0" y1="0" x2="0" y2="0" />
+                  <line id="cDp_arrow" x1="0" y1="0" x2="0" y2="0" />
+                  <text id="svgDp" x="0" y="0" />
+                  <line id="cD_ref_t" x1="0" y1="0" x2="0" y2="0" />
+                  <line id="cD_ref_b" x1="0" y1="0" x2="0" y2="0" />
+                  <line id="cD_arrow" x1="0" y1="0" x2="0" y2="0" />
+                  <text id="svgD" x="0" y="0" />
+                  <line id="cRec_ref_t" x1="0" y1="0" x2="0" y2="0" />
+                  <line id="cRec_ref_b" x1="0" y1="0" x2="0" y2="0" />
+                  <line id="cRec_arrow" x1="0" y1="0" x2="0" y2="0" />
+                  <text id="svgRec" x="0" y="0" />
+                </g>
+              </svg>
+            </div>
+
+            <!-- D/C destacado — sin espacio extra -->
+            <div id="dcIndicator"
+              style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.3);border-radius:8px;padding:5px;text-align:center;width:100%;">
+              <div style="font-size:24px;font-weight:700;font-family:var(--sans);line-height:1" id="dcValue">—</div>
+              <div style="font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:0.1em">DEMANDA / CAPACIDAD
+              </div>
+            </div>
+
+            <!-- DATOS ABAJO: Lv, Lt, hmin destacados + resto en grid -->
+            <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:0 10px;">
+              <div class="mini-row"
+                style="grid-column:1/-1;background:rgba(0,229,255,0.05);border-radius:4px;padding:1px 5px;">
+                <span class="rl" style="font-weight:600;color:var(--accent)">Longitud viga mayor luz (Lv)</span>
+                <span class="rv accent-v" id="r_Lv">—</span><span class="ru">m</span>
+              </div>
+              <div class="mini-row"
+                style="grid-column:1/-1;background:rgba(0,229,255,0.05);border-radius:4px;padding:1px 5px;">
+                <span class="rl" style="font-weight:600;color:var(--accent)">Longitud viga transversal (Lt)</span>
+                <span class="rv accent-v" id="r_Lt">—</span><span class="ru">m</span>
+              </div>
+              <div class="mini-row"
+                style="grid-column:1/-1;background:rgba(0,229,255,0.05);border-radius:4px;padding:1px 5px;">
+                <span class="rl clickable-label" id="lbl_hmin" data-eq-title="Altura Mínima"
+                  data-eq-body="h_{min} = \sqrt{\frac{M_u}{0.145 \cdot f'_c \cdot b}} + rec">Altura mínima (hmin)</span>
+                <span class="rv accent-v" id="r_hmin">—</span><span class="ru">cm</span>
+              </div>
+              <div class="mini-sep" style="grid-column:1/-1"></div>
+              <div class="mini-row" style="grid-column:1/-1"><span class="rl clickable-label" id="lbl_rel"
+                  data-eq-title="Relación h_{def}/b" data-eq-body="Rel = \frac{h_{def}}{b}">Relación hdef/b <span
+                    style="font-size:11px;color:var(--muted);font-weight:600">(1.1-1.6 viga
+                    eficiente)</span></span><span id="r_rel_wrap"><span class="rv" id="r_rel">—</span></span></div>
+              <div class="mini-row" style="grid-column:1/-1"><span class="rl clickable-label" id="lbl_d"
+                  data-eq-title="Peralte Efectivo"
+                  data-eq-body="d = h - rec - \frac{\phi_{est}}{10} - \frac{\phi_{long}}{20}">Peralte efectivo
+                  (d)</span><span class="rv" id="r_d">—</span><span class="ru">cm</span></div>
+              <div class="mini-row" style="grid-column:1/-1"><span class="rl clickable-label" id="lbl_dp"
+                  data-eq-title="Recubrimiento a Compresión"
+                  data-eq-body="d' = rec + \frac{\phi_{est}}{10} + \frac{\phi_{long}}{20}">Recub. compresión
+                  (d')</span><span class="rv" id="r_dp">—</span><span class="ru">cm</span></div>
+              <div class="mini-row" style="grid-column:1/-1"><span class="rl">Carga mayorada (Cu)</span><span class="rv"
+                  id="r_Cu">—</span><span class="ru">t/m²</span></div>
+              <div class="mini-sep" style="grid-column:1/-1"></div>
+              <div class="mini-row"
+                style="grid-column:1/-1;background:rgba(0,229,255,0.06);border-radius:4px;padding:1px 5px;">
+                <span class="rl clickable-label" id="lbl_mdis" data-eq-title="Momento de Diseño"
+                  data-eq-body="M_u = \frac{C_u \cdot L_t \cdot L_v^2}{8} \cdot 0.65">Momento diseño (Demanda)</span>
+                <span class="rv accent-v" id="r_Mdis">—</span><span class="ru">t·m</span>
+              </div>
+              <div class="mini-row"
+                style="grid-column:1/-1;background:rgba(255,107,53,0.06);border-radius:4px;padding:1px 5px;">
+                <span class="rl clickable-label" id="lbl_mres" data-eq-title="Momento Resistente"
+                  data-eq-body="M_n = \phi \cdot A_s \cdot f_y \cdot (d - a/2)">Momento resistente (Capacidad)</span>
+                <span class="rv accent2-v" id="r_Mres">—</span><span class="ru">t·m</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- CARGAS Y MOMENTOS -->
+        <div class="mini-card">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Cargas y Momentos</div>
+          <div class="mini-body">
+            <div class="mini-row"><span class="rl">Acero mínimo (Asmin)</span><span class="rv"
+                id="r_Asmin">—</span><span class="ru">cm²</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_pb" data-eq-title="Cuantía Balanceada"
+                data-eq-body="\rho_b = 0.85 \cdot \beta_1 \cdot \frac{f'_c}{f_y} \cdot \left( \frac{6115}{6115 + f_y} \right)">Cuantía
+                balanceada (pb) <span style="font-size:11px;color:var(--muted);font-weight:600">> 2%</span></span><span
+                class="rv" id="r_pb">—</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_pmax" data-eq-title="Cuantía Máxima"
+                data-eq-body="\rho_{max} = C_{zona} \cdot \rho_b">Cuantía máxima (pmax) <span
+                  style="font-size:11px;color:var(--muted);font-weight:600">f(zona)</span></span><span class="rv"
+                id="r_pmax">—</span>
+            </div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_a" data-eq-title="Bloque de Compresión"
+                data-eq-body="a = \frac{A_s \cdot f_y}{0.85 \cdot f'_c \cdot b}">Bloque compresión (a)</span><span
+                class="rv" id="r_a">—</span><span class="ru">cm</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_lmax"
+                data-eq-title="Longitud Máxima Voladizo"
+                data-eq-body="L_{max} = \sqrt[3]{\frac{2 \cdot M_n}{C_u}}">Long. máx. voladizo</span><span class="rv"
+                id="r_Lmax">—</span><span class="ru">m</span></div>
+          </div>
+        </div>
+
+        <!-- CORTANTE -->
+        <div class="mini-card">
+          <div class="mini-header"><span style="color:var(--bad)">▸</span> Cortante</div>
+          <div class="mini-body">
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_vug" data-eq-title="Cortante por Gravedad"
+                data-eq-body="V_{ug} = \frac{(2 \cdot L_v - L_t) \cdot L_t \cdot C_u}{4}">Cortante gravedad
+                (Vug)</span><span class="rv" id="r_Vug">—</span><span class="ru">t</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_vum" data-eq-title="Cortante por Sismo"
+                data-eq-body="V_{um} = \frac{M_{pr}^{-} + M_{pr}^{+}}{L_v - B_c - (h_{def}/25)}">Cortante sismo
+                (Vum)</span><span class="rv" id="r_Vum">—</span><span class="ru">t</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_vu" data-eq-title="Cortante de Diseño"
+                data-eq-body="V_u = V_{ug} + V_{um}">Cortante total (Vu)</span><span class="rv accent2-v"
+                id="r_Vu">—</span><span class="ru">t</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_vc"
+                data-eq-title="Resistencia Cortante Concreto"
+                data-eq-body="V_c = 0.53 \cdot \sqrt{f'_c} \cdot b \cdot d">Cortante concreto (Vc)</span><span
+                class="rv" id="r_Vc">—</span><span class="ru">t</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_vs"
+                data-eq-title="Resistencia Cortante Acero" data-eq-body="V_s = \frac{V_u}{\phi} - V_c">Cortante acero
+                (Vs)</span><span class="rv" id="r_Vs">—</span><span class="ru">t</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">Diám. estribo (Øv)</span><span class="rv" id="r_fi_est">—</span><span
+                class="ru">mm</span></div>
+            <div class="mini-row"><span class="rl">Área varilla estribo</span><span class="rv"
+                id="r_Ab_est">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_s" data-eq-title="Separación de Estribos"
+                data-eq-body="s = \frac{A_v \cdot f_y \cdot d}{V_s}">Separación calculada (s)</span><span class="rv"
+                id="r_s">—</span><span class="ru">cm</span></div>
+            <div class="mini-row"><span class="rl">Sep. máx. zona protegida</span><span class="rv"
+                id="r_smax_prot">—</span><span class="ru">cm</span></div>
+            <div class="mini-row"><span class="rl">Sep. máx. zona central</span><span class="rv"
+                id="r_smax_cent">—</span><span class="ru">cm</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row" style="background:rgba(0,229,255,0.06);border-radius:4px;padding:1px 5px;">
+              <span class="rl clickable-label" id="lbl_s_prot" data-eq-title="Separación Adoptada (Zona Protegida)"
+                data-eq-body="s_{prot} = \min(s_{calc}, s_{max,prot})">Separación adoptada protección</span>
+              <span class="rv accent-v" id="r_s_adopt_prot">—</span><span class="ru">cm</span>
+            </div>
+            <div class="mini-row" style="background:rgba(0,229,255,0.06);border-radius:4px;padding:1px 5px;">
+              <span class="rl clickable-label" id="lbl_s_cent" data-eq-title="Separación Adoptada (Zona Central)"
+                data-eq-body="s_{cent} = \min(s_{calc}, s_{max,cent})">Separación adoptada central</span>
+              <span class="rv accent-v" id="r_s_adopt_cent">—</span><span class="ru">cm</span>
+            </div>
+            <div class="mini-row"><span class="rl">Longitud zona protegida</span><span class="rv"
+                id="r_Zprot">—</span><span class="ru">cm</span></div>
+            <div class="mini-row"><span class="rl">Longitud zona central</span><span class="rv"
+                id="r_Zcentral">—</span><span class="ru">cm</span></div>
+          </div>
+        </div>
+
+        <!-- ACERO NEGATIVO -->
+        <div class="mini-card">
+          <div class="mini-header" style="color:#ff6b35;"><span style="color:#ff6b35;">▸</span> Acero As(−) Negativo
+          </div>
+          <div class="mini-body">
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_asmin" data-eq-title="Acero Mínimo"
+                data-eq-body="As_{min} = \frac{14 \cdot b \cdot d}{f_y}">Acero mínimo (As min)</span><span class="rv"
+                id="r_Asmin_dup">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl">Diám. varilla long. (Øl)</span><span class="rv"
+                id="r_fi_neg">—</span><span class="ru">mm</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_Ab_neg" data-eq-title="Área de Varilla"
+                data-eq-body="A_b = \pi \cdot \frac{\phi^2}{400}">Área varilla (Ab)</span><span class="rv"
+                id="r_Ab_neg">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_num_neg_base"
+                data-eq-title="N° Varillas Base"
+                data-eq-body="N_{base} = \max\left(\lfloor \frac{As_{min}}{A_b} \rfloor, 2\right)"><span class="bar-dot"
+                  style="background:#ff0000"></span>N° varillas base (As min)</span><span class="rv accent-v"
+                id="r_num_neg_base">—</span><span class="ru">u</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_asreq_neg"
+                data-eq-title="Acero Requerido (−)" data-eq-body="As_{req} = \frac{30 \cdot M_u}{d}">Acero requerido (As
+                req)</span><span class="rv accent2-v" id="r_Asreq_neg">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_num_neg_adic"
+                data-eq-title="N° Varillas Adicionales"
+                data-eq-body="N_{adic} = \lceil \frac{As_{req} - N_{base} \cdot A_b}{A_b} \rceil"><span class="bar-dot"
+                  style="background:#ff6b35"></span>N° varillas adic. (As req)</span><span class="rv"
+                id="r_num_neg_adic">—</span><span class="ru">u</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">N° varillas total</span><span class="rv accent-v"
+                id="r_num_neg_place">—</span><span class="ru">u</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_astot_neg"
+                data-eq-title="Área de Acero Total (−)" data-eq-body="As_{tot} = N_{total} \cdot A_b">Área acero
+                total</span><span class="rv accent-v" id="r_Astot_neg">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_cuant_neg" data-eq-title="Cuantía de Acero"
+                data-eq-body="\rho = \frac{A_s}{b \cdot d}">Cuantía (p) <span
+                  style="font-size:10px;color:var(--muted);font-weight:400">
+                  < pmax</span>
+                </span><span id="r_cuant_neg_wrap"><span class="rv" id="r_cuant_neg">—</span></span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_sep_neg"
+                data-eq-title="Separación de Varillas"
+                data-eq-body="s = \frac{b - 2\cdot rec - 2\cdot \phi_{v} - n\cdot \phi_{l}}{n-1}">Separación
+                varillas</span><span id="r_sep_neg_wrap"><span class="rv" id="r_sep_neg">—</span><span
+                  class="ru">cm</span></span></div>
+            <div class="mini-row"><span class="rl">Momento probable (−)</span><span class="rv"
+                id="r_Mpr_neg">—</span><span class="ru">t·m</span></div>
+          </div>
+        </div>
+
+        <!-- ACERO POSITIVO -->
+        <div class="mini-card">
+          <div class="mini-header" style="color:#7fff6b;"><span style="color:#7fff6b;">▸</span> Acero As(+) Positivo
+          </div>
+          <div class="mini-body">
+            <div class="mini-row"><span class="rl">Diám. varilla long. (Øl)</span><span class="rv"
+                id="r_fi_pos">—</span><span class="ru">mm</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_Ab_pos" data-eq-title="Área de Varilla"
+                data-eq-body="A_b = \pi \cdot \frac{\phi^2}{400}">Área varilla (Ab)</span><span class="rv"
+                id="r_Ab_pos">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_asreq_pos"
+                data-eq-title="Acero Requerido (+)" data-eq-body="As_{req} = 0.67 \cdot As_{neg}">Acero
+                requerido</span><span class="rv" id="r_Asreq_pos">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl"><span class="bar-dot" style="background:#00ff00"></span>N° varillas
+                calculado</span><span class="rv accent-v" id="r_num_pos_req">—</span><span class="ru">u</span></div>
+            <div class="mini-row"><span class="rl"><span class="bar-dot"
+                  style="background:#00ff00;opacity:0.6"></span>N° varillas total</span><span class="rv"
+                id="r_num_pos_place">—</span><span class="ru">u</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_astot_pos"
+                data-eq-title="Área de Acero Total (+)" data-eq-body="As_{tot} = N_{total} \cdot A_b">Área acero
+                total</span><span class="rv accent-v" id="r_Astot_pos">—</span><span class="ru">cm²</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_cuant_pos" data-eq-title="Cuantía de Acero"
+                data-eq-body="\rho = \frac{A_s}{b \cdot d}">Cuantía (p) <span
+                  style="font-size:10px;color:var(--muted);font-weight:400">
+                  < pmax</span>
+                </span><span id="r_cuant_pos_wrap"><span class="rv" id="r_cuant_pos">—</span></span></div>
+            <div class="mini-row"><span class="rl">Momento probable (+)</span><span class="rv"
+                id="r_Mpr_pos">—</span><span class="ru">t·m</span></div>
+          </div>
+        </div>
+
+        <!-- VERIFICACIONES -->
+        <div class="mini-card checks-card">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Verificaciones</div>
+          <div class="mini-body" id="summaryChecks"></div>
+        </div>
+
+      </div><!-- end results-row-wrap -->
+
+    </div><!-- end results-panel -->
+  </div><!-- end layout -->
+
+  <script>
+    // ============================================================
+    // REACTIVE ENGINE — ALL CALCULATIONS
+    // ============================================================
+
+    function getVal(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      if (el.tagName === 'SELECT') return el.value;
+      return parseFloat(el.value) || 0;
+    }
+
+    function setResult(id, val, decimals = 4) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (typeof val === 'number' && isFinite(val)) {
+        el.textContent = val.toFixed(decimals);
+      } else {
+        el.textContent = val || '—';
+      }
+    }
+
+    function setStatus(wrapId, ok, text, unit = '') {
+      const wrap = document.getElementById(wrapId);
+      if (!wrap) return;
+      const statusClass = ok === true ? 'status-ok' : ok === false ? 'status-no' : 'status-warn';
+      wrap.innerHTML = `<span class="${statusClass}">${text}</span>${unit ? `<span class="result-unit">${unit}</span>` : ''}`;
+    }
+
+    function recalc() {
+      // ---- INPUTS ----
+      const L1 = getVal('L1'), L2 = getVal('L2'), L3 = getVal('L3'), L4 = getVal('L4');
+      const pisos = getVal('pisos'), He = getVal('He');
+      const uso = getVal('uso');
+      const Cm = getVal('Cm'), Cv = getVal('Cv');
+      const zonaS = getVal('zonaS');
+      const fc = getVal('fc'), fy = getVal('fy');
+      const b = getVal('b'), rec = getVal('rec'), hdef = getVal('hdef');
+      const fi_neg = getVal('fi_neg');
+      const fi_pos = getVal('fi_pos');
+      const fi_est = getVal('fi_est'), bcol = getVal('bcol');
+
+      // ---- GEOMETRY ----
+      const spans = [L1, L2, L3, L4].filter(v => v > 0);
+      const Lv = Math.max(...spans); // "Longitud mas larga Lv"
+      const Lt = (L3 + L4) / 2;      // Ancho tributario aproximado
+
+      // Carga última
+      const Cu = 1.2 * Cm + 1.6 * Cv;  // B11*1.2 + B12*1.6  (Cv ingresado por usuario)
+
+      // h mínimo (L/16 para viga simplemente apoyada referencia ACI)
+      // Momento de diseño (viga continua aprox)
+      const Mdis = Cu * Lt * (Lv - 0.3) ** 2 / 8 * 0.65 * 0.85 * 1.1;
+
+      const hmin = Math.ceil((Mdis * 100000 / 0.145 / fc / b) ** 0.5 + rec); // ROUNDUP((Mdis*100000/0.145/fc/b)^0.5 + rec, 0)
+
+      // h efectivo definitivo
+      const h = hdef;
+
+      // Relación h/b
+      const rel = h / b;
+      const relOK = rel >= 1.1 && rel <= 1.6;
+
+      // d efectivo y d'
+      // d efectivo específico para cada cara
+      const d_neg = h - rec - fi_est / 10 - fi_neg / 20;
+      const d_pos = h - rec - fi_est / 10 - fi_pos / 20;
+      const d = d_neg; // d general para cortante por defecto
+      const dp = h - d;
+
+      // Asmin
+      const Asmin = 14 * b * d / fy;
+
+      // pb y pmax
+      const pb = 0.85 * 0.85 * fc / fy * (6100 / (6100 + fy));
+      const pmax = (zonaS === 'Alta') ? 0.5 * pb : 0.75 * pb;
+
+      // ---- ACERO NEGATIVO (fórmulas exactas Excel) ----
+      const Ab_neg = 0.785 * (fi_neg / 10) ** 2;              // F17 = 0.00785*F16^2  (en cm²)
+      const Asreq_neg = 30 * Mdis / d;                         // F19 = 30*F4/F13
+      const num_neg_base = Math.max(Math.floor(Asmin / Ab_neg), 2); // F18 = MAX(INT(F15/F17),2)
+      const num_neg_adic = Math.floor((Asreq_neg - num_neg_base * Ab_neg) / Ab_neg) + 1; // F20 = INT((F19-F18*F17)/F17)+1
+      const num_neg = num_neg_base + num_neg_adic;             // Total = F18 + F20
+      const Astot_neg = num_neg * Ab_neg;                      // F21 = (F18+F20)*F17
+      const cuant_neg = Astot_neg / (b * h);                   // F22 = F21/b/h
+      const sep_neg = (b - 2 * rec - 2 - num_neg * fi_neg / 10) / (num_neg - 1); // F24
+      const sepOK_neg = sep_neg > Math.max(fi_neg / 10, 2.54);
+
+      // Mres (resistencia)
+      const a = Astot_neg * fy / (0.85 * fc * b);
+      const Mres = 0.9 * (Astot_neg * fy * (d - a / 2)) / 100000;
+
+      // D/C
+      const DC = Mdis / Mres;
+
+      // ---- ACERO POSITIVO (fórmulas exactas Excel) ----
+      const Ab_pos = 0.785 * (fi_pos / 10) ** 2;              // F27 = 0.00785*F26^2
+      const Asreq_pos = 0.67 * Astot_neg;                      // F25 = 0.67*F21
+      const num_pos = Math.floor(Asreq_pos / Ab_pos);          // F28 = INT(F25/F27)
+      const Astot_pos = num_pos * Ab_pos;                       // F29 = F28*F27
+      const cuant_pos = Astot_pos / (b * h);                   // F30 = F29/b/h
+      const cuantOK_pos = cuant_pos <= pmax && cuant_pos >= (Asmin / (b * h));
+
+      // Mpr negativo y positivo usando sus d correspondientes
+      const Mpr_neg = 1.25 * Astot_neg * fy * (d_neg - 1.25 * Astot_neg * fy / (1.7 * fc * b)) / 100000;
+      const Mpr_pos = 1.25 * Astot_pos * fy * (d_pos - 1.25 * Astot_pos * fy / (1.7 * fc * b)) / 100000;
+
+      // ---- CORTANTE ----
+      const Vug = (2 * Lv - Lt) * Lt * Cu / 4; // Cortante por Gravedad (Tributario)
+      const Bc_m = bcol / 100;     // Bc en metros
+      const Vum = (Mpr_neg + Mpr_pos) / (Lv - Bc_m - (h / 25)); // EXCEL: (Mpr+Mpr)/(5.50-0.30-1.60) = 7.39
+      const Vu = Vug + Vum;
+      const Vc = 0.53 * Math.sqrt(fc) * b * d / 1000;
+      const Vs = (Vu - 0.75 * Vc) / 0.75;
+
+      // Estribos
+      const Ab_est = 0.7854 * (fi_est / 10) ** 2;
+      const s_calc = b * Ab_est * 2 * fy / Vs / 1000;
+      const smax_prot = Math.ceil(Math.min(d / 4, 6 * fi_neg / 10, 10, s_calc));  // J11: ROUNDUP(MIN(d/4, 6*fi/10, 10, s),0)
+      const Zprot = 2 * h;
+      const Zcentral = (Lv - bcol / 100 - Zprot / 50) * 100;
+      const smax_cent = Math.ceil(Math.min(d / 2, 8 * fi_neg / 10, 15));  // J14: ROUNDUP(MIN(d/2, 8*fi/10, 15),0)
+      const s_adopt_prot = Math.min(s_calc, smax_prot);  // s real adoptado zona protegida
+      const s_adopt_cent = Math.min(s_calc, smax_cent);  // s real adoptado zona central
+
+      const Lmax_voladizo = (2 * Mres / Cu) ** 0.333;
+
+      // ========== DISPLAY ==========
+
+      // Geometry
+      setResult('r_Lv', Lv, 2);
+      setResult('r_Lt', Lt, 2);
+      setResult('r_hmin', hmin, 0);
+      const hdefCheck = document.getElementById('hdef_check');
+      if (hdefCheck) {
+        if (hdef >= hmin) {
+          hdefCheck.textContent = '≥ ' + hmin + ' ✓';
+          hdefCheck.style.background = 'rgba(127,255,107,0.15)';
+          hdefCheck.style.color = 'var(--accent3)';
+          hdefCheck.style.border = '1px solid rgba(127,255,107,0.3)';
+        } else {
+          hdefCheck.textContent = '< ' + hmin + ' ✗';
+          hdefCheck.style.background = 'rgba(255,71,87,0.15)';
+          hdefCheck.style.color = 'var(--bad)';
+          hdefCheck.style.border = '1px solid rgba(255,71,87,0.3)';
+        }
+      }
+      setResult('r_d', d, 1);
+      setResult('r_dp', dp, 1);
+      setResult('r_Cu', Cu, 2);
+      const cuEl = document.getElementById('cu_display'); if (cuEl) cuEl.textContent = Cu.toFixed(2);
+      setResult('r_Mdis', Mdis, 2);
+      setResult('r_Mres', Mres, 2);
+      setResult('r_Asmin', Asmin, 2);
+      setResult('r_Asmin_dup', Asmin, 2);
+      setResult('r_pb', pb.toFixed(6));
+      setResult('r_pmax', pmax.toFixed(6));
+      setResult('r_a', a, 2);
+      setResult('r_Lmax', Lmax_voladizo, 2);
+
+      // Rel h/b
+      setStatus('r_rel_wrap', relOK, rel.toFixed(2));
+
+      // D/C indicator
+      const dcEl = document.getElementById('dcValue');
+      const dcInd = document.getElementById('dcIndicator');
+      dcEl.textContent = DC.toFixed(4);
+      if (DC <= 1.0) {
+        dcEl.style.color = 'var(--accent3)';
+        dcInd.style.background = 'rgba(127,255,107,0.08)';
+        dcInd.style.border = '1px solid rgba(127,255,107,0.3)';
+      } else {
+        dcEl.style.color = 'var(--bad)';
+        dcInd.style.background = 'rgba(255,71,87,0.08)';
+        dcInd.style.border = '1px solid rgba(255,71,87,0.3)';
+      }
+
+      // Flexion
+      setResult('r_fi_neg', fi_neg, 0);
+      setResult('r_Ab_neg', Ab_neg, 2);
+      setResult('r_Asreq_neg', Asreq_neg, 2);
+      setResult('r_num_neg_base', num_neg_base, 0);
+      setResult('r_num_neg_adic', Math.max(0, num_neg_adic), 0);
+      setResult('r_num_neg_place', num_neg, 0);
+      setResult('r_Astot_neg', Astot_neg, 2);
+      setResult('r_Mpr_neg', Mpr_neg, 2);
+      setResult('r_sep_neg', sep_neg, 2);
+      setResult('r_fi_pos', fi_pos, 0);
+      setResult('r_Ab_pos', Ab_pos, 2);
+      setResult('r_Asreq_pos', Asreq_pos, 2);
+      setResult('r_num_pos_req', num_pos, 0);
+      setResult('r_num_pos_place', num_pos, 0);
+      setResult('r_Astot_pos', Astot_pos, 2);
+      setResult('r_Mpr_pos', Mpr_pos, 2);
+
+      // Cuantías
+      const cuant_neg_ok = cuant_neg <= pmax && cuant_neg >= (Asmin / (b * h));
+      setStatus('r_cuant_neg_wrap', cuant_neg_ok, cuant_neg.toFixed(6));
+      setStatus('r_cuant_pos_wrap', cuantOK_pos, cuant_pos.toFixed(6));
+      setStatus('r_sep_neg_wrap', sepOK_neg, sep_neg.toFixed(2) + '<span class="ru"> cm</span>', '');
+
+      // Cortante
+      setResult('r_Vug', Vug, 2);
+      setResult('r_Vum', Vum, 2);
+      setResult('r_Vu', Vu, 2);
+      setResult('r_Vc', Vc, 2);
+      setResult('r_Vs', Vs, 2);
+      setResult('r_fi_est', fi_est, 0);
+      setResult('r_Ab_est', Ab_est, 2);
+      setResult('r_s', s_calc, 2);
+      setResult('r_smax_prot', smax_prot, 0);
+      setResult('r_smax_cent', smax_cent, 0);
+      setResult('r_s_adopt_prot', s_adopt_prot, 2);
+      setResult('r_s_adopt_cent', s_adopt_cent, 2);
+      setResult('r_Zprot', Zprot, 0);
+      setResult('r_Zcentral', Zcentral, 0);
+
+      // SVG diagram update
+      updateDiagram(b, h, rec, d, dp, num_neg, num_pos, fi_neg, fi_pos);
+
+      // Update numeric tooltips
+      const lblRel = document.getElementById('lbl_rel');
+      if (lblRel) lblRel.setAttribute('data-eq-calc', `\\frac{${h}}{${b}} = ${rel.toFixed(2)}`);
+
+      const lblAsmin = document.getElementById('lbl_asmin');
+      if (lblAsmin) lblAsmin.setAttribute('data-eq-calc', `\\frac{14 \\cdot ${b} \\cdot ${d.toFixed(1)}}{${fy}} = ${Asmin.toFixed(2)} \\text{ cm}^2`);
+
+      const lblPb = document.getElementById('lbl_pb');
+      if (lblPb) lblPb.setAttribute('data-eq-calc', `0.85^2 \\cdot \\frac{${fc}}{${fy}} \\cdot \\left(\\frac{6115}{6115+${fy}}\\right) = ${pb.toFixed(6)}`);
+
+      const lblPmax = document.getElementById('lbl_pmax');
+      const cZonaVal = (zonaS === 'Alta') ? '0.50' : '0.75';
+      if (lblPmax) lblPmax.setAttribute('data-eq-calc', `${cZonaVal} \\cdot ${pb.toFixed(6)} = ${pmax.toFixed(6)}`);
+
+      const lblVu = document.getElementById('lbl_vu');
+      if (lblVu) lblVu.setAttribute('data-eq-calc', `${Vug.toFixed(2)} + ${Vum.toFixed(2)} = ${Vu.toFixed(2)} \\text{ t}`);
+
+      const lblVug = document.getElementById('lbl_vug');
+      const lblVum = document.getElementById('lbl_vum');
+      const lblSProt = document.getElementById('lbl_s_prot');
+      const lblSCent = document.getElementById('lbl_s_cent');
+
+      const lblHmin = document.getElementById('lbl_hmin');
+      if (lblHmin) lblHmin.setAttribute('data-eq-calc', `\\sqrt{\\frac{${Mdis.toFixed(2)} \\cdot 10^5}{0.145 \\cdot ${fc} \\cdot ${b}}} + ${rec} = ${hmin.toFixed(0)} \\text{ cm}`);
+
+      const lblD = document.getElementById('lbl_d');
+      if (lblD) lblD.setAttribute('data-eq-calc', `${h} - ${rec} - \\frac{${fi_est}}{10} - \\frac{${fi_neg.toFixed(0)}}{20} = ${d.toFixed(1)} \\text{ cm}`);
+
+      const lblDp = document.getElementById('lbl_dp');
+      if (lblDp) lblDp.setAttribute('data-eq-calc', `${h} - ${d.toFixed(1)} = ${dp.toFixed(1)} \\text{ cm}`);
+
+      const lblA = document.getElementById('lbl_a');
+      if (lblA) lblA.setAttribute('data-eq-calc', `\\frac{${Astot_neg.toFixed(2)} \\cdot ${fy}}{0.85 \\cdot ${fc} \\cdot ${b}} = ${a.toFixed(2)} \\text{ cm}`);
+
+      const lblVc = document.getElementById('lbl_vc');
+      if (lblVc) lblVc.setAttribute('data-eq-calc', `0.53 \\cdot \\sqrt{${fc}} \\cdot ${b} \\cdot ${d.toFixed(1)} / 1000 = ${Vc.toFixed(2)} \\text{ t}`);
+
+      const lblVs = document.getElementById('lbl_vs');
+      const phiV = 0.75;
+      if (lblVs) lblVs.setAttribute('data-eq-calc', `\\frac{${Vu.toFixed(2)}}{${phiV}} - ${Vc.toFixed(2)} = ${Vs.toFixed(2)} \\text{ t}`);
+
+      const lblS = document.getElementById('lbl_s');
+      const Av = 2 * Ab_est;
+      if (lblS) lblS.setAttribute('data-eq-calc', `\\frac{${Av.toFixed(2)} \\cdot ${fy} \\cdot ${d.toFixed(1)}}{${Vs.toFixed(2)} \\cdot 1000} = ${s_calc.toFixed(2)} \\text{ cm}`);
+
+      const lblAbNeg = document.getElementById('lbl_Ab_neg');
+      if (lblAbNeg) lblAbNeg.setAttribute('data-eq-calc', `0.785 \\cdot (\\frac{${fi_neg}}{10})^2 = ${Ab_neg.toFixed(2)} \\text{ cm}^2`);
+
+      const lblNumNegBase = document.getElementById('lbl_num_neg_base');
+      if (lblNumNegBase) lblNumNegBase.setAttribute('data-eq-calc', `\\max(\\lfloor \\frac{${Asmin.toFixed(2)}}{${Ab_neg.toFixed(2)}} \\rfloor, 2) = ${num_neg_base} \\text{ u}`);
+
+      const lblAsreqNeg = document.getElementById('lbl_asreq_neg');
+      if (lblAsreqNeg) lblAsreqNeg.setAttribute('data-eq-calc', `\\frac{30 \\cdot ${Mdis.toFixed(2)}}{${d.toFixed(1)}} = ${Asreq_neg.toFixed(2)} \\text{ cm}^2`);
+
+      const lblNumNegAdic = document.getElementById('lbl_num_neg_adic');
+      const adicVal = Math.max(0, num_neg_adic);
+      if (lblNumNegAdic) lblNumNegAdic.setAttribute('data-eq-calc', `\\lceil \\frac{${Asreq_neg.toFixed(2)} - ${num_neg_base} \\cdot ${Ab_neg.toFixed(2)}}{${Ab_neg.toFixed(2)}} \\rceil = ${adicVal} \\text{ u}`);
+
+      const lblAstotNeg = document.getElementById('lbl_astot_neg');
+      if (lblAstotNeg) lblAstotNeg.setAttribute('data-eq-calc', `${num_neg} \\cdot ${Ab_neg.toFixed(2)} = ${Astot_neg.toFixed(2)} \\text{ cm}^2`);
+
+      const lblAbPos = document.getElementById('lbl_Ab_pos');
+      if (lblAbPos) lblAbPos.setAttribute('data-eq-calc', `0.785 \\cdot (\\frac{${fi_pos}}{10})^2 = ${Ab_pos.toFixed(2)} \\text{ cm}^2`);
+
+      const lblAsreqPos = document.getElementById('lbl_asreq_pos');
+      if (lblAsreqPos) lblAsreqPos.setAttribute('data-eq-calc', `0.67 \\cdot ${Astot_neg.toFixed(2)} = ${Asreq_pos.toFixed(2)} \\text{ cm}^2`);
+
+      const lblAstotPos = document.getElementById('lbl_astot_pos');
+      if (lblAstotPos) lblAstotPos.setAttribute('data-eq-calc', `${num_pos} \\cdot ${Ab_pos.toFixed(2)} = ${Astot_pos.toFixed(2)} \\text{ cm}^2`);
+
+      const lblMdis = document.getElementById('lbl_mdis');
+      if (lblMdis) lblMdis.setAttribute('data-eq-calc', `\\frac{${Cu.toFixed(2)} \\cdot ${Lt.toFixed(2)} \\cdot ${Lv}^2}{8} \\cdot 0.65 = ${Mdis.toFixed(2)} \\text{ t·m}`);
+
+      const lblMres = document.getElementById('lbl_mres');
+      if (lblMres) lblMres.setAttribute('data-eq-calc', `0.9 \\cdot ${Astot_neg.toFixed(2)} \\cdot ${fy} \\cdot (${d.toFixed(1)} - ${a.toFixed(2)}/2) = ${Mres.toFixed(2)} \\text{ t·m}`);
+
+      const lblLmax = document.getElementById('lbl_lmax');
+      if (lblLmax) lblLmax.setAttribute('data-eq-calc', `\\sqrt[3]{\\frac{2 \\cdot ${Mres.toFixed(2)}}{${Cu.toFixed(2)}}} = ${Lmax_voladizo.toFixed(2)} \\text{ m}`);
+
+      const lblSepNeg = document.getElementById('lbl_sep_neg');
+      if (lblSepNeg) {
+        lblSepNeg.setAttribute('data-eq-calc', `s = ${sep_neg.toFixed(2)} \\text{ cm} > \\max(${fi_neg / 10}, 2.54) = ${Math.max(fi_neg / 10, 2.54).toFixed(2)}`);
+        lblSepNeg.setAttribute('data-eq-status', sepOK_neg ? 'ok' : 'no');
+      }
+
+      const pmin = (Asmin / (b * h)).toFixed(6);
+      const lblCuantNeg = document.getElementById('lbl_cuant_neg');
+      if (lblCuantNeg) {
+        lblCuantNeg.setAttribute('data-eq-calc', `${pmin} \\leq ${cuant_neg.toFixed(6)} \\leq ${pmax.toFixed(6)}`);
+        lblCuantNeg.setAttribute('data-eq-status', cuant_neg_ok ? 'ok' : 'no');
+      }
+
+      const lblCuantPos = document.getElementById('lbl_cuant_pos');
+      if (lblCuantPos) {
+        lblCuantPos.setAttribute('data-eq-calc', `${pmin} \\leq ${cuant_pos.toFixed(6)} \\leq ${pmax.toFixed(6)}`);
+        lblCuantPos.setAttribute('data-eq-status', cuantOK_pos ? 'ok' : 'no');
+      }
+
+      const lblDc = document.getElementById('lbl_dc');
+      if (lblDc) {
+        lblDc.setAttribute('data-eq-calc', `${DC.toFixed(4)} \\leq 1.00`);
+        lblDc.setAttribute('data-eq-status', DC <= 1.0 ? 'ok' : 'no');
+      }
+
+      if (lblRel) {
+        lblRel.setAttribute('data-eq-calc', `1.1 \\leq ${rel.toFixed(2)} \\leq 1.6`);
+        lblRel.setAttribute('data-eq-status', relOK ? 'ok' : 'no');
+      }
+      if (lblHmin) {
+        lblHmin.setAttribute('data-eq-calc', `h = ${h} \\geq h_{min} = ${hmin.toFixed(0)}`);
+        lblHmin.setAttribute('data-eq-status', hdef >= hmin ? 'ok' : 'no');
+      }
+
+      if (lblVug) lblVug.setAttribute('data-eq-calc', `\\frac{(2 \\cdot ${Lv} - ${Lt}) \\cdot ${Lt} \\cdot ${Cu.toFixed(2)}}{4} = ${Vug.toFixed(2)} \\text{ t}`);
+      if (lblVum) {
+        const h25 = (h / 25).toFixed(2);
+        const Bc_m = (bcol / 100).toFixed(2);
+        lblVum.setAttribute('data-eq-calc', `\\frac{${Mpr_neg.toFixed(2)} + ${Mpr_pos.toFixed(2)}}{${Lv.toFixed(2)} - ${Bc_m} - (${h}/25)} = ${Vum.toFixed(2)} \\text{ t}`);
+      }
+      if (lblSProt) lblSProt.setAttribute('data-eq-calc', `\\min(${s_calc.toFixed(1)}, ${smax_prot}) = ${s_adopt_prot} \\text{ cm}`);
+      if (lblSCent) lblSCent.setAttribute('data-eq-calc', `\\min(${s_calc.toFixed(1)}, ${smax_cent}) = ${s_adopt_cent} \\text{ cm}`);
+
+      // Summary
+      updateSummary({
+        DC, relOK, rel, cuant_neg_ok, cuant_neg, cuantOK_pos, cuant_pos,
+        pmax, sepOK_neg, sep_neg, fi_neg, fi_pos, s_calc, smax_prot, smax_cent,
+        Vu, Vc, Vs, Mres, Mdis
+      });
+    }
+
+    function updateDiagram(b, h, rec, d, dp, num_neg, num_pos, fi_neg, fi_pos) {
+      // SVG canvas: 180x180 usable area, 10px margin all sides
+      const SVG_W = 180, SVG_H = 180;
+      const ox = 10, oy = 10;
+
+      // Scale proportionally keeping aspect ratio
+      const scale = Math.min(SVG_W / b, SVG_H / h);
+      const sw = b * scale;
+      const sh = h * scale;
+      const sx = ox + (SVG_W - sw) / 2;
+      const sy = oy + (SVG_H - sh) / 2;
+
+      // Section outline & fill
+      document.getElementById('svgSection').setAttribute('x', sx);
+      document.getElementById('svgSection').setAttribute('y', sy);
+      document.getElementById('svgSection').setAttribute('width', sw);
+      document.getElementById('svgSection').setAttribute('height', sh);
+
+      document.getElementById('svgConcrete').setAttribute('x', sx + 1);
+      document.getElementById('svgConcrete').setAttribute('y', sy + 1);
+      document.getElementById('svgConcrete').setAttribute('width', sw - 2);
+      document.getElementById('svgConcrete').setAttribute('height', sh - 2);
+
+      // Stirrup — recubrimiento 2.5cm scaled
+      const rec_px = 2.5 * scale;
+      const est_t = Math.max(1.5, scale * 0.8); // stirrup thickness in px
+      const stx = sx + rec_px, sty = sy + rec_px;
+      const stw = sw - 2 * rec_px, sth = sh - 2 * rec_px;
+
+      document.getElementById('svgStirrup').setAttribute('x', stx);
+      document.getElementById('svgStirrup').setAttribute('y', sty);
+      document.getElementById('svgStirrup').setAttribute('width', stw);
+      document.getElementById('svgStirrup').setAttribute('height', sth);
+      document.getElementById('svgStirrup').setAttribute('stroke-width', est_t);
+
+      // hooks removed
+
+      // ── Bar radii ──
+      const r_neg = Math.min((fi_neg / 10) * scale * 0.45, 7);
+      const r_pos = Math.min((fi_pos / 10) * scale * 0.45, 7);
+
+      // ── Update b / h labels ──
+      const elB = document.getElementById('svgB');
+      if (elB) { elB.textContent = b + ' cm'; elB.setAttribute('x', sx + sw / 2); elB.setAttribute('y', sy + sh + 22); }
+      const elH = document.getElementById('svgH');
+      const hMid = sy + sh / 2;
+      if (elH) { elH.textContent = h + ' cm'; const hx = sx + sw + 25; elH.setAttribute('x', hx); elH.setAttribute('y', hMid); elH.setAttribute('transform', 'rotate(90,' + hx + ',' + hMid + ')'); }
+      // update cota b lines
+      const cBl = document.getElementById('cB_ext_l'); if (cBl) { cBl.setAttribute('x1', sx); cBl.setAttribute('x2', sx); cBl.setAttribute('y1', sy + sh + 4); cBl.setAttribute('y2', sy + sh + 10); }
+      const cBr = document.getElementById('cB_ext_r'); if (cBr) { cBr.setAttribute('x1', sx + sw); cBr.setAttribute('x2', sx + sw); cBr.setAttribute('y1', sy + sh + 4); cBr.setAttribute('y2', sy + sh + 10); }
+      const cBa = document.getElementById('cB_arrow'); if (cBa) { cBa.setAttribute('x1', sx + 1); cBa.setAttribute('x2', sx + sw - 1); cBa.setAttribute('y1', sy + sh + 7); cBa.setAttribute('y2', sy + sh + 7); }
+      // update cota h lines
+      const cHt = document.getElementById('cH_ext_t'); if (cHt) { cHt.setAttribute('x1', sx + sw + 3); cHt.setAttribute('x2', sx + sw + 10); cHt.setAttribute('y1', sy); cHt.setAttribute('y2', sy); }
+      const cHb = document.getElementById('cH_ext_b'); if (cHb) { cHb.setAttribute('x1', sx + sw + 3); cHb.setAttribute('x2', sx + sw + 10); cHb.setAttribute('y1', sy + sh); cHb.setAttribute('y2', sy + sh); }
+      const cHa = document.getElementById('cH_arrow'); if (cHa) { cHa.setAttribute('x1', sx + sw + 7); cHa.setAttribute('x2', sx + sw + 7); cHa.setAttribute('y1', sy + 1); cHa.setAttribute('y2', sy + sh - 1); }
+
+
+
+      // ── top/bot bar Y positions ──
+      const bar_top_y = sty + r_neg + 1;
+      const bar_bot_y = sty + sth - r_pos - 1;
+
+      // Helper: draw a bar circle with glow
+      function drawBar(g, cx, cy, r, fill, stroke, sw = 1) {
+        const ns = 'http://www.w3.org/2000/svg';
+        const glow = document.createElementNS(ns, 'circle');
+        glow.setAttribute('cx', cx); glow.setAttribute('cy', cy);
+        glow.setAttribute('r', r + 2); glow.setAttribute('fill', fill.replace(')', ',0.18)').replace('rgb', 'rgba'));
+        g.appendChild(glow);
+        const c = document.createElementNS(ns, 'circle');
+        c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r);
+        c.setAttribute('fill', fill); c.setAttribute('stroke', stroke); c.setAttribute('stroke-width', sw);
+        g.appendChild(c);
+      }
+
+      // Helper: compute bar positions — corners first, rest evenly distributed
+      function barPositions(n, x0, width, r) {
+        const positions = [];
+        if (n <= 0) return positions;
+        positions.push(x0 + r);
+        if (n >= 2) positions.push(x0 + width - r);
+        const remaining = n - 2;
+        if (remaining > 0) {
+          const innerW = (x0 + width - r) - (x0 + r);
+          for (let i = 1; i <= remaining; i++) {
+            positions.push((x0 + r) + innerW * i / (remaining + 1));
+          }
+        }
+        return positions;
+      }
+
+      // ── Top bars (As neg) ──
+      const topG = document.getElementById('svgTopBars');
+      topG.innerHTML = '';
+      const top_y = sty + r_neg + 1;
+      const n = Math.min(num_neg, 10);
+      barPositions(n, stx, stw, r_neg).forEach((cx, idx) => {
+        const isCorner = (idx === 0 || idx === 1) && n >= 2;
+        const color = isCorner ? '#ff0000' : '#ff6b35';
+        const stroke = isCorner ? '#ffffff' : '#ff9060';
+        drawBar(topG, cx, top_y, r_neg, color, stroke, isCorner ? 2 : 1);
+      });
+
+      // ── Bottom bars (As pos) ──
+      const botG = document.getElementById('svgBotBars');
+      botG.innerHTML = '';
+      const bot_y = sty + sth - r_pos - 1;
+      const np = Math.min(num_pos, 10);
+      barPositions(np, stx, stw, r_pos).forEach((cx, idx) => {
+        const isCorner = (idx === 0 || idx === 1) && np >= 2;
+        const color = isCorner ? '#00ff00' : '#7fff6b';
+        const stroke = isCorner ? '#ffffff' : '#aaffaa';
+        drawBar(botG, cx, bot_y, r_pos, color, stroke, isCorner ? 2 : 1);
+      });
+    }
+
+    function updateSummary(v) {
+      const checks = [
+        { label: 'D/C Demanda/Capacidad', ok: v.DC <= 1.0, val: v.DC.toFixed(4), limit: '≤ 1.0' },
+        { label: 'Relación hdef/b sección', ok: v.relOK, val: v.rel.toFixed(2), limit: '1.1 – 1.6' },
+        { label: 'Cuantía acero negativo (−)', ok: v.cuant_neg_ok, val: v.cuant_neg.toFixed(6), limit: '≤ pmax' },
+        { label: 'Cuantía acero positivo (+)', ok: v.cuantOK_pos, val: v.cuant_pos.toFixed(6), limit: '≤ pmax' },
+        { label: 'Separación barras neg.', ok: v.sepOK_neg, val: v.sep_neg.toFixed(2) + ' cm', limit: '> max(db, 2.54 cm)' },
+        { label: 's adoptado prot. = MIN(s, smax)', ok: true, val: Math.min(v.s_calc, v.smax_prot).toFixed(1) + ' cm', limit: 'smax=' + v.smax_prot + ' cm' },
+        { label: 's adoptado cent. = MIN(s, smax)', ok: true, val: Math.min(v.s_calc, v.smax_cent).toFixed(1) + ' cm', limit: 'smax=' + v.smax_cent + ' cm' },
+      ];
+
+      const container = document.getElementById('summaryChecks');
+      container.innerHTML = '';
+      // arrange in 2-col grid
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:1px 12px;';
+      checks.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'mini-row';
+        row.innerHTML = `
+      <span class="rl" style="flex:1">${c.label}</span>
+      <span style="font-size:10px;color:var(--muted);margin-right:6px;white-space:nowrap">${c.val}</span>
+      <span class="${c.ok ? 'status-ok' : 'status-no'}" style="font-size:10px;padding:1px 5px">${c.ok ? 'OK' : 'NO'}</span>
+    `;
+        grid.appendChild(row);
+      });
+      container.appendChild(grid);
+    }
+
+
+
+    // ---- DYNAMIC TOOLTIP HANDLER ----
+    function initEquations() {
+      const tooltip = document.getElementById('eqTooltip');
+      const title = tooltip.querySelector('.eq-tooltip-title');
+      const formula = tooltip.querySelector('.eq-tooltip-formula');
+      const calc = tooltip.querySelector('.eq-tooltip-calc');
+      const status = tooltip.querySelector('.eq-tooltip-status');
+
+      document.querySelectorAll('.clickable-label').forEach(label => {
+        label.addEventListener('mouseenter', (e) => {
+          const t = label.getAttribute('data-eq-title');
+          const texBody = label.getAttribute('data-eq-body');
+          const texCalc = label.getAttribute('data-eq-calc');
+          const sText = label.getAttribute('data-eq-status');
+
+          title.textContent = t;
+          try {
+            katex.render(texBody, formula, { throwOnError: false, displayMode: false });
+            if (texCalc) {
+              katex.render(texCalc, calc, { throwOnError: false, displayMode: false });
+            }
+          } catch (err) {
+            formula.textContent = texBody;
+          }
+
+          // Handle Status Check
+          status.className = 'eq-tooltip-status';
+          if (sText) {
+            status.classList.add(sText);
+            status.textContent = sText.toUpperCase() + (sText === 'ok' ? ' ✅' : ' ❌');
+          }
+
+          tooltip.classList.add('active');
+          updateTooltipPos(e);
+        });
+
+        label.addEventListener('mousemove', (e) => {
+          updateTooltipPos(e);
+        });
+
+        label.addEventListener('mouseleave', () => {
+          tooltip.classList.remove('active');
+        });
+      });
+
+      function updateTooltipPos(e) {
+        const gap = 15;
+        let x = e.clientX + gap;
+        let y = e.clientY + gap;
+
+        // Prevent overflow
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+        if (x + tw > window.innerWidth) x = e.clientX - tw - gap;
+        if (y + th > window.innerHeight) y = e.clientY - th - gap;
+
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+      }
+    }
+
+    // ---- ATTACH LISTENERS ----
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(inp => {
+        inp.addEventListener('input', recalc);
+        inp.addEventListener('change', recalc);
+      });
+      initEquations();
+      recalc(); // Initial calculation
+    });
+  </script>
+
+  <div id="eqTooltip" class="eq-tooltip">
+    <div class="eq-tooltip-title">Ecuación</div>
+    <div class="eq-tooltip-formula"></div>
+    <div class="eq-tooltip-calc"></div>
+    <div class="eq-tooltip-status"></div>
+  </div>
+</body>
+
+</html>
