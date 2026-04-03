@@ -1,0 +1,520 @@
+POBLACIONES ECUATORIANAS Y VALOR DEL FACTOR Z
+Tabla 19 - NEC (Norma Ecuatoriana de la Construcción)
+================================================================================
+POBLACIÓN                        PARROQUIA                        CANTÓN                    PROVINCIA            Z
+--------------------------------------------------------------------------------
+CUENCA                           CUENCA                           CUENCA                    AZUAY                0.25
+CHORDELEG                        CHORDELEG                        CHORDELEG                 AZUAY                0.25
+GUALACEO                         GUALACEO                         GUALACEO                  AZUAY                0.25
+SEVILLA DE ORO                   SEVILLA DE ORO                   SEVILLA DE ORO            AZUAY                0.25
+EL PAN                           EL PAN                           EL PAN                    AZUAY                0.25
+PAUTE                            CHICAN (GUILLERMO ORTEGA)        PAUTE                     AZUAY                0.25
+GUARANDA                         GUARANDA                         GUARANDA                  BOLIVAR              0.35
+SAN LORENZO                      SAN LORENZO                      GUARANDA                  BOLIVAR              0.35
+SANTIAGO                         SANTIAGO                         SAN MIGUEL                BOLIVAR              0.35
+SAN JOSE DEL TAMBO               SAN JOSE DEL TAMBO               CHILLANES                 BOLIVAR              0.35
+SAN SIMON                        SAN SIMON (YACOTO)               GUARANDA                  BOLIVAR              0.35
+SAN MIGUEL DE BOLIVAR            SAN MIGUEL                       SAN MIGUEL                BOLIVAR              0.35
+SAN JOSE DE CHIMBO               SAN JOSE DE CHIMBO               CHIMBO                    BOLIVAR              0.35
+SIMIATUG                         SIMIATUG                         GUARANDA                  BOLIVAR              0.30
+SAN LUIS DE PAMBIL               SAN LUIS DE PAMBIL               GUARANDA                  BOLIVAR              0.30
+FACUNDO VELA                     FACUNDO VELA                     GUARANDA                  BOLIVAR              0.30
+LAS MERCEDES                     LAS NAVES                        LAS NAVES                 BOLIVAR              0.30
+LAS NAVES                        LAS NAVES                        LAS NAVES                 BOLIVAR              0.30
+SAN LUIS DE LAS MERCEDES         SAN LUIS DE PAMBIL               GUARANDA                  BOLIVAR              0.30
+ECHEANDIA                        ECHEANDIA                        ECHEANDIA                 BOLIVAR              0.30
+CHILLANES                        CHILLANES                        CHILLANES                 BOLIVAR              0.40
+CAÑAR                            CAÑAR                            CAÑAR                     CAÑAR                0.30
+EL TAMBO                         EL TAMBO                         EL TAMBO                  CAÑAR                0.30
+LA PUNTILLA                      PANCHO NEGRO                     LA TRONCAL                CAÑAR                0.40
+LA TRONCAL                       LA TRONCAL                       LA TRONCAL                CAÑAR                0.40
+DELEG                            DELEG                            DELEG                     CAÑAR                0.25
+AZOGUES                          AZOGUES                          AZOGUES                   CAÑAR                0.25
+BIBLIAN                          BIBLIAN                          BIBLIAN                   CAÑAR                0.25
+HUACA                            HUACA                            SAN PEDRO DE HUACA        CARCHI               0.40
+EL PLAYON DE SAN FRANCISCO       EL CARMELO (EL PUN)              TULCAN                    CARCHI               0.40
+MARISCAL SUCRE                   MARISCAL SUCRE                   SAN PEDRO DE HUACA        CARCHI               0.40
+TULCAN                           TULCAN                           TULCAN                    CARCHI               0.40
+EL ANGEL                         EL ANGEL                         ESPEJO                    CARCHI               0.40
+SAN GABRIEL                      SAN GABRIEL                      MONTUFAR                  CARCHI               0.40
+EL CARMELO                       EL CARMELO (EL PUN)              TULCAN                    CARCHI               0.40
+LA LIBERTAD                      LA LIBERTAD (ALIZO)              ESPEJO                    CARCHI               0.40
+JULIO ANDRADE                    JULIO ANDRADE (OREJUELA)         TULCAN                    CARCHI               0.40
+LA PAZ                           LA PAZ                           MONTUFAR                  CARCHI               0.40
+SAN ISIDRO                       SAN ISIDRO                       ESPEJO                    CARCHI               0.40
+SAN JOSE DE TINAJILLAS           GARCIA MORENO                    BOLIVAR                   CARCHI               0.40
+SANTA MARTHA DE CUBA             SANTA MARTHA DE CUBA             TULCAN                    CARCHI               0.40
+GARCIA MORENO                    GARCIA MORENO                    BOLIVAR                   CARCHI               0.40
+MONTE OLIVO                      MONTE OLIVO                      BOLIVAR                   CARCHI               0.40
+PIQUIUCHO                        LOS ANDES                        BOLIVAR                   CARCHI               0.40
+PUEBLO NUEVO                     SAN RAFAEL                       BOLIVAR                   CARCHI               0.40
+PUSIR                            SAN VICENTE DE PUSIR             BOLIVAR                   CARCHI               0.40
+LOS ANDES                        LOS ANDES                        BOLIVAR                   CARCHI               0.40
+FERNANDEZ SALVADOR               FERNANDEZ SALVADOR               MONTUFAR                  CARCHI               0.40
+SAN VICENTE DE PUSIR             SAN VICENTE DE PUSIR             BOLIVAR                   CARCHI               0.40
+MIRA                             MIRA (CHONTAHUASI)               MIRA                      CARCHI               0.40
+BOLIVAR                          BOLIVAR                          BOLIVAR                   CARCHI               0.40
+TUFIÑO                           TUFIÑO                           TULCAN                    CARCHI               0.40
+CALPI                            CALPI                            COLTA                     CHIMBORAZO           0.35
+PALLATANGA                       PALLATANGA                       PALLATANGA                CHIMBORAZO           0.40
+PUNGAL GRANDE                    GUANO                            GUANO                     CHIMBORAZO           0.40
+GUANO                            GUANO                            GUANO                     CHIMBORAZO           0.40
+PENIPE                           PENIPE                           PENIPE                    CHIMBORAZO           0.40
+SAN ANDRES                       SAN ANDRES                       GUANO                     CHIMBORAZO           0.40
+SAN ISIDRO DE PATULU             SAN ISIDRO DE PATULU             GUANO                     CHIMBORAZO           0.40
+VALPARAISO                       VALPARAISO                       GUANO                     CHIMBORAZO           0.40
+SAN JOSE DE CHAZO                SAN JOSE DEL CHAZO               GUANO                     CHIMBORAZO           0.40
+GUANANDO                         GUANANDO                         GUANO                     CHIMBORAZO           0.40
+CALPI                            CALPI                            RIOBAMBA                  CHIMBORAZO           0.40
+LICIN                            RIOBAMBA                         RIOBAMBA                  CHIMBORAZO           0.40
+QUIMIAG                          QUIMIAG                          RIOBAMBA                  CHIMBORAZO           0.40
+ASUNCION                         CALPI                            RIOBAMBA                  CHIMBORAZO           0.40
+MACAJA                           RIOBAMBA                         RIOBAMBA                  CHIMBORAZO           0.40
+PUELA                            PUELA                            PENIPE                    CHIMBORAZO           0.40
+RIOBAMBA                         GUANO                            GUANO                     CHIMBORAZO           0.40
+ILAPO                            ILAPO                            GUANO                     CHIMBORAZO           0.40
+SAN GERARDO                      SAN GERARDO DE PACAICAGUAN       GUANO                     CHIMBORAZO           0.40
+SAN ANTONIO DE BAYUSHIG          SAN ANTONIO DE BAYUSHIG          PENIPE                    CHIMBORAZO           0.40
+SANTA FE DE GALAN                SANTA FE DE GALAN                GUANO                     CHIMBORAZO           0.40
+SAN VICENTE                      RIOBAMBA                         RIOBAMBA                  CHIMBORAZO           0.40
+CHAMBO                           CHAMBO                           CHAMBO                    CHIMBORAZO           0.40
+PUNIN                            PUNIN                            RIOBAMBA                  CHIMBORAZO           0.40
+LICTO                            LICTO                            RIOBAMBA                  CHIMBORAZO           0.40
+PUNGALA                          PUNGALA                          RIOBAMBA                  CHIMBORAZO           0.40
+YARUQUIES                        RIOBAMBA                         RIOBAMBA                  CHIMBORAZO           0.40
+SAN LUIS                         SAN LUIS                         RIOBAMBA                  CHIMBORAZO           0.40
+JUAN DE VELASCO                  JUAN DE VELASCO (PANGOR)         COLTA                     CHIMBORAZO           0.40
+CEBADAS                          CEBADAS                          GUAMOTE                   CHIMBORAZO           0.40
+CAJABAMBA                        VILLA LA UNION (CAJABAMBA)       COLTA                     CHIMBORAZO           0.40
+CUBIJIES                         GUANO                            GUANO                     CHIMBORAZO           0.40
+SAN JUAN                         SAN JUAN                         RIOBAMBA                  CHIMBORAZO           0.40
+COLUMBE                          COLUMBE                          COLTA                     CHIMBORAZO           0.40
+MATUS                            EL ALTAR                         PENIPE                    CHIMBORAZO           0.40
+VILLA LA UNION                   VILLA LA UNION (CAJABAMBA)       COLTA                     CHIMBORAZO           0.40
+GUAMOTE                          GUAMOTE                          GUAMOTE                   CHIMBORAZO           0.40
+LLACTAPAMBA DE ALAO              PUNGALA                          RIOBAMBA                  CHIMBORAZO           0.35
+CHUNCHI                          CHUNCHI                          CHUNCHI                   CHIMBORAZO           0.35
+ALAUSI                           SIBAMBE                          ALAUSI                    CHIMBORAZO           0.35
+ANGAMARCA                        ANGAMARCA                        PUJILI                    COTOPAXI             0.30
+LA MANA                          LA MANA                          LA MANA                   COTOPAXI             0.30
+ZUMBAHUA                         ZUMBAHUA                         PUJILI                    COTOPAXI             0.30
+EL CORAZON                       EL CORAZON                       PANGUA                    COTOPAXI             0.30
+MORASPUNGO                       MORASPUNGO                       PANGUA                    COTOPAXI             0.30
+SIGCHOS                          SIGCHOS                          SIGCHOS                   COTOPAXI             0.30
+CUSUBAMBA                        CUSUBAMBA                        SALCEDO                   COTOPAXI             0.40
+ALAQUES                          ALAQUES (ALAQUEZ)                LATACUNGA                 COTOPAXI             0.40
+MULALILLO                        MULALILLO                        SALCEDO                   COTOPAXI             0.40
+PANSALEO                         PANSALEO                         SALCEDO                   COTOPAXI             0.40
+ANTONIO JOSE HOLGUIN             ANTONIO JOSE HOLGUIN             SALCEDO                   COTOPAXI             0.40
+GUAITACAMA                       GUAITACAMA (GUAYTACAMA)          LATACUNGA                 COTOPAXI             0.40
+MULLIQUINDIL                     MULLIQUINDIL (SANTA ANA)         SALCEDO                   COTOPAXI             0.40
+SAQUISILI                        CHANTILIN                        SAQUISILI                 COTOPAXI             0.40
+MARISCAL SUCRE                   POALO                            LATACUNGA                 COTOPAXI             0.40
+LATACUNGA                        LATACUNGA                        LATACUNGA                 COTOPAXI             0.40
+LA VICTORIA                      LA VICTORIA                      PUJILI                    COTOPAXI             0.40
+SAN JUAN DE PASTOCALLE           SAN JUAN DE PASTOCALLE           LATACUNGA                 COTOPAXI             0.40
+TANICUCHA                        TANICUCHI                        LATACUNGA                 COTOPAXI             0.40
+TOACASO                          TOACASO                          LATACUNGA                 COTOPAXI             0.40
+MULALO                           MULALO                           LATACUNGA                 COTOPAXI             0.40
+SAN AGUSTIN DE CALLO             MULALO                           LATACUNGA                 COTOPAXI             0.40
+SAN MIGUEL DE SALCEDO            SAN MIGUEL                       SALCEDO                   COTOPAXI             0.40
+PUJILI                           PUJILI                           PUJILI                    COTOPAXI             0.40
+PORTOVELO                        PORTOVELO                        PORTOVELO                 EL ORO               0.30
+CHILLA                           CHILLA                           CHILLA                    EL ORO               0.30
+PACCHA                           PACCHA                           ATAHUALPA                 EL ORO               0.30
+PIÑAS                            PIÑAS                            PIÑAS                     EL ORO               0.30
+ZARUMA                           MALVAS                           ZARUMA                    EL ORO               0.30
+HUAQUILLAS                       HUAQUILLAS                       HUAQUILLAS                EL ORO               0.40
+SANTA ROSA                       SANTA ROSA                       SANTA ROSA                EL ORO               0.40
+ARENILLAS                        ARENILLAS                        ARENILLAS                 EL ORO               0.40
+BELLAVISTA                       BELLAVISTA                       SANTA ROSA                EL ORO               0.40
+MACHALA                          MACHALA                          MACHALA                   EL ORO               0.40
+BALSAS                           BALSAS                           BALSAS                    EL ORO               0.35
+MARCABELI                        MARCABELI                        MARCABELI                 EL ORO               0.35
+PASAJE                           PASAJE                           PASAJE                    EL ORO               0.35
+BELLA MARIA                      BELLAMARIA                       SANTA ROSA                EL ORO               0.40
+EL GUABO                         EL GUABO                         EL GUABO                  EL ORO               0.40
+LA UNION                         VICHE                            QUININDE                  ESMERALDAS           0.50
+VICHE                            VICHE                            QUININDE                  ESMERALDAS           0.50
+MONTERREY                        ROSA ZARATE (QUININDE)           QUININDE                  ESMERALDAS           0.50
+LA VILLEGAS                      ROSA ZARATE (QUININDE)           QUININDE                  ESMERALDAS           0.50
+ATACAMES                         ATACAMES                         ATACAMES                  ESMERALDAS           0.50
+ROSA ZARATE                      ROSA ZARATE (QUININDE)           QUININDE                  ESMERALDAS           0.50
+BOLIVAR                          BOLIVAR                          MUISNE                    ESMERALDAS           0.50
+LA INDEPENDENCIA                 ROSA ZARATE (QUININDE)           QUININDE                  ESMERALDAS           0.50
+LA TE                            MALIMPIA                         QUININDE                  ESMERALDAS           0.50
+ZAPALLO                          MALIMPIA                         QUININDE                  ESMERALDAS           0.50
+ESMERALDAS                       ESMERALDAS                       ESMERALDAS                ESMERALDAS           0.50
+SAN LORENZO                      SAN LORENZO                      SAN LORENZO               ESMERALDAS           0.50
+PUERTO GAVIOTA                   TONSUPA                          ATACAMES                  ESMERALDAS           0.50
+LA CONCORDIA                     LA CONCORDIA                     LA CONCORDIA              ESMERALDAS           0.50
+PLAN PILOTO                      LA CONCORDIA                     LA CONCORDIA              ESMERALDAS           0.40
+VALDEZ                           VALDEZ (LIMONES)                 ELOY ALFARO               ESMERALDAS           0.50
+MUISNE                           MUISNE                           MUISNE                    ESMERALDAS           0.50
+JUAN GOMEZ RENDON                JUAN GOMEZ RENDON (PROGRESO)     GUAYAQUIL                 GUAYAS               0.50
+GENERAL VILLAMIL                 GENERAL VILLAMIL (PLAYAS)        PLAYAS                    GUAYAS               0.50
+LA ESTACADA                      PEDRO CARBO                      PEDRO CARBO               GUAYAS               0.50
+SAN LORENZO                      JUAN GOMEZ RENDON (PROGRESO)     GUAYAQUIL                 GUAYAS               0.50
+SAN CAMILO                       GUAYAS (PUEBLO NUEVO)            EMPALME                   GUAYAS               0.35
+SAN JACINTO DE YAGUACHI          SAN JACINTO DE YAGUACHI          SAN JACINTO DE YAGUACHI   GUAYAS               0.35
+MARISCAL SUCRE                   MARISCAL SUCRE (HUAQUES)         MILAGRO                   GUAYAS               0.35
+LORENZO DE GARAICOA              CRNEL. LORENZO DE GARAICOA       SIMON BOLIVAR             GUAYAS               0.35
+SANTO DOMINGO                    SIMON BOLIVAR                    SIMON BOLIVAR             GUAYAS               0.35
+SAMBORONDON                      SAMBORONDON                      SAMBORONDON               GUAYAS               0.35
+GENERAL VERNAZA                  GRAL. VERNAZA (DOS ESTEROS)      SALITRE                   GUAYAS               0.35
+MATA DE CACAO                    CRNEL. LORENZO DE GARAICOA       SIMON BOLIVAR             GUAYAS               0.35
+VELASCO IBARRA                   VELASCO IBARRA (CAB. EL EMPALME) EMPALME                   GUAYAS               0.35
+MILAGRO                          MILAGRO                          MILAGRO                   GUAYAS               0.35
+PEDRO J. MONTERO                 GRAL. PEDRO J. MONTERO (BOLICHE) SAN JACINTO DE YAGUACHI   GUAYAS               0.35
+NARANJITO                        NARANJITO                        NARANJITO                 GUAYAS               0.35
+CORONEL MARCELINO MARIDUEÑA      CRNEL. MARCELINO MARIDUEÑA       CRNEL. MARCELINO MARIDUEÑA GUAYAS              0.35
+ALFREDO BAQUERIZO MORENO         ALFREDO BAQUERIZO MORENO         ALFREDO BAQUERIZO MORENO  GUAYAS               0.30
+CARLOS J. AROSEMENA              GUAYAS (PUEBLO NUEVO)            EMPALME                   GUAYAS               0.40
+LA GUAYAQUIL                     BALZAR                           BALZAR                    GUAYAS               0.40
+PALESTINA                        PALESTINA                        PALESTINA                 GUAYAS               0.40
+PEDRO VELEZ                      EL ROSARIO                       EMPALME                   GUAYAS               0.40
+SANTA LUCIA                      EL ROSARIO                       EMPALME                   GUAYAS               0.40
+BALZAR                           BALZAR                           BALZAR                    GUAYAS               0.40
+SANTA LUCIA                      SANTA LUCIA                      SANTA LUCIA               GUAYAS               0.40
+JUNQUILLAL                       JUNQUILLAL                       SALITRE                   GUAYAS               0.40
+CERRITOS                         BALZAR                           BALZAR                    GUAYAS               0.40
+EL SALITRE                       EL SALITRE (LAS RAMAS)           SALITRE                   GUAYAS               0.40
+DAULE                            DAULE                            DAULE                     GUAYAS               0.40
+COLIMES                          COLIMES                          COLIMES                   GUAYAS               0.40
+CASCAJAL                         VALLE DE LA VIRGEN               PEDRO CARBO               GUAYAS               0.40
+ZAMORA NUEVO                     PEDRO CARBO                      PEDRO CARBO               GUAYAS               0.40
+EL PIÑAL DE ABAJO                LIMONAL                          DAULE                     GUAYAS               0.40
+PEDRO CARBO                      PEDRO CARBO                      PEDRO CARBO               GUAYAS               0.40
+LAS CAÑAS                        LOMAS DE SARGENTILLO             LOMAS DE SARGENTILLO      GUAYAS               0.40
+PUEBLO NUEVO                     ISIDRO AYORA                     ISIDRO AYORA              GUAYAS               0.40
+LAS MERCEDES                     ISIDRO AYORA                     ISIDRO AYORA              GUAYAS               0.40
+SABANILLA                        SABANILLA                        PEDRO CARBO               GUAYAS               0.40
+ISIDRO AYORA                     ISIDRO AYORA                     ISIDRO AYORA              GUAYAS               0.40
+LOMAS DE SARGENTILLO             LOMAS DE SARGENTILLO             LOMAS DE SARGENTILLO      GUAYAS               0.40
+BALAO                            BALAO                            BALAO                     GUAYAS               0.40
+NARANJAL                         NARANJAL                         NARANJAL                  GUAYAS               0.40
+EL TRIUNFO                       EL TRIUNFO                       EL TRIUNFO                GUAYAS               0.40
+TAURA                            VIRGEN DE FATIMA                 SAN JACINTO DE YAGUACHI   GUAYAS               0.40
+NARCIZA DE JESUS                 NARCISA DE JESUS                 NOBOL                     GUAYAS               0.40
+DAULE                            DAULE                            DAULE                     GUAYAS               0.40
+LA PUNTILLA                      SAMBORONDON                      SAMBORONDON               GUAYAS               0.40
+LAUREL                           JUNQUILLAL                       SALITRE                   GUAYAS               0.40
+LAUREL                           LAUREL                           DAULE                     GUAYAS               0.40
+PUEBLO NUEVO                     SIMON BOLIVAR                    SIMON BOLIVAR             GUAYAS               0.50
+SIMON BOLIVAR                    SIMON BOLIVAR                    SIMON BOLIVAR             GUAYAS               0.50
+KILOMETRO VEINTE Y SEIS          VIRGEN DE FATIMA                 SAN JACINTO DE YAGUACHI   GUAYAS               0.35
+ELOY ALFARO                      ELOY ALFARO (DURAN)              DURAN                     GUAYAS               0.40
+GUAYAQUIL                        GUAYAQUIL                        GUAYAQUIL                 GUAYAS               0.40
+CARPUELA                         AMBUQUI                          IBARRA                    IMBABURA             0.40
+CHALGUAYACU                      PIMAMPIRO                        PIMAMPIRO                 IMBABURA             0.40
+PIMAMPIRO                        PIMAMPIRO                        PIMAMPIRO                 IMBABURA             0.40
+MARIANO ACOSTA                   MARIANO ACOSTA                   PIMAMPIRO                 IMBABURA             0.40
+EL JUNCAL                        AMBUQUI                          IBARRA                    IMBABURA             0.40
+SAN RAFAEL                       SAN RAFAEL                       OTAVALO                   IMBABURA             0.40
+AMBUQUI                          AMBUQUI                          IBARRA                    IMBABURA             0.40
+SAN ANTONIO DE IBARRA            SAN ANTONIO                      IBARRA                    IMBABURA             0.40
+SAN FRANCISCO DE NATABUELA       SAN ANTONIO                      IBARRA                    IMBABURA             0.40
+SAN JOSE DE CHALTURA             SAN JOSE DE CHALTURA             ANTONIO ANTE              IMBABURA             0.40
+IMANTAG                          IMANTAG                          COTACACHI                 IMBABURA             0.40
+COTACACHI                        COTACACHI                        COTACACHI                 IMBABURA             0.40
+QUIROGA                          QUIROGA                          COTACACHI                 IMBABURA             0.40
+SAN MIGUEL DE IBARRA             IMBAYA (SAN LUIS DE COBUENDO)    ANTONIO ANTE              IMBABURA             0.40
+LA CALERA                        COTACACHI                        COTACACHI                 IMBABURA             0.40
+SAN ROQUE                        SAN ROQUE                        ANTONIO ANTE              IMBABURA             0.40
+SAN JUAN DE ILUMAN               SAN JUAN DE ILUMAN               OTAVALO                   IMBABURA             0.40
+SALINAS                          SALINAS                          IBARRA                    IMBABURA             0.40
+CAHUASQUI                        CAHUASQUI                        SAN MIGUEL DE URCUQUI     IMBABURA             0.40
+PABLO ARENAS                     PABLO ARENAS                     SAN MIGUEL DE URCUQUI     IMBABURA             0.40
+TUMBABIRO                        TUMBABIRO                        SAN MIGUEL DE URCUQUI     IMBABURA             0.40
+SAN BLAS                         URCUQUI                          SAN MIGUEL DE URCUQUI     IMBABURA             0.40
+PRIORATO                         SAN MIGUEL DE IBARRA             IBARRA                    IMBABURA             0.40
+SAN MIGUEL DE YAHUARCOCHA        SAN MIGUEL DE IBARRA             IBARRA                    IMBABURA             0.40
+CARANQUI                         SAN MIGUEL DE IBARRA             IBARRA                    IMBABURA             0.40
+SANTA ROSA                       SAN MIGUEL DE IBARRA             IBARRA                    IMBABURA             0.40
+OTAVALO                          DOCTOR MIGUEL EGAS CABEZAS       OTAVALO                   IMBABURA             0.40
+CRUZ LOMA                        EUGENIO ESPEJO (CALPAQUI)        OTAVALO                   IMBABURA             0.40
+SAN JOSE DE QUICHINCHE           SAN JOSE DE QUICHINCHE           OTAVALO                   IMBABURA             0.40
+SAN PABLO DEL LAGO               SAN PABLO                        OTAVALO                   IMBABURA             0.40
+GONZALEZ SUAREZ                  GONZALEZ SUAREZ                  OTAVALO                   IMBABURA             0.40
+ATUNTAQUI                        SAN JOSE DE CHALTURA             ANTONIO ANTE              IMBABURA             0.40
+URCUQUI                          URCUQUI                          SAN MIGUEL DE URCUQUI     IMBABURA             0.40
+CHAGUARPAMBA                     CHAGUARPAMBA                     CHAGUARPAMBA              LOJA                 0.30
+CATACOCHA                        CATACOCHA                        PALTAS                    LOJA                 0.30
+ALAMOR                           ALAMOR                           PUYANGO                   LOJA                 0.40
+MACARA                           MACARA                           MACARA                    LOJA                 0.35
+CELICA                           CELICA                           CELICA                    LOJA                 0.35
+SOZORANGA                        SOZORANGA                        SOZORANGA                 LOJA                 0.35
+CATAMAYO                         CATAMAYO (LA TOMA)               CATAMAYO                  LOJA                 0.25
+AMALUZA                          AMALUZA                          ESPINDOLA                 LOJA                 0.25
+QUILANGA                         QUILANGA                         QUILANGA                  LOJA                 0.25
+CARIAMANGA                       CARIAMANGA                       CALVAS                    LOJA                 0.25
+LOJA                             LOJA                             LOJA                      LOJA                 0.25
+SAN JACINTO DE BUENA FE          SAN JACINTO DE BUENA FE          BUENA FE                  LOS RIOS             0.35
+JAUNECHE                         PALENQUE                         PALENQUE                  LOS RIOS             0.35
+ANTONIO SOTOMAYOR                ANTONIO SOTOMAYOR                VINCES                    LOS RIOS             0.35
+BABA                             BABA                             BABA                      LOS RIOS             0.35
+QUEVEDO                          QUEVEDO                          QUEVEDO                   LOS RIOS             0.35
+VINCES                           VINCES                           VINCES                    LOS RIOS             0.35
+PALENQUE                         PALENQUE                         PALENQUE                  LOS RIOS             0.35
+LA UNION                         LA UNION                         BABAHOYO                  LOS RIOS             0.30
+COSTA AZUL                       VALENCIA                         VALENCIA                  LOS RIOS             0.30
+VALENCIA                         VALENCIA                         VALENCIA                  LOS RIOS             0.30
+MONTALVO                         MONTALVO                         MONTALVO                  LOS RIOS             0.30
+QUINSALOMA                       QUINSALOMA                       QUINSALOMA                LOS RIOS             0.30
+SAN JUAN                         SAN JUAN                         PUEBLOVIEJO               LOS RIOS             0.30
+SAN CARLOS                       SAN CARLOS                       QUEVEDO                   LOS RIOS             0.30
+MOCACHE                          MOCACHE                          MOCACHE                   LOS RIOS             0.30
+PUEBLOVIEJO                      PUEBLOVIEJO                      PUEBLOVIEJO               LOS RIOS             0.30
+CATARAMA                         CATARAMA                         URDANETA                  LOS RIOS             0.30
+BABAHOYO                         BABAHOYO                         BABAHOYO                  LOS RIOS             0.30
+VENTANAS                         VENTANAS                         VENTANAS                  LOS RIOS             0.30
+PATRICIA PILAR                   PATRICIA PILAR                   BUENA FE                  LOS RIOS             0.40
+COLON                            PORTOVIEJO                       PORTOVIEJO                MANABI               0.50
+JULCUY                           JULCUY                           JIPIJAPA                  MANABI               0.50
+CHARAPOTO                        CHARAPOTO                        SUCRE                     MANABI               0.50
+FLAVIO ALFARO                    FLAVIO ALFARO                    FLAVIO ALFARO             MANABI               0.50
+SAN PEDRO DE SUMA                SAN PEDRO DE SUMA                EL CARMEN                 MANABI               0.50
+ROCAFUERTE                       ROCAFUERTE                       ROCAFUERTE                MANABI               0.50
+RIOCHICO                         RIOCHICO (RIO CHICO)             PORTOVIEJO                MANABI               0.50
+SAN ISIDRO                       SAN ISIDRO                       BAHIA DE CARAQUEZ         MANABI               0.50
+ELOY ALFARO                      ELOY ALFARO                      CHONE                     MANABI               0.50
+SAN JACINTO                      CHARAPOTO                        SUCRE                     MANABI               0.50
+SAN VICENTE                      SAN VICENTE                      SAN VICENTE               MANABI               0.50
+LEONIDAS PLAZA                   BAHIA DE CARAQUEZ                SUCRE                     MANABI               0.50
+CALCETA                          CALCETA                          BOLIVAR                   MANABI               0.50
+JARAMIJO                         JARAMIJO                         JARAMIJO                  MANABI               0.50
+SANTA ANA DE VUELTA LARGA        SANTA ANA DE VUELTA LARGA        SANTA ANA                 MANABI               0.50
+CHONE                            CHONE                            CHONE                     MANABI               0.50
+EL AROMO                         MANTA                            MANTA                     MANABI               0.50
+PILES                            MONTECRISTI                      MONTECRISTI               MANABI               0.50
+SAN LORENZO                      SAN LORENZO                      MANTA                     MANABI               0.50
+PACOCHE ABAJO                    SANTA MARIANITA                  MANTA                     MANABI               0.50
+EL LIMON                         PORTOVIEJO                       PORTOVIEJO                MANABI               0.50
+CALDERON                         ABDON CALDERON (SAN FRANCISCO)   PORTOVIEJO                MANABI               0.50
+PORTOVIEJO                       PORTOVIEJO                       PORTOVIEJO                MANABI               0.50
+SAN PLACIDO                      SAN PLACIDO                      PORTOVIEJO                MANABI               0.50
+SUCRE                            SUCRE                            24 DE MAYO                MANABI               0.50
+SANCAN                           JIPIJAPA                         JIPIJAPA                  MANABI               0.50
+MEMBRILLAL                       MEMBRILLAL                       JIPIJAPA                  MANABI               0.50
+RIO DE CAÑA                      MONTECRISTI                      MONTECRISTI               MANABI               0.50
+JIPIJAPA                         JIPIJAPA                         JIPIJAPA                  MANABI               0.50
+EL ANEGADO                       EL ANEGADO (CAB EN ELOY ALFARO)  JIPIJAPA                  MANABI               0.50
+EL ESFUERZO                      BELLAVISTA                       24 DE MAYO                MANABI               0.50
+NOBOA                            NOBOA                            24 DE MAYO                MANABI               0.50
+BELLAVISTA                       OLMEDO                           OLMEDO                    MANABI               0.50
+PAJAN                            PAJAN                            PAJAN                     MANABI               0.50
+CASCOL                           CASCOL                           PAJAN                     MANABI               0.50
+PEDRO PABLO GOMEZ                PEDRO PABLO GOMEZ                JIPIJAPA                  MANABI               0.50
+SALANGO                          SALANGO                          PUERTO LOPEZ              MANABI               0.50
+RIO CHICO                        SALANGO                          PUERTO LOPEZ              MANABI               0.50
+PUERTO LOPEZ                     PUERTO LOPEZ                     PUERTO LOPEZ              MANABI               0.50
+AYAMPE                           SALANGO                          PUERTO LOPEZ              MANABI               0.50
+MONTECRISTI                      MONTECRISTI                      MONTECRISTI               MANABI               0.50
+AGUA PATO                        EL ANEGADO (CAB EN ELOY ALFARO)  JIPIJAPA                  MANABI               0.50
+COJIMIES                         COJIMIES                         PEDERNALES                MANABI               0.50
+PEDERNALES                       PEDERNALES                       PEDERNALES                MANABI               0.50
+QUIROGA                          QUIROGA                          BOLIVAR                   MANABI               0.50
+JUNIN                            JUNIN                            JUNIN                     MANABI               0.50
+CANUTO                           CANUTO                           CHONE                     MANABI               0.50
+TOSAGUA                          TOSAGUA                          TOSAGUA                   MANABI               0.50
+EL PUEBLITO                      CHARAPOTO                        SUCRE                     MANABI               0.50
+JAMA                             JAMA                             JAMA                      MANABI               0.50
+MANTA                            MONTECRISTI                      MONTECRISTI               MANABI               0.50
+SAN CLEMENTE                     CHARAPOTO                        SUCRE                     MANABI               0.50
+SAN PABLO                        SAN PABLO (PUEBLO NUEVO)         SANTA ANA                 MANABI               0.40
+EL CARMEN                        EL CARMEN                        EL CARMEN                 MANABI               0.40
+LA BRAMADORA                     EL CARMEN                        EL CARMEN                 MANABI               0.40
+BARRAGANETE                      BARRAGANETE                      PICHINCHA                 MANABI               0.40
+MEMBRILLO                        MEMBRILLO                        BOLIVAR                   MANABI               0.40
+OLMEDO                           OLMEDO                           OLMEDO                    MANABI               0.40
+PICHINCHA                        PICHINCHA                        PICHINCHA                 MANABI               0.40
+LA UNION                         LA UNION                         SANTA ANA                 MANABI               0.40
+LASCANO                          LASCANO                          PAJAN                     MANABI               0.40
+GUALE                            GUALE                            PAJAN                     MANABI               0.40
+BAHIA DE CARAQUEZ                BAHIA DE CARAQUEZ                SUCRE                     MANABI               0.50
+MACHALILLA                       MACHALILLA                       PUERTO LOPEZ              MANABI               0.50
+PUERTO DE CAYO                   PUERTO DE CAYO                   JIPIJAPA                  MANABI               0.50
+PUERTO RICO                      SALANGO                          PUERTO LOPEZ              MANABI               0.50
+PALORA                           PALORA (METZERA)                 PALORA                    MORONA SANTIAGO      0.30
+PABLO SEXTO                      PABLO SEXTO                      PABLO SEXTO               MORONA SANTIAGO      0.30
+GENERAL LEONIDAS PLAZA GUTIERREZ GRAL. LEONIDAS PLAZA GUTIERREZ  LIMON INDANZA             MORONA SANTIAGO      0.30
+SANTIAGO DE MENDEZ               SANTIAGO DE MENDEZ               SANTIAGO                  MORONA SANTIAGO      0.30
+SUCUA                            SUCUA                            SUCUA                     MORONA SANTIAGO      0.30
+MACAS                            MACAS                            MORONA                    MORONA SANTIAGO      0.30
+CUYUJA                           CUYUJA                           QUIJOS                    NAPO                 0.40
+SAN FRANCISCO DE BORJA           SAN FRANCISCO DE BORJA           QUIJOS                    NAPO                 0.40
+EL CHACO                         EL CHACO                         EL CHACO                  NAPO                 0.40
+BAEZA                            BAEZA                            QUIJOS                    NAPO                 0.40
+PAPALLACTA                       PAPALLACTA                       QUIJOS                    NAPO                 0.40
+ARCHIDONA                        ARCHIDONA                        ARCHIDONA                 NAPO                 0.35
+COTUNDO                          COTUNDO                          ARCHIDONA                 NAPO                 0.35
+TENA                             TENA                             TENA                      NAPO                 0.35
+LA JOYA DE LOS SACHAS            LA JOYA DE LOS SACHAS            LA JOYA DE LOS SACHAS     ORELLANA             0.15
+TARACOA                          TARACOA                          ORELLANA                  ORELLANA             0.15
+NUEVO ROCAFUERTE                 NUEVO ROCAFUERTE                 AGUARICO                  ORELLANA             0.15
+TIPUTINI                         TIPUTINI                         AGUARICO                  ORELLANA             0.15
+PAYAMINO                         PUERTO FRANCISCO DE ORELLANA     ORELLANA                  ORELLANA             0.25
+SAN SEBASTIAN DEL COCA           SAN SEBASTIAN DEL COCA           LA JOYA DE LOS SACHAS     ORELLANA             0.25
+PUERTO FRANCISCO DE ORELLANA     PUERTO FRANCISCO DE ORELLANA     ORELLANA                  ORELLANA             0.25
+SHELL                            SHELL                            MERA                      PASTAZA              0.30
+PUYO                             PUYO                             PASTAZA                   PASTAZA              0.30
+MERA                             MERA                             MERA                      PASTAZA              0.35
+SIMON BOLIVAR                    PUERTO QUITO                     PUERTO QUITO              PICHINCHA            0.50
+BUENOS AIRES                     PUERTO QUITO                     PUERTO QUITO              PICHINCHA            0.50
+EL QUINCHE                       EL QUINCHE                       QUITO                     PICHINCHA            0.40
+SAN ANTONIO DE PICHINCHA         SAN ANTONIO                      QUITO                     PICHINCHA            0.40
+CUMBAYA                          CUMBAYA                          QUITO                     PICHINCHA            0.40
+ARMENIA                          GUANGOPOLO                       QUITO                     PICHINCHA            0.40
+UYUMBICHO                        AMAGUAÑA                         QUITO                     PICHINCHA            0.40
+ALOAG                            ALOAG                            MEJIA                     PICHINCHA            0.40
+CANGAGHUA                        CANGAHUA                         CAYAMBE                   PICHINCHA            0.40
+GUAYLLABAMBA                     GUAYLLABAMBA                     QUITO                     PICHINCHA            0.40
+ASCAZUBI                         ASCAZUBI                         CAYAMBE                   PICHINCHA            0.40
+POMASQUI                         POMASQUI                         QUITO                     PICHINCHA            0.40
+CALDERON                         CALDERON (CARAPUNGO)             QUITO                     PICHINCHA            0.40
+NAYON                            NAYON                            QUITO                     PICHINCHA            0.40
+ZAMBIZA                          ZAMBIZA                          QUITO                     PICHINCHA            0.40
+YARUQUI                          YARUQUI                          QUITO                     PICHINCHA            0.40
+CHECA                            CHECA (CHILPA)                   QUITO                     PICHINCHA            0.40
+ALOAG                            MACHACHI                         MEJIA                     PICHINCHA            0.40
+AMAGUAÑA                         AMAGUAÑA                         QUITO                     PICHINCHA            0.40
+PINTAG                           PINTAG                           QUITO                     PICHINCHA            0.40
+LA MERCED                        LA MERCED                        QUITO                     PICHINCHA            0.40
+PUEMBO                           PUEMBO                           QUITO                     PICHINCHA            0.40
+TABABELA                         TABABELA                         QUITO                     PICHINCHA            0.40
+LLANO GRANDE                     CALDERON (CARAPUNGO)             QUITO                     PICHINCHA            0.40
+MACHACHI                         MACHACHI                         MEJIA                     PICHINCHA            0.40
+ANGUMBA                          TABACUNDO                        PEDRO MONCAYO             PICHINCHA            0.40
+HUAYCUPATA                       CAYAMBE                          CAYAMBE                   PICHINCHA            0.40
+NANEGAL                          NANEGAL                          QUITO                     PICHINCHA            0.40
+GUALEA                           GUALEA                           QUITO                     PICHINCHA            0.40
+TUPIGACHI                        TUPIGACHI                        PEDRO MONCAYO             PICHINCHA            0.40
+CAYAMBE                          CAYAMBE                          CAYAMBE                   PICHINCHA            0.40
+JUAN MONTALVO                    CAYAMBE                          CAYAMBE                   PICHINCHA            0.40
+TABACUNDO                        TABACUNDO                        PEDRO MONCAYO             PICHINCHA            0.40
+LA ESPERANZA                     LA ESPERANZA                     PEDRO MONCAYO             PICHINCHA            0.40
+GUARAQUI                         LA ESPERANZA                     PEDRO MONCAYO             PICHINCHA            0.40
+TOCACHI                          TOCACHI                          PEDRO MONCAYO             PICHINCHA            0.40
+MALCHINGUI                       MALCHINGUI                       PEDRO MONCAYO             PICHINCHA            0.40
+PERUCHO                          PERUCHO                          QUITO                     PICHINCHA            0.40
+PUELLARO                         PUELLARO                         QUITO                     PICHINCHA            0.40
+ALCHIPICHI                       PUELLARO                         QUITO                     PICHINCHA            0.40
+PULULAHUA                        CALACALI                         QUITO                     PICHINCHA            0.40
+CASPIGASI DEL CARMEN             SAN ANTONIO                      QUITO                     PICHINCHA            0.40
+CALACALI                         CALACALI                         QUITO                     PICHINCHA            0.40
+OLMEDO                           OLMEDO (PECILLO)                 CAYAMBE                   PICHINCHA            0.40
+ATAHUALPA                        ATAHUALPA (HABASPAMBA)           QUITO                     PICHINCHA            0.40
+SAN JOSE DE MINAS                SAN JOSE DE MINAS                QUITO                     PICHINCHA            0.40
+SAN MIGUEL DE LOS BANCOS         SAN MIGUEL DE LOS BANCOS         SAN MIGUEL DE LOS BANCOS  PICHINCHA            0.40
+NANEGALITO                       NANEGALITO                       QUITO                     PICHINCHA            0.40
+AYORA                            CAYAMBE                          CAYAMBE                   PICHINCHA            0.40
+SANGOLQUI                        SANGOLQUI                        RUMIÑAHUI                 PICHINCHA            0.40
+PUERTO QUITO                     PUERTO QUITO                     PUERTO QUITO              PICHINCHA            0.40
+PEDRO VICENTE MALDONADO          PEDRO VICENTE MALDONADO          PEDRO VICENTE MALDONADO   PICHINCHA            0.40
+TUMBACO                          TUMBACO                          QUITO                     PICHINCHA            0.40
+PIFO                             PIFO                             QUITO                     PICHINCHA            0.40
+TAMBILLO                         TAMBILLO                         MEJIA                     PICHINCHA            0.40
+SANTA ROSA                       CONOCOTO                         QUITO                     PICHINCHA            0.40
+SAN RAFAEL                       AMAGUAÑA                         QUITO                     PICHINCHA            0.40
+CONOCOTO                         CONOCOTO                         QUITO                     PICHINCHA            0.40
+QUITO                            POMASQUI                         QUITO                     PICHINCHA            0.40
+ALANGASI                         ALANGASI                         QUITO                     PICHINCHA            0.40
+SAN PABLO                        SANTA ELENA                      SANTA ELENA               SANTA ELENA          0.50
+ATAHUALPA                        ATAHUALPA                        SANTA ELENA               SANTA ELENA          0.50
+SANTA ELENA                      SANTA ELENA                      SANTA ELENA               SANTA ELENA          0.50
+SAN JOSE                         MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+LA CURIA                         MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+OLON                             MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+MONTAÑITA                        MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+EL MAMEY                         MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+FEBRES CORDERO                   COLONCHE                         SANTA ELENA               SANTA ELENA          0.50
+BAMBIL CALLAO                    COLONCHE                         SANTA ELENA               SANTA ELENA          0.50
+BARCELONA                        COLONCHE                         SANTA ELENA               SANTA ELENA          0.50
+SAN PEDRO DE VALDIVIA            MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+AYANGUE                          COLONCHE                         SANTA ELENA               SANTA ELENA          0.50
+SINCAL                           MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+MANGLARALTO                      MANGLARALTO                      SANTA ELENA               SANTA ELENA          0.50
+LA LIBERTAD                      SALINAS                          SALINAS                   SANTA ELENA          0.50
+SALINAS                          SALINAS                          SALINAS                   SANTA ELENA          0.50
+SANTA MARIA DEL TOACHI           SANTA MARIA DEL TOACHI           SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.35
+LUZ DE AMERICA                   LUZ DE AMERICA                   SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+PUERTO LIMON                     PUERTO LIMON                     SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+EL ESFUERZO                      EL ESFUERZO                      SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+SAN JACINTO DE BUA               SAN JACINTO DEL BUA              SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+VALLE HERMOSO                    VALLE HERMOSO                    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+CRISTOBAL COLON                  VALLE HERMOSO                    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+NUEVO ISRAEL                     STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+LAS DELICIAS                     STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+LA AURORA                        STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+JULIO MORENO                     STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+UNION CIVICA POPULAR             STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+SUSANITA                         STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+EULOGIO                          STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+SANTO DOMINGO DE LOS COLORADOS   STO. DOMINGO DE LOS COLORADOS    SANTO DOMINGO             STO. DOMINGO DE LOS TSACHILAS  0.40
+SHUSHUFINDI                      SHUSHUFINDI                      SHUSHUFINDI               SUCUMBIOS            0.15
+SIETE DE JULIO                   SIETE DE JULIO                   SHUSHUFINDI               SUCUMBIOS            0.15
+EL ENO                           EL ENO                           LAGO AGRIO                SUCUMBIOS            0.15
+AGUARICO                         PACAYACU                         LAGO AGRIO                SUCUMBIOS            0.15
+CHIRITZA                         TARAPOA                          CUYABENO                  SUCUMBIOS            0.15
+SAN PEDRO DE LOS COFANES         SAN PEDRO DE LOS COFANES         SHUSHUFINDI               SUCUMBIOS            0.15
+JIVINO                           SAN PEDRO DE LOS COFANES         SHUSHUFINDI               SUCUMBIOS            0.15
+PUERTO EL CARMEN DEL PUTUMAYO    PUERTO EL CARMEN DEL PUTUMAYO    PUTUMAYO                  SUCUMBIOS            0.15
+PUERTO AGUARICO                  NUEVA LOJA                       LAGO AGRIO                SUCUMBIOS            0.15
+SANTA CECILIA                    SANTA CECILIA                    LAGO AGRIO                SUCUMBIOS            0.15
+GENERAL FARFAN                   GENERAL FARFAN                   LAGO AGRIO                SUCUMBIOS            0.15
+SAN MIGUEL                       GENERAL FARFAN                   LAGO AGRIO                SUCUMBIOS            0.15
+NUEVA LOJA                       NUEVA LOJA                       LAGO AGRIO                SUCUMBIOS            0.15
+SANTA ROSA                       NUEVA LOJA                       LAGO AGRIO                SUCUMBIOS            0.15
+JAMBELI                          JAMBELI                          LAGO AGRIO                SUCUMBIOS            0.25
+SEVILLA                          SEVILLA                          CASCALES                  SUCUMBIOS            0.25
+EL DORADO DE CASCALES            EL DORADO DE CASCALES            CASCALES                  SUCUMBIOS            0.30
+EL DORADO DE CASCALES            LUMBAQUI                         GONZALO PIZARRO           SUCUMBIOS            0.30
+COMUNA TAMBO LOMA                PILAGUIN (PILAHUIN)              AMBATO                    TUNGURAHUA           0.35
+CORAZON DE JESUS                 IZAMBA                           AMBATO                    TUNGURAHUA           0.40
+URBANIZACION AEROPUERTO          IZAMBA                           AMBATO                    TUNGURAHUA           0.40
+PILAHUIN                         PILAGUIN (PILAHUIN)              AMBATO                    TUNGURAHUA           0.40
+QUINSAPINCHA                     QUISAPINCHA (QUIZAPINCHA)        AMBATO                    TUNGURAHUA           0.40
+JUAN BENIGNO VELA                JUAN BENIGNO VELA                AMBATO                    TUNGURAHUA           0.40
+MARTINEZ                         AUGUSTO N. MARTINEZ              AMBATO                    TUNGURAHUA           0.40
+SAN ISIDRO                       PICAIGUA                         AMBATO                    TUNGURAHUA           0.40
+TOTORAS                          TOTORAS                          AMBATO                    TUNGURAHUA           0.40
+AMBATILLO                        AMBATILLO                        AMBATO                    TUNGURAHUA           0.40
+ATAHUALPA                        ATAHUALPA (CHISALATA)            AMBATO                    TUNGURAHUA           0.40
+IZAMBA                           IZAMBA                           AMBATO                    TUNGURAHUA           0.40
+SAN MIGUELITO                    SAN MIGUELITO                    SANTIAGO DE PILLARO       TUNGURAHUA           0.40
+HUACHI GRANDE                    HUACHI GRANDE                    AMBATO                    TUNGURAHUA           0.40
+SANTA ROSA                       SANTA ROSA                       AMBATO                    TUNGURAHUA           0.40
+AMBATO                           AMBATO                           AMBATO                    TUNGURAHUA           0.40
+PELILEO GRANDE                   PELILEO                          SAN PEDRO DE PELILEO      TUNGURAHUA           0.40
+SAN ANTONIO DE PASA              PASA                             AMBATO                    TUNGURAHUA           0.40
+SAN BARTOLOME DE PINLLOG         SAN BARTOLOME DE PINLLOG         AMBATO                    TUNGURAHUA           0.40
+PATATE                           PATATE                           PATATE                    TUNGURAHUA           0.40
+SAN FERNANDO                     SAN FERNANDO                     AMBATO                    TUNGURAHUA           0.40
+EMILIO M. TERAN                  EMILIO MARIA TERAN (RUMIPAMBA)   SANTIAGO DE PILLARO       TUNGURAHUA           0.40
+MARCOS ESPINEL                   MARCOS ESPINEL (CHACATA)         SANTIAGO DE PILLARO       TUNGURAHUA           0.40
+BAÑOS DE AGUA SANTA              BAÑOS DE AGUA SANTA              BAÑOS DE AGUA SANTA       TUNGURAHUA           0.40
+ULBA                             ULBA                             BAÑOS DE AGUA SANTA       TUNGURAHUA           0.40
+RIO VERDE                        RIO VERDE                        BAÑOS DE AGUA SANTA       TUNGURAHUA           0.40
+GUAMBALO                         GUAMBALO (HUAMBALO)              SAN PEDRO DE PELILEO      TUNGURAHUA           0.40
+TISALEO                          TISALEO                          TISALEO                   TUNGURAHUA           0.40
+CEVALLOS                         CEVALLOS                         CEVALLOS                  TUNGURAHUA           0.40
+QUERO                            QUERO                            QUERO                     TUNGURAHUA           0.40
+RUMIPAMBA                        RUMIPAMBA                        QUERO                     TUNGURAHUA           0.40
+COTALO                           COTALO                           SAN PEDRO DE PELILEO      TUNGURAHUA           0.40
+SAN ANDRES                       SAN ANDRES                       SANTIAGO DE PILLARO       TUNGURAHUA           0.40
+CUNCHIBAMBA                      CUNCHIBAMBA                      AMBATO                    TUNGURAHUA           0.40
+SAN JOSE DE POALO                SAN JOSE DE POALO                SANTIAGO DE PILLARO       TUNGURAHUA           0.40
+EL TRIUNFO                       EL TRIUNFO                       PATATE                    TUNGURAHUA           0.40
+SUCRE                            LOS ANDES (CAB EN POATUG)        PATATE                    TUNGURAHUA           0.40
+MOCHA                            MOCHA                            MOCHA                     TUNGURAHUA           0.40
+PELILEO                          PELILEO                          SAN PEDRO DE PELILEO      TUNGURAHUA           0.40
+PILLARO                          PILLARO                          SANTIAGO DE PILLARO       TUNGURAHUA           0.40
+GUAYZIMI                         GUAYZIMI                         NANGARITZA                ZAMORA CHINCHIPE     0.30
+YANTZAZA                         YANTZAZA (YANZATZA)              YANTZAZA                  ZAMORA CHINCHIPE     0.30
+ZUMBA                            ZUMBA                            CHINCHIPE                 ZAMORA CHINCHIPE     0.25
+ZAMORA                           ZAMORA                           ZAMORA                    ZAMORA CHINCHIPE     0.25
+LAS GOLONDRINAS                  LAS GOLONDRINAS                  LAS GOLONDRINAS           ZONA NO DELIMITADA   0.50
+SANTA MARIA                      MANGA DEL CURA                   MANGA DEL CURA            ZONA NO DELIMITADA   0.40
+SANTA TERESA                     MANGA DEL CURA                   MANGA DEL CURA            ZONA NO DELIMITADA   0.40
+================================================================================
+Fuente: NEC - Norma Ecuatoriana de la Construccion

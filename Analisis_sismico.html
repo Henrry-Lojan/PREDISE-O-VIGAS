@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diseño de Vigas — ACI 318</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- KaTeX for beautiful math equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --panel: rgba(20, 23, 32, 0.8);
+      --card: rgba(26, 30, 42, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #00e5ff;
+      --accent2: #ff6b35;
+      --accent3: #7fff6b;
+      --warn: #ffb830;
+      --bad: #ff4757;
+      --text: #e8eaf0;
+      --muted: #717b91;
+      --label: #a0aec0;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --display: 'Outfit', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid Background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(13, 15, 20, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #0080aa);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    header span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .norm-badge {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    .btn-print {
+      background: var(--accent);
+      border: none;
+      color: #000;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-print:hover {
+      background: #fff;
+      transform: scale(1.05);
+    }
+
+    @media print {
+
+      .inputs-panel,
+      .btn-print {
+        display: none !important;
+      }
+
+      .layout {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+      }
+
+      body::before {
+        display: none;
+      }
+
+      header {
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      header h1 {
+        color: #000 !important;
+      }
+
+      .results-panel {
+        padding: 0 !important;
+      }
+
+      .mini-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        background: #fff !important;
+        color: #000 !important;
+        backdrop-filter: none !important;
+      }
+
+      .rl,
+      .rv,
+      .ru,
+      header span {
+        color: #000 !important;
+      }
+    }
+
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(350px, 420px) 1fr;
+      height: calc(100vh - 52px);
+      min-height: 0;
+      /* Important for grid item overflow */
+    }
+
+    @media (max-width: 1280px) {
+      .layout {
+        grid-template-columns: 350px 1fr;
+      }
+
+      .results-row-wrap {
+        grid-template-columns: 1fr 1fr;
+        /* Stack results more on laptops */
+      }
+
+      .diagram-mini {
+        grid-column: 1 / -1;
+        /* Give more space to diagram */
+        grid-row: auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 10px;
+        text-align: center;
+        align-items: center;
+      }
+      header h1 {
+        font-size: 15px;
+      }
+      header span {
+        display: none;
+      }
+      .norm-badge {
+        font-size: 10px;
+        padding: 2px 8px;
+      }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .inputs-panel {
+        max-height: 40vh; /* Para que se pueda ver algo de resultados abajo */
+        overflow-y: auto;
+      }
+      .results-panel {
+        padding: 5px;
+      }
+      .results-row-wrap {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+      }
+      .mini-card {
+        border-radius: 8px;
+      }
+      .rv {
+        font-size: 12px;
+        min-width: 35px;
+      }
+      .rl {
+        font-size: 11px;
+      }
+      .input-wrap {
+        width: 100% !important;
+      }
+      .input-wrap input {
+        font-size: 14px;
+        height: 34px; /* Más fácil de tocar */
+      }
+      #beamSvg {
+        width: 100%;
+        height: auto;
+        max-width: 280px;
+      }
+    }
+
+    /* LEFT PANEL - INPUTS */
+    .inputs-panel {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: hidden;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .inputs-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding-bottom: 5px;
+    }
+
+    /* Custom scrollbar for Inputs */
+    .inputs-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .inputs-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .section-header {
+      padding: 4px 12px 3px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .section-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--label);
+    }
+
+    .input-group {
+      padding: 1px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .input-group-title {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1px;
+      gap: 8px;
+    }
+
+    .input-row label {
+      font-size: 12px;
+      color: var(--label);
+      flex: 1;
+      font-style: normal;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .input-wrap {
+      width: 140px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 65px 2px 10px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s;
+      text-align: right;
+      height: 30px;
+      appearance: none;
+      -moz-appearance: textfield;
+    }
+
+    /* Hide arrows Chrome, Safari, Edge, Opera */
+    .input-wrap input::-webkit-outer-spin-button,
+    .input-wrap input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+      background: rgba(0, 229, 255, 0.05);
+    }
+
+    .input-unit {
+      position: absolute;
+      right: 10px;
+      font-size: 10px;
+      color: var(--muted);
+      pointer-events: none;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    .input-wrap select {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 6px;
+      color: var(--accent);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      height: 28px;
+      transition: all 0.2s;
+    }
+
+    .input-wrap select:hover {
+      border-color: var(--accent);
+    }
+
+    /* RIGHT PANEL - RESULTS */
+    .results-panel {
+      overflow-y: auto;
+      padding: 8px;
+      background: var(--bg);
+    }
+
+    .results-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .results-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .results-panel::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+
+
+    .status-ok {
+      background: rgba(127, 255, 107, 0.15);
+      color: var(--accent3);
+      border: 1px solid rgba(127, 255, 107, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-no {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--bad);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-warn {
+      background: rgba(255, 184, 48, 0.15);
+      color: var(--warn);
+      border: 1px solid rgba(255, 184, 48, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .highlight-value {
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .highlight-value2 {
+      color: var(--accent2);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    /* Beam SVG diagram */
+    .diagram-card {
+      grid-column: 1 / -1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .diagram-svg-wrap {
+      flex-shrink: 0;
+    }
+
+    .diagram-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+      flex: 1;
+    }
+
+    .dc-indicator {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .dc-value {
+      font-size: 34px;
+      font-weight: 700;
+      font-family: var(--sans);
+    }
+
+    .dc-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Results row wrap */
+    .results-row-wrap {
+      display: grid;
+      grid-template-columns: 1.15fr 0.9fr 0.95fr;
+      grid-template-rows: auto auto;
+      gap: 7px;
+      height: 100%;
+      align-content: start;
+    }
+
+    .mini-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .mini-card:hover {
+      border-color: rgba(0, 229, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.1);
+    }
+
+    .diagram-mini {
+      grid-row: 1 / 3;
+    }
+
+    .checks-card {
+      grid-column: 2 / 4;
+    }
+
+    .mini-header {
+      padding: 4px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--label);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-body {
+      padding: 5px 10px;
+    }
+
+    .mini-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      padding: 1px 0;
+      border-bottom: 1px solid rgba(37, 43, 59, 0.3);
+    }
+
+    .mini-row:last-child {
+      border-bottom: none;
+    }
+
+    .rl {
+      font-size: 12px;
+      color: var(--label);
+      font-style: normal;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rv-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .rv {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+      white-space: nowrap;
+      min-width: 44px;
+    }
+
+    .ru {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 24px;
+    }
+
+    .accent-v {
+      color: var(--accent) !important;
+      font-weight: 700;
+    }
+
+    .accent2-v {
+      color: var(--accent2) !important;
+      font-weight: 700;
+    }
+
+    .mini-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+
+    /* Pulse animation for recalculating */
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .recalculating {
+      animation: pulse 0.4s ease;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--accent3);
+      margin-left: auto;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent3);
+      border-radius: 50%;
+      animation: livepulse 1.5s infinite;
+    }
+
+    @keyframes livepulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.7);
+      }
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+
+    .bar-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-right: 6px;
+      vertical-align: middle;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Interactive Equation Tooltip */
+    .eq-tooltip {
+      position: fixed;
+      z-index: 2000;
+      background: rgba(15, 18, 25, 0.98);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 229, 255, 0.15);
+      pointer-events: none;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 320px;
+      backdrop-filter: blur(4px);
+      transition: opacity 0.2s;
+      opacity: 0;
+    }
+
+    .eq-tooltip.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .eq-tooltip-title {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      padding-bottom: 4px;
+    }
+
+    .eq-tooltip-formula {
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .eq-tooltip-calc {
+      font-size: 13px;
+      color: var(--accent3);
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-top: 6px;
+      margin-top: 4px;
+    }
+
+    .eq-tooltip-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-align: center;
+      margin-top: 6px;
+      display: none;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .eq-tooltip-status.ok {
+      background: rgba(127, 255, 107, 0.2);
+      color: #7fff6b;
+      display: block;
+    }
+
+    .eq-tooltip-status.no {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+      display: block;
+    }
+
+    .clickable-label {
+      cursor: help;
+      text-decoration: underline dotted var(--muted);
+      transition: color 0.2s;
+    }
+
+    .clickable-label:hover {
+      color: var(--accent) !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-badge">⬛</div>
+    <div>
+      <h1>ANÁLISIS SÍSMICO Y ESPECTRO - NEC 15</h1>
+      <span>Cálculo de derivas y coeficientes</span>
+    </div>
+    <div class="norm-badge">ACI 318 · NEC</div>
+    <button class="btn-print" onclick="window.print()">
+      <span style="font-size:16px">⎙</span> IMPRIMIR REPORTE
+    </button>
+  </header>
+  <div class="layout">
+    <div class="inputs-panel">
+      <div class="inputs-body">
+        <div class="section-header">
+          <div class="section-dot" style="background:var(--accent)"></div>
+          <h2>Datos de Entrada</h2>
+          <span class="live-badge"><div class="live-dot"></div> EN VIVO</span>
+        </div>
+        
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent)">◈</span> Parámetros Terreno y Zona</div>
+          <div class="input-row"><label>Factor Zona (Z)</label><div class="input-wrap"><input type="number" id="Z" value="0.4"><span class="input-unit"></span></div></div>
+          <div class="input-row"><label>Tipo de Suelo</label><div class="input-wrap">
+            <select id="suelo"><option value="C">C</option><option value="D">D</option><option value="E">E</option></select>
+          </div></div>
+          <div class="input-row"><label>Importancia (I)</label><div class="input-wrap"><input type="number" id="I" value="1.0" step="0.1"><span class="input-unit"></span></div></div>
+          <div class="input-row"><label>Reducción R</label><div class="input-wrap"><input type="number" id="R" value="6" step="1"><span class="input-unit"></span></div></div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--warn)">◈</span> Irregularidades</div>
+          <div class="input-row"><label>Planta (Øp)</label><div class="input-wrap"><input type="number" id="fip" value="0.9" step="0.05"><span class="input-unit"></span></div></div>
+          <div class="input-row"><label>Elevación (Øe)</label><div class="input-wrap"><input type="number" id="fie" value="1.0" step="0.05"><span class="input-unit"></span></div></div>
+          <div class="input-row"><label>Factor n</label><div class="input-wrap"><input type="number" id="n" value="2.48" step="0.01"><span class="input-unit"></span></div></div>
+          <div class="input-row"><label>Factor r</label><div class="input-wrap"><input type="number" id="r" value="1.0" step="0.01"><span class="input-unit"></span></div></div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="results-panel">
+      <div class="results-row-wrap">
+        
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Espectro Sísmico (NEC-15)</div>
+          <div class="mini-body" style="padding:15px;">
+             <div style="display:flex;gap:10px;">
+                <div style="flex:1;background:rgba(0,229,255,0.06);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+                  <div style="font-size:20px;font-weight:700;font-family:var(--sans);color:var(--accent)" id="r_fa">—</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">Fa</div>
+                </div>
+                <div style="flex:1;background:rgba(0,229,255,0.06);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+                  <div style="font-size:20px;font-weight:700;font-family:var(--sans);color:var(--accent)" id="r_fd">—</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">Fd</div>
+                </div>
+                <div style="flex:1;background:rgba(0,229,255,0.06);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+                  <div style="font-size:20px;font-weight:700;font-family:var(--sans);color:var(--accent)" id="r_fs">—</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">Fs</div>
+                </div>
+             </div>
+            <div class="mini-row"><span class="rl">Periodo Tc (seg)</span><span class="rv accent-v" id="r_tc">—</span><span class="ru">s</span></div>
+            <div class="mini-row"><span class="rl">Cortante Basal Máximo V = (Sa * W) / R</span><span class="rv accent-v" id="r_samax">—</span><span class="ru"> % W</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">Espectro Elástico Lleno D(Sa)</span><span class="rv" id="r_sael">—</span><span class="ru">g</span></div>
+            <div class="mini-row"><span class="rl">Espectro Inelástico Reducido D(Sa_ine)</span><span class="rv accent2-v" id="r_saine">—</span><span class="ru">g</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-header" style="color:#ff6b35;padding:0;margin-top:10px;"><span style="color:#ff6b35;">▸</span> Verificación Dervias</div>
+            <div class="mini-row"><span class="rl">Deriva Elástica Supuesta X</span><span class="rv input-wrap"><input type="number" id="derx" value="0.0026" style="height:20px;font-size:12px;width:70px" onchange="recalc()"></span></div>
+            <div class="mini-row"><span class="rl">Deriva Inelástica Calculada X</span><span class="rv accent-v" id="r_d_ine_x">—</span> <span id="r_ok_x"></span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">Deriva Elástica Supuesta Y</span><span class="rv input-wrap"><input type="number" id="dery" value="0.0022" style="height:20px;font-size:12px;width:70px" onchange="recalc()"></span></div>
+            <div class="mini-row"><span class="rl">Deriva Inelástica Calculada Y</span><span class="rv accent-v" id="r_d_ine_y">—</span> <span id="r_ok_y"></span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function getVal(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      if (el.tagName === 'SELECT') return el.value;
+      return parseFloat(el.value) || 0;
+    }
+    function setResult(id, val, decimals = 2) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (typeof val === 'number' && isFinite(val)) {
+        el.textContent = val.toFixed(decimals);
+      } else {
+        el.textContent = val || '—';
+      }
+    }
+    function setStatus(wrapId, ok, text, unit = '') {
+      const wrap = document.getElementById(wrapId);
+      if (!wrap) return;
+      const statusClass = ok === true ? 'status-ok' : ok === false ? 'status-no' : 'status-warn';
+      wrap.innerHTML = `<span class="${statusClass}">${text}</span>${unit ? `<span class="result-unit">${unit}</span>` : ''}`;
+    }
+    
+    function recalc() {
+      const Z = getVal('Z');
+      const suelo = getVal('suelo');
+      const I = getVal('I');
+      const R = getVal('R');
+      const fip = getVal('fip'), fie = getVal('fie'), n = getVal('n'), rs = getVal('r');
+      
+      let fa = 1.0, fd = 1.0, fs = 1.0;
+      if (Z == 0.4) {
+          if (suelo === 'C') { fa=1.2; fd=1.19; fs=1.28; }
+          else if (suelo === 'D') { fa=1.12; fd=1.11; fs=1.20; }
+          else if (suelo === 'E') { fa=0.9; fd=0.9; fs=1.0; }
+      }
+      
+      const tc = 0.55 * fs * fd / fa;
+      const sa_max = Z * fa * n;
+      const sa_ine_max = sa_max * I / (R * fip * fie);
+      
+      setResult('r_fa', fa, 2);
+      setResult('r_fd', fd, 2);
+      setResult('r_fs', fs, 2);
+      setResult('r_tc', tc, 3);
+      setResult('r_samax', sa_ine_max * 100, 2);
+      setResult('r_sael', sa_max, 4);
+      setResult('r_saine', sa_ine_max, 4);
+      
+      const dx = getVal('derx');
+      const dy = getVal('dery');
+      
+      const dx_ine = dx * 0.75 * R;
+      const dy_ine = dy * 0.75 * R;
+      
+      setResult('r_d_ine_x', dx_ine, 4);
+      setResult('r_d_ine_y', dy_ine, 4);
+      
+      setStatus('r_ok_x', dx_ine <= 0.02, dx_ine <= 0.02 ? 'OK (< 2%)' : 'RECHAZO');
+      setStatus('r_ok_y', dy_ine <= 0.02, dy_ine <= 0.02 ? 'OK (< 2%)' : 'RECHAZO');
+    }
+
+    
+    // Add event listeners
+    document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', recalc);
+    });
+    // Init
+    window.onload = recalc;
+  </script>
+</body>
+</html>

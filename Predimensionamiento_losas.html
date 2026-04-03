@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diseño de Vigas — ACI 318</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- KaTeX for beautiful math equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --panel: rgba(20, 23, 32, 0.8);
+      --card: rgba(26, 30, 42, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #00e5ff;
+      --accent2: #ff6b35;
+      --accent3: #7fff6b;
+      --warn: #ffb830;
+      --bad: #ff4757;
+      --text: #e8eaf0;
+      --muted: #717b91;
+      --label: #a0aec0;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --display: 'Outfit', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid Background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(13, 15, 20, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #0080aa);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    header span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .norm-badge {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    .btn-print {
+      background: var(--accent);
+      border: none;
+      color: #000;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-print:hover {
+      background: #fff;
+      transform: scale(1.05);
+    }
+
+    @media print {
+
+      .inputs-panel,
+      .btn-print {
+        display: none !important;
+      }
+
+      .layout {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+      }
+
+      body::before {
+        display: none;
+      }
+
+      header {
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      header h1 {
+        color: #000 !important;
+      }
+
+      .results-panel {
+        padding: 0 !important;
+      }
+
+      .mini-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        background: #fff !important;
+        color: #000 !important;
+        backdrop-filter: none !important;
+      }
+
+      .rl,
+      .rv,
+      .ru,
+      header span {
+        color: #000 !important;
+      }
+    }
+
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(350px, 420px) 1fr;
+      height: calc(100vh - 52px);
+      min-height: 0;
+      /* Important for grid item overflow */
+    }
+
+    @media (max-width: 1280px) {
+      .layout {
+        grid-template-columns: 350px 1fr;
+      }
+
+      .results-row-wrap {
+        grid-template-columns: 1fr 1fr;
+        /* Stack results more on laptops */
+      }
+
+      .diagram-mini {
+        grid-column: 1 / -1;
+        /* Give more space to diagram */
+        grid-row: auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 10px;
+        text-align: center;
+        align-items: center;
+      }
+      header h1 {
+        font-size: 15px;
+      }
+      header span {
+        display: none;
+      }
+      .norm-badge {
+        font-size: 10px;
+        padding: 2px 8px;
+      }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .inputs-panel {
+        max-height: 40vh; /* Para que se pueda ver algo de resultados abajo */
+        overflow-y: auto;
+      }
+      .results-panel {
+        padding: 5px;
+      }
+      .results-row-wrap {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+      }
+      .mini-card {
+        border-radius: 8px;
+      }
+      .rv {
+        font-size: 12px;
+        min-width: 35px;
+      }
+      .rl {
+        font-size: 11px;
+      }
+      .input-wrap {
+        width: 100% !important;
+      }
+      .input-wrap input {
+        font-size: 14px;
+        height: 34px; /* Más fácil de tocar */
+      }
+      #beamSvg {
+        width: 100%;
+        height: auto;
+        max-width: 280px;
+      }
+    }
+
+    /* LEFT PANEL - INPUTS */
+    .inputs-panel {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: hidden;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .inputs-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding-bottom: 5px;
+    }
+
+    /* Custom scrollbar for Inputs */
+    .inputs-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .inputs-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .section-header {
+      padding: 4px 12px 3px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .section-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--label);
+    }
+
+    .input-group {
+      padding: 1px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .input-group-title {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1px;
+      gap: 8px;
+    }
+
+    .input-row label {
+      font-size: 12px;
+      color: var(--label);
+      flex: 1;
+      font-style: normal;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .input-wrap {
+      width: 140px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 65px 2px 10px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s;
+      text-align: right;
+      height: 30px;
+      appearance: none;
+      -moz-appearance: textfield;
+    }
+
+    /* Hide arrows Chrome, Safari, Edge, Opera */
+    .input-wrap input::-webkit-outer-spin-button,
+    .input-wrap input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+      background: rgba(0, 229, 255, 0.05);
+    }
+
+    .input-unit {
+      position: absolute;
+      right: 10px;
+      font-size: 10px;
+      color: var(--muted);
+      pointer-events: none;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    .input-wrap select {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 6px;
+      color: var(--accent);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      height: 28px;
+      transition: all 0.2s;
+    }
+
+    .input-wrap select:hover {
+      border-color: var(--accent);
+    }
+
+    /* RIGHT PANEL - RESULTS */
+    .results-panel {
+      overflow-y: auto;
+      padding: 8px;
+      background: var(--bg);
+    }
+
+    .results-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .results-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .results-panel::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+
+
+    .status-ok {
+      background: rgba(127, 255, 107, 0.15);
+      color: var(--accent3);
+      border: 1px solid rgba(127, 255, 107, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-no {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--bad);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-warn {
+      background: rgba(255, 184, 48, 0.15);
+      color: var(--warn);
+      border: 1px solid rgba(255, 184, 48, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .highlight-value {
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .highlight-value2 {
+      color: var(--accent2);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    /* Beam SVG diagram */
+    .diagram-card {
+      grid-column: 1 / -1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .diagram-svg-wrap {
+      flex-shrink: 0;
+    }
+
+    .diagram-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+      flex: 1;
+    }
+
+    .dc-indicator {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .dc-value {
+      font-size: 34px;
+      font-weight: 700;
+      font-family: var(--sans);
+    }
+
+    .dc-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Results row wrap */
+    .results-row-wrap {
+      display: grid;
+      grid-template-columns: 1.15fr 0.9fr 0.95fr;
+      grid-template-rows: auto auto;
+      gap: 7px;
+      height: 100%;
+      align-content: start;
+    }
+
+    .mini-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .mini-card:hover {
+      border-color: rgba(0, 229, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.1);
+    }
+
+    .diagram-mini {
+      grid-row: 1 / 3;
+    }
+
+    .checks-card {
+      grid-column: 2 / 4;
+    }
+
+    .mini-header {
+      padding: 4px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--label);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-body {
+      padding: 5px 10px;
+    }
+
+    .mini-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      padding: 1px 0;
+      border-bottom: 1px solid rgba(37, 43, 59, 0.3);
+    }
+
+    .mini-row:last-child {
+      border-bottom: none;
+    }
+
+    .rl {
+      font-size: 12px;
+      color: var(--label);
+      font-style: normal;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rv-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .rv {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+      white-space: nowrap;
+      min-width: 44px;
+    }
+
+    .ru {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 24px;
+    }
+
+    .accent-v {
+      color: var(--accent) !important;
+      font-weight: 700;
+    }
+
+    .accent2-v {
+      color: var(--accent2) !important;
+      font-weight: 700;
+    }
+
+    .mini-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+
+    /* Pulse animation for recalculating */
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .recalculating {
+      animation: pulse 0.4s ease;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--accent3);
+      margin-left: auto;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent3);
+      border-radius: 50%;
+      animation: livepulse 1.5s infinite;
+    }
+
+    @keyframes livepulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.7);
+      }
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+
+    .bar-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-right: 6px;
+      vertical-align: middle;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Interactive Equation Tooltip */
+    .eq-tooltip {
+      position: fixed;
+      z-index: 2000;
+      background: rgba(15, 18, 25, 0.98);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 229, 255, 0.15);
+      pointer-events: none;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 320px;
+      backdrop-filter: blur(4px);
+      transition: opacity 0.2s;
+      opacity: 0;
+    }
+
+    .eq-tooltip.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .eq-tooltip-title {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      padding-bottom: 4px;
+    }
+
+    .eq-tooltip-formula {
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .eq-tooltip-calc {
+      font-size: 13px;
+      color: var(--accent3);
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-top: 6px;
+      margin-top: 4px;
+    }
+
+    .eq-tooltip-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-align: center;
+      margin-top: 6px;
+      display: none;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .eq-tooltip-status.ok {
+      background: rgba(127, 255, 107, 0.2);
+      color: #7fff6b;
+      display: block;
+    }
+
+    .eq-tooltip-status.no {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+      display: block;
+    }
+
+    .clickable-label {
+      cursor: help;
+      text-decoration: underline dotted var(--muted);
+      transition: color 0.2s;
+    }
+
+    .clickable-label:hover {
+      color: var(--accent) !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-badge">⬛</div>
+    <div>
+      <h1>PREDIMENSIONAMIENTO - LOSAS ALIVIANADAS</h1>
+      <span>Cálculo estructural reactivo — actualización en tiempo real</span>
+    </div>
+    <div class="norm-badge">ACI 318 · NEC</div>
+    <button class="btn-print" onclick="window.print()">
+      <span style="font-size:16px">⎙</span> IMPRIMIR REPORTE
+    </button>
+  </header>
+  <div class="layout">
+    <div class="inputs-panel">
+      <div class="inputs-body">
+        <div class="section-header">
+          <div class="section-dot" style="background:var(--accent)"></div>
+          <h2>Datos de Entrada</h2>
+          <span class="live-badge"><div class="live-dot"></div> EN VIVO</span>
+        </div>
+        
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent)">◈</span> Datos Arquitectónicos</div>
+          <div class="input-row"><label>Longitud L1</label><div class="input-wrap"><input type="number" id="L1" value="3.96"><span class="input-unit">m</span></div></div>
+          <div class="input-row"><label>Longitud L2</label><div class="input-wrap"><input type="number" id="L2" value="6.75"><span class="input-unit">m</span></div></div>
+          <div class="input-row"><label>Longitud L3</label><div class="input-wrap"><input type="number" id="L3" value="4.56"><span class="input-unit">m</span></div></div>
+          <div class="input-row"><label>Longitud L4</label><div class="input-wrap"><input type="number" id="L4" value="4.20"><span class="input-unit">m</span></div></div>
+          <div class="input-row"><label>Pisos</label><div class="input-wrap"><input type="number" id="pisos" value="2"><span class="input-unit">u</span></div></div>
+          <div class="input-row"><label>Altura (He)</label><div class="input-wrap"><input type="number" id="He" value="3.4"><span class="input-unit">m</span></div></div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent2)">◈</span> Sección Losa / Nervios</div>
+          <div class="input-row"><label>H losa (Hl)</label><div class="input-wrap"><input type="number" id="hl" value="25"><span class="input-unit">cm</span></div></div>
+          <div class="input-row"><label>b nervio (bn)</label><div class="input-wrap"><input type="number" id="bn" value="10"><span class="input-unit">cm</span></div></div>
+          <div class="input-row"><label>b bloque (bb)</label><div class="input-wrap"><input type="number" id="bb" value="40"><span class="input-unit">cm</span></div></div>
+          <div class="input-row"><label>t capa comp. (tc)</label><div class="input-wrap"><input type="number" id="tc" value="5"><span class="input-unit">cm</span></div></div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--warn)">◈</span> Cargas Base</div>
+          <div class="input-row"><label>Paredes</label><div class="input-wrap">
+            <select id="paredes"><option value="Pesado">Pesado</option><option value="Liviano">Liviano</option></select>
+          </div></div>
+          <div class="input-row"><label>Alivianado</label><div class="input-wrap">
+            <select id="alivian"><option value="Pesado">Pesado</option><option value="Liviano">Liviano</option></select>
+          </div></div>
+          <div class="input-row"><label>Carga Mayorada (Cu)</label><div class="input-wrap"><input type="number" id="Cu" value="1.16"><span class="input-unit">t/m2</span></div></div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="results-panel">
+      <div class="results-row-wrap">
+        
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Resultados Losa Alivianada</div>
+          <div class="mini-body" style="padding:15px;">
+             <div id="dcIndicator" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+              <div style="font-size:24px;font-weight:700;font-family:var(--sans);" id="r_hmin">—</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">ESPESOR MINIMO (h min)</div>
+            </div>
+            <div class="mini-row"><span class="rl">Luz Máxima (Lmax)</span><span class="rv accent-v" id="r_lmax">—</span><span class="ru">m</span></div>
+            <div class="mini-row"><span class="rl">Inercia mínima (Imin)</span><span class="rv" id="r_imin">—</span><span class="ru">cm4</span></div>
+            <div class="mini-row"><span class="rl">Inercia losa (I losa)</span><span class="rv accent-v" id="r_ilosa">—</span><span class="ru">cm4</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">Carga distribuida nervio (Wr)</span><span class="rv" id="r_wr">—</span><span class="ru">t/m</span></div>
+            <div class="mini-row"><span class="rl">Momento último (Mu)</span><span class="rv accent2-v" id="r_mu">—</span><span class="ru">t·m</span></div>
+            <div class="mini-row"><span class="rl">Área Acero requerida (As)</span><span class="rv accent2-v" id="r_as">—</span><span class="ru">cm2</span></div>
+            <div class="mini-row"><span class="rl">Acero inferior (As inf)</span><span class="rv" id="r_asinf">—</span><span class="ru">cm2</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">Volumen bloque</span><span class="rv" id="r_vbloq">—</span><span class="ru">m3</span></div>
+            <div class="mini-row"><span class="rl">Volumen hormigón</span><span class="rv" id="r_vhorm">—</span><span class="ru">m3</span></div>
+            <div class="mini-row"><span class="rl">Volumen total (1m2)</span><span class="rv" id="r_vtot">—</span><span class="ru">m3</span></div>
+          </div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-header"><span style="color:var(--accent2)">▸</span> Pesos y Cargas Etabs</div>
+          <div class="mini-body">
+            <div class="mini-row"><span class="rl">Peso total hormigón (P horm)</span><span class="rv" id="r_phorm">—</span><span class="ru">t/m2</span></div>
+            <div class="mini-row"><span class="rl">Centro de Gravedad (cg)</span><span class="rv" id="r_cg">—</span><span class="ru">cm</span></div>
+            <div class="mini-row"><span class="rl">Altura equivalente (heq)</span><span class="rv" id="r_heq">—</span><span class="ru">cm</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">Carga Paredes (equiv)</span><span class="rv" id="r_cpared">—</span><span class="ru">t/m2</span></div>
+            <div class="mini-row"><span class="rl">Carga Alivianado</span><span class="rv" id="r_caliv">—</span><span class="ru">t/m2</span></div>
+            <div class="mini-row"><span class="rl">P losa equivalente</span><span class="rv accent-v" id="r_plosa">—</span><span class="ru">t/m2</span></div>
+            <div class="mini-row"><span class="rl">P ETABS (Dead)</span><span class="rv accent-v" id="r_petabs">—</span><span class="ru">t/m2</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function getVal(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      if (el.tagName === 'SELECT') return el.value;
+      return parseFloat(el.value) || 0;
+    }
+    function setResult(id, val, decimals = 2) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (typeof val === 'number' && isFinite(val)) {
+        el.textContent = val.toFixed(decimals);
+      } else {
+        el.textContent = val || '—';
+      }
+    }
+    function setStatus(wrapId, ok, text, unit = '') {
+      const wrap = document.getElementById(wrapId);
+      if (!wrap) return;
+      const statusClass = ok === true ? 'status-ok' : ok === false ? 'status-no' : 'status-warn';
+      wrap.innerHTML = `<span class="${statusClass}">${text}</span>${unit ? `<span class="result-unit">${unit}</span>` : ''}`;
+    }
+    
+    function recalc() {
+      const L1 = getVal('L1'), L2 = getVal('L2'), L3 = getVal('L3'), L4 = getVal('L4');
+      const hl = getVal('hl'), bn = getVal('bn'), bb = getVal('bb'), tc = getVal('tc');
+      const Cu = getVal('Cu');
+      const pisos = getVal('pisos'), He = getVal('He');
+      const paredes = getVal('paredes'), alivian = getVal('alivian');
+      
+      const lmax = Math.max(L1, L2, L3, L4);
+      const hmin = lmax * 100 * 0.03; // ~ L/33
+      
+      const vtot = (bb+bn)*(hl)/10000;
+      const vbloq = bb/100 * (hl-tc)/100;
+      const vhorm = vtot - vbloq;
+      
+      const wr = Cu * 0.5; // ancho tributario nervio 0.5m
+      const mu = wr * lmax * lmax / 12; // Momento aprox empotrada
+      
+      const As = 30 * mu / (hl - 3) * 0.75; // Formula empírica de As en base a la de excel As=30*Mu/(h-3)*0.75
+      const As_inf = As * 0.65;
+      
+      const Phorm = vhorm * 2.4 / ((bn+bb)/100); 
+      const c_pared = paredes === 'Pesado' ? 0.18 : 0.06;
+      const c_aliv = alivian === 'Pesado' ? 0.75*(hl-tc)/100 : 0;
+      const P_eq = Phorm + c_aliv;
+      
+      // Inercia aprox
+      const I_losa = ( (bn+bb)*hl*hl*hl )/ 12; // basico bruto real es con Te
+      const h_eq = Math.cbrt(12*I_losa / (bn+bb)); // Altura maciza equivalente
+      
+      setResult('r_lmax', lmax, 2);
+      setResult('r_hmin', hmin, 1);
+      setResult('r_ilosa', I_losa, 0);
+      setResult('r_imin', (bn+bb)*hmin*hmin*hmin/12, 0);
+      setResult('r_wr', wr, 3);
+      setResult('r_mu', mu, 3);
+      setResult('r_as', As, 3);
+      setResult('r_asinf', As_inf, 3);
+      
+      setResult('r_vbloq', vbloq, 4);
+      setResult('r_vhorm', vhorm, 4);
+      setResult('r_vtot', vtot, 4);
+      
+      setResult('r_phorm', Phorm, 3);
+      setResult('r_cpared', c_pared, 2);
+      setResult('r_caliv', c_aliv, 3);
+      setResult('r_plosa', P_eq, 3);
+      setResult('r_petabs', Phorm, 3); // ETABS asume P_horm usualmente si se modela como Shell
+      setResult('r_heq', h_eq, 2);
+    }
+
+    
+    // Add event listeners
+    document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', recalc);
+    });
+    // Init
+    window.onload = recalc;
+  </script>
+</body>
+</html>

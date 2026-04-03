@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Hub de Diseño Estructural</title>
+  <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;700&display=swap' rel='stylesheet'>
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --card: rgba(26, 30, 42, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #00e5ff;
+      --accent-hover: #00b3cc;
+      --text: #e8eaf0;
+      --sans: 'Inter', sans-serif;
+      --display: 'Outfit', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    /* Grid Background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: 36px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p { color: #a0aec0; font-size: 16px; margin-bottom: 30px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(0, 229, 255, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1);
+    }
+
+    .card-title {
+      font-family: var(--display);
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: #a0aec0;
+      line-height: 1.5;
+    }
+    
+    .card-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class='container'>
+    <header>
+      <h1>DISEÑO ESTRUCTURAL</h1>
+      <p>Módulos de cálculo interactivo según ACI 318 y NEC</p>
+    </header>
+    <div class='grid'>
+      <a href='Predimensionamiento_vigas.html' class='card'>
+        <div class='card-icon'>🏗️</div>
+        <div class='card-title'>Vigas</div>
+        <div class='card-desc'>Diseño a flexión y cortante, verificación de cuantías, diagramas interactivos y estribos.</div>
+      </a>
+      <a href='Predimensionamiento_losas.html' class='card'>
+        <div class='card-icon'>🟦</div>
+        <div class='card-title'>Losas</div>
+        <div class='card-desc'>Espesor mínimo, inercia, momentos últimos y cálculo de cargas equivalentes para ETABS.</div>
+      </a>
+      <a href='Predimensionamiento_columnas.html' class='card'>
+        <div class='card-icon'>🗼</div>
+        <div class='card-title'>Columnas</div>
+        <div class='card-desc'>Carga axial, cuantía de diseño, confinamiento transversal y chequeo de nudo fuerte-viga débil.</div>
+      </a>
+      <a href='Analisis_sismico.html' class='card'>
+        <div class='card-icon'>📈</div>
+        <div class='card-title'>Análisis Sísmico</div>
+        <div class='card-desc'>Espectro NEC 15, factores de reducción, derivas elásticas e inelásticas.</div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
