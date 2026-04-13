@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diseño de Vigas — ACI 318</title>
+  <title>Dashboard Unificado - Ingeniería</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -32,7 +32,51 @@
       --mono: 'JetBrains Mono', monospace;
       --sans: 'Inter', sans-serif;
       --display: 'Outfit', sans-serif;
+      --white: #fff;
     }
+
+    /* ===== MODO CLARO ===== */
+    body.light-mode {
+      --bg: #f0f2f7;
+      --panel: rgba(255, 255, 255, 0.9);
+      --card: rgba(235, 238, 248, 0.9);
+      --border: rgba(0, 0, 0, 0.1);
+      --text: #1a1e2e;
+      --muted: #5a6580;
+      --label: #3a4460;
+      --white: #1a1e2e;
+    }
+    body.light-mode header {
+      background: rgba(255,255,255,0.95);
+      border-bottom-color: rgba(0,0,0,0.1);
+    }
+    body.light-mode .mini-card {
+      background: rgba(255,255,255,0.8);
+      border-color: rgba(0,0,0,0.1);
+    }
+    body.light-mode .input-group {
+      background: rgba(240,242,248,0.8);
+      border-color: rgba(0,0,0,0.08);
+    }
+    body.light-mode input, body.light-mode select {
+      background: rgba(255,255,255,0.9);
+      color: #1a1e2e;
+      border-color: rgba(0,0,0,0.15);
+    }
+
+    /* ===== BOTÓN TOGGLE TEMA ===== */
+    .btn-theme {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 4px 10px;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+    .btn-theme:hover { background: rgba(255,255,255,0.05); color: var(--accent); border-color: var(--accent); }
 
     * {
       margin: 0;
@@ -205,51 +249,63 @@
 
     @media (max-width: 600px) {
       header {
-        padding: 10px;
-        text-align: center;
-        align-items: center;
+        padding: 8px 15px;
+        flex-wrap: wrap;
+        justify-content: center;
       }
-      header h1 {
-        font-size: 15px;
+      
+      header h1 { font-size: 16px; width: 100%; text-align: center; }
+
+      .tabs-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 5px 10px !important;
+        -webkit-overflow-scrolling: touch;
       }
-      header span {
-        display: none;
-      }
-      .norm-badge {
-        font-size: 10px;
-        padding: 2px 8px;
-      }
+      .tab-btn { padding: 6px 12px; font-size: 11px; }
+
       .layout {
         grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
       }
+
       .inputs-panel {
-        max-height: 40vh; /* Para que se pueda ver algo de resultados abajo */
-        overflow-y: auto;
+        max-height: none;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
       }
+
       .results-panel {
-        padding: 5px;
+        padding: 10px;
+        height: auto;
+        overflow: visible;
       }
+
       .results-row-wrap {
         grid-template-columns: 1fr !important;
-        gap: 10px;
+        gap: 12px;
       }
-      .mini-card {
-        border-radius: 8px;
-      }
-      .rv {
-        font-size: 12px;
-        min-width: 35px;
-      }
-      .rl {
-        font-size: 11px;
-      }
+
+      .mini-card { margin-bottom: 5px; }
+      
+      .input-wrap { width: 110px !important; }
+      .input-wrap input { font-size: 14px; height: 32px; }
+      
+      /* Scale SVG containers */
+      svg { max-width: 100%; height: auto; }
+    }
+
       .input-wrap {
         width: 100% !important;
       }
+
       .input-wrap input {
         font-size: 14px;
-        height: 34px; /* Más fácil de tocar */
+        height: 34px;
+        /* Más fácil de tocar */
       }
+
       #beamSvg {
         width: 100%;
         height: auto;
@@ -779,23 +835,638 @@
       color: var(--accent) !important;
     }
   </style>
-</head>
 
 <body>
-
-  <header>
+  <header style='margin-bottom:0;border-bottom:none'>
     <div class="logo-badge">⬛</div>
     <div>
       <h1>DISEÑO DE VIGAS DE HORMIGÓN ARMADO</h1>
       <span>Cálculo estructural reactivo — actualización en tiempo real</span>
     </div>
     <div class="norm-badge">ACI 318 · NEC</div>
-    <button class="btn-print" onclick="window.print()">
-      <span style="font-size:16px">⎙</span> IMPRIMIR REPORTE
-    </button>
+    <div style="display:flex; gap:10px; margin-left:auto; align-items:center;">
+      <button class="btn-theme" id="btnTheme" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+      <button class="btn-print" onclick="window.print()">
+        <span style="font-size:16px">⎙</span> IMPRIMIR
+      </button>
+      <button class="btn-print" onclick="export2Word()" style="background:#2b579a; color:#fff;">
+        <span style="font-size:16px">📄</span> A WORD
+      </button>
+    </div>
   </header>
+  <div
+    style="display:flex; gap:10px; background:var(--panel); padding:10px 24px; border-bottom:1px solid var(--border);">
+    <button class="tab-btn active" onclick="openTab('tab-losas', this)">🟦 Losas</button>
+    <button class="tab-btn" onclick="openTab('tab-vigas', this)">🏗️ Vigas</button>
+    <button class="tab-btn" onclick="openTab('tab-columnas', this)">🗼 Columnas</button>
+    <button class="tab-btn" onclick="openTab('tab-sismo', this)">📈 Sismo</button>
+    <button class="tab-btn" onclick="openTab('tab-resumen', this)">📋 Resumen</button>
+  </div>
 
-  <div class="layout">
+  <style>
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-family: var(--display);
+      font-size: 14px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--accent);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .module-container {
+      display: none;
+    }
+
+    .module-container.active {
+      display: grid;
+    }
+
+    #tab-resumen.active {
+      display: block;
+    }
+
+    /* ==== MODAL ZONAS SISMICAS ==== */
+    .svg-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: none; /* hidden by default */
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .svg-modal-overlay.active {
+      display: flex !important;
+      opacity: 1;
+    }
+    .svg-modal-content {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      padding-top: 40px;
+      max-width: 750px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .svg-modal-overlay.active .svg-modal-content {
+      transform: translateY(0);
+    }
+    .svg-modal-close {
+      position: absolute;
+      top: 15px; right: 20px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .svg-modal-close:hover {
+      color: var(--bad);
+    }
+    
+    /* MODAL TABLA IRREGULARIDADES */
+    .irreg-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-family: var(--sans);
+    }
+    .irreg-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .irreg-table tr {
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .irreg-table tr:hover {
+      background: rgba(0, 229, 255, 0.05);
+    }
+    .irreg-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 13px;
+    }
+    .irreg-radio {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .irreg-val {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--accent);
+    }
+    
+    .irreg-btn {
+      height: 30px;
+      width: 32px;
+      background: rgba(0, 229, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-left: 2px;
+    }
+    .irreg-btn:hover {
+      background: rgba(0, 229, 255, 0.2);
+      border-color: var(--accent);
+      transform: scale(1.08);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+    }
+  </style>
+
+  <script>
+
+    // --- PERSISTENCIA DE DATOS (LocalStorage) ---
+    function saveAllData() {
+      const data = {};
+      document.querySelectorAll('input, select').forEach(el => {
+        if (el.id) data[el.id] = el.value;
+      });
+      localStorage.setItem('structural_suite_data', JSON.stringify(data));
+    }
+
+
+    // --- SYNCHRONIZE INPUTS ACROSS TABS ---
+
+    // --- EVENT DELEGATION GLOBAL SYNC ---
+    document.addEventListener('input', function (e) {
+      const t = e.target;
+      if (!t.classList) return;
+      const cls = Array.from(t.classList).find(c => c.startsWith('sync-'));
+      if (cls) {
+        document.querySelectorAll('.' + cls).forEach(s => {
+          if (s !== t && s.value !== t.value) {
+            s.value = t.value;
+            s.style.backgroundColor = "rgba(0,229,255,0.2)";
+            setTimeout(() => s.style.backgroundColor = "", 500);
+
+            const id = s.id;
+            if (id.startsWith('losa_')) { if (typeof recalcLosa === 'function') recalcLosa(); }
+            else if (id.startsWith('col_')) { if (typeof recalcCol === 'function') recalcCol(); }
+            else { if (typeof recalc === 'function') recalc(); }
+          }
+        });
+        if (cls === 'sync-uso') {
+          const cv_viga = document.getElementById('Cv');
+          if (cv_viga) {
+            cv_viga.value = parseFloat(t.value).toFixed(2);
+            cv_viga.style.backgroundColor = "rgba(0,229,255,0.2)";
+            setTimeout(() => cv_viga.style.backgroundColor = "", 500);
+            if (typeof recalc === 'function') recalc();
+          }
+
+          // Also manually sync it for CV in Losas
+          const elCv = document.getElementById('r_losa_cv');
+          const elCvTot = document.getElementById('r_losa_cv_total');
+          const elUso = document.getElementById('r_losa_uso_txt');
+          if (elCv) elCv.textContent = parseFloat(t.value).toFixed(2);
+          if (elCvTot) elCvTot.textContent = parseFloat(t.value).toFixed(2);
+          if (elUso && t.options) elUso.textContent = t.options[t.selectedIndex].text;
+        }
+      }
+    });
+    document.addEventListener('change', function (e) {
+      // just trigger an input event to catch select changes
+      if (e.target.tagName === 'SELECT' && Array.from(e.target.classList).find(c => c.startsWith('sync-'))) {
+        e.target.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+
+
+
+    function loadAllData() {
+      const saved = localStorage.getItem('structural_suite_data');
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      Object.keys(data).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.value = data[id];
+          // Trigger UI styling for specialized elements if they were active
+          if (el.tagName === 'INPUT' && el.style.backgroundColor) {
+            // optional: handle highlighting here if needed
+          }
+        }
+      });
+    }
+
+    // Add persistence triggers
+    document.addEventListener('input', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+        saveAllData();
+      }
+    });
+    document.addEventListener('change', (e) => {
+      if (e.target.tagName === 'SELECT') {
+        saveAllData();
+      }
+    });
+
+    function openTab(tabId, btn) {
+      document.querySelectorAll('.module-container').forEach(e => e.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // Init all engines on load
+    const originalOnload = window.onload;
+    window.onload = function () {
+      if (originalOnload) originalOnload();
+      try { loadAllData(); } catch (e) { console.error('Error loading data', e); }
+      // delegated sync catch(e) { console.error('Error initSync', e); }
+      // trigger initial sync for CV
+      const glUso = document.getElementById('uso'); if (glUso) { const cv_viga = document.getElementById('Cv'); if (cv_viga && glUso.value !== '') cv_viga.value = parseFloat(glUso.value).toFixed(2); }
+      recalcLosa();
+      if (typeof recalc === 'function') recalc(); // Vigas
+      recalcCol();
+      recalcSis();
+      setTimeout(function() { actualizarResumen(); }, 200);
+    };
+  </script>
+  <div id="tab-losas" class="module-container layout active">
+    <div class="inputs-panel">
+      <div class="inputs-body">
+        <div class="section-header">
+          <div class="section-dot"></div>
+          <h2>Losas (Datos van a Vigas)</h2>
+        </div>
+        <!-- ARQUITECTÓNICOS -->
+        <div class="input-group arch-group">
+          <div class="input-group-title"><span style="color:var(--accent)">◈</span> Datos Coordinados (Globales)</div>
+          <div class="input-row"><label>Longitud en eje x (L1)</label>
+            <div class="input-wrap"><input type="number" id="losa_L1" class="sync-L1" value="5.50" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Longitud en eje x (L2)</label>
+            <div class="input-wrap"><input type="number" id="losa_L2" class="sync-L2" value="4.50" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Longitud en eje y (L3)</label>
+            <div class="input-wrap"><input type="number" id="losa_L3" class="sync-L3" value="4.80" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Longitud en eje y (L4)</label>
+            <div class="input-wrap"><input type="number" id="losa_L4" class="sync-L4" value="4.20" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Número de pisos (N°)</label>
+            <div class="input-wrap"><input type="number" id="losa_pisos" class="sync-pisos" value="2" step="1"
+                min="1"><span class="input-unit">u</span></div>
+          </div>
+          <div class="input-row"><label>Altura entrepiso</label>
+            <div class="input-wrap"><input type="number" id="losa_He" class="sync-He" value="2.60" step="0.05"
+                min="1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Uso</label>
+            <div class="input-wrap" style="width:150px;">
+              <select id="losa_uso" class="sync-uso" style="font-size:11px;">
+                <option value="0.200">Vivienda / Departamentos</option>
+                <option value="0.240">Oficinas</option>
+                <option value="0.480">Gimnasios / Áreas de baile</option>
+                <option value="0.480">Áreas de reunión / Teatros</option>
+                <option value="0.480">Comercial (Primer piso)</option>
+                <option value="0.360">Comercial (Pisos sup.)</option>
+                <option value="0.300">Escuelas (Aulas)</option>
+                <option value="0.480">Escuelas (Corredores p. sup)</option>
+                <option value="0.300">Garajes (Livianos < 4t)</option>
+                <option value="0.180">Cubierta accesible (Terrazas)</option>
+                <option value="0.070">Cubierta no accesible</option>
+                <option value="0.480">Balcones</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:10px; color:var(--muted); text-align:right; margin-top:5px; opacity:0.8;">(Catálogo
+            unificado NEC-SE-CG)</div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent2)">◈</span> Sección Losa / Nervios</div>
+          <div class="input-row"><label>Vigas Intermedias</label>
+            <div class="input-wrap"><input type="number" id="losa_vint" value="0"><span class="input-unit">u</span>
+            </div>
+          </div>
+          <div class="input-row"><label>Altura de losa alivianada (Hl)</label>
+            <div class="input-wrap"><input type="number" id="losa_hl" value="25"><span class="input-unit">cm</span>
+            </div>
+          </div>
+          <div class="input-row"><label>Ancho del nervio (bn)</label>
+            <div class="input-wrap"><input type="number" id="losa_bn" value="10"><span class="input-unit">cm</span>
+            </div>
+          </div>
+          <div class="input-row"><label>Ancho del bloque alivianado (bb)</label>
+            <div class="input-wrap"><input type="number" id="losa_bb" value="40"><span class="input-unit">cm</span>
+            </div>
+          </div>
+          <div class="input-row"><label>Tabla de compresion (tc)</label>
+            <div class="input-wrap"><input type="number" id="losa_tc" value="5"><span class="input-unit">cm</span></div>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--warn)">◈</span> Cargas Muertas Adicionales (CM)</div>
+          <div class="input-row"><label>Paredes / Tabiques</label>
+            <div class="input-wrap">
+              <select id="losa_paredes" style="width:150px; text-overflow:ellipsis;">
+                <option value="0.18">Ladrillo macizo</option>
+                <option value="0.12">Bloque pomez 10 cm</option>
+                <option value="0.05">Steel Framing</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-row"><label>Alivianador en losa</label>
+            <div class="input-wrap">
+              <select id="losa_alivian" style="width:150px; text-overflow:ellipsis;">
+                <option value="0.10">Bloque de pomez</option>
+                <option value="0.15">Ladrillo o bloque pesado</option>
+                <option value="0.005">Caseton</option>
+                <option value="0.000">Sin alivianador</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-row"><label>Masillado</label>
+            <div class="input-wrap"><input type="number" id="losa_masillado" value="0.08" step="0.01"><span
+                class="input-unit">t/m2</span></div>
+          </div>
+          <div class="input-row"><label>Acabados</label>
+            <div class="input-wrap"><input type="number" id="losa_acabados" value="0.02" step="0.01"><span
+                class="input-unit">t/m2</span></div>
+          </div>
+          <div class="input-row"><label>Instalaciones</label>
+            <div class="input-wrap"><input type="number" id="losa_instalaciones" value="0.02" step="0.01"><span
+                class="input-unit">t/m2</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="results-panel">
+      <div class="results-row-wrap">
+
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--accent)">&#9658;</span> Predimensionamiento de Losa</div>
+          <div class="mini-body" style="padding:15px;">
+            <div style="display:flex;gap:10px;">
+              <div id="dcIndicator_losa"
+                style="flex:1;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+                <div style="font-size:24px;font-weight:700;font-family:var(--sans);" id="r_losa_hmin">—</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">ESPESOR MINIMO CALC.
+                  (cm)</div>
+              </div>
+              <div id="status_losa_check"
+                style="flex:1;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+                <div style="font-size:14px;font-weight:700;font-family:var(--sans);margin-top:5px" id="r_losa_ok">—
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">CHEQUEO ESPESOR</div>
+              </div>
+            </div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_lmax" data-eq-title="Luz Máxima"
+                data-eq-body="\text{Máxima luz entre L1, L2, L3 y L4}">Luz Máxima Arquitectónica (Lmáx)</span><span
+                class="rv" id="r_losa_lmax">—</span><span class="ru">m</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_lreal" data-eq-title="Luz Cálculo"
+                data-eq-body="L_{real} = \frac{L_{m\acute{a}x}}{V_{int} + 1}">Luz Efectiva de Cálculo
+                (Lreal)</span><span class="rv accent-v" id="r_losa_lreal">—</span><span class="ru">m</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_imin"
+                data-eq-title="Inercia Mínima Requerida" data-eq-body="I_{min} = \frac{100 \cdot h_{min}^3}{12}">Inercia
+                mínima requerida de losa maciza (1m)</span><span class="rv" id="r_losa_imin">—</span><span
+                class="ru">cm4</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_isteiner"
+                data-eq-title="Inercia Alivianada (Steiner)" data-eq-body="I_{total} = \sum I_{individuales}">Inercia de
+                la losa alivianada de espesor — cm</span><span class="rv accent-v" id="r_losa_isteiner">—</span><span
+                class="ru">cm4</span></div>
+          </div>
+        </div>
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--accent)">&#9658;</span> <span id="lbl_losa_graf_title">LOSA
+              ALIVIANADA DE — CM</span></div>
+          <div class="mini-body" style="padding:15px; text-align:center;">
+            <div
+              style="background:rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.08); border-radius:6px; padding:25px 15px 15px 15px; margin-bottom:15px; position:relative;">
+              <div style="display:flex; align-items:center;">
+                <div
+                  style="display:flex; flex-direction:column; justify-content:center; align-items:center; border-left:1px solid rgba(255,255,255,0.3); padding-left:5px; margin-right:15px; position:relative;"
+                  id="dib_h_cota">
+                  <div style="border-top:1px solid rgba(255,255,255,0.3); width:5px; position:absolute; top:0; left:0;">
+                  </div>
+                  <div
+                    style="font-size:10px; color:var(--muted); font-weight:bold; writing-mode:vertical-rl; transform:rotate(180deg); letter-spacing:0.05em; white-space:nowrap;"
+                    id="dib_h_val">Hl = 25 cm</div>
+                  <div
+                    style="border-bottom:1px solid rgba(255,255,255,0.3); width:5px; position:absolute; bottom:0; left:0;">
+                  </div>
+                </div>
+                <div style="flex:1;">
+                  <div
+                    style="display:flex; width:100%; border-bottom:1px solid rgba(255,255,255,0.3); margin-bottom:2px; position:relative;">
+                    <div
+                      style="position:absolute; top:-16px; width:100%; text-align:center; font-size:10px; color:var(--muted); font-weight:bold; letter-spacing:0.05em;">
+                      ANCHO DE ANÁLISIS = 1.00 m</div>
+                    <div
+                      style="border-left:1px solid rgba(255,255,255,0.3); height:5px; position:absolute; left:0; bottom:0;">
+                    </div>
+                    <div
+                      style="border-right:1px solid rgba(255,255,255,0.3); height:5px; position:absolute; right:0; bottom:0;">
+                    </div>
+                  </div>
+                  <div id="dib_tabla"
+                    style="background:var(--accent); width:100%; height:15px; border-radius:2px 2px 0 0; display:flex; align-items:center; justify-content:center; color:rgba(0,0,0,0.7); font-size:11px; font-weight:800; letter-spacing:0.05em;">
+                    Tabla de compresión
+                  </div>
+                  <div id="dib_nervios_container" style="display:flex; width:100%; justify-content:flex-start;">
+                    <!-- JS injected webs -->
+                  </div>
+                </div>
+              </div>
+              <div id="dib_labels"
+                style="margin-top:15px; font-size:12px; color:var(--text); font-family:var(--sans); background:rgba(0,229,255,0.05); padding:8px; border-radius:4px; border:1px solid rgba(0,229,255,0.2);">
+              </div>
+            </div>
+            <div class="mini-row" style="text-align:left;"><span class="rl clickable-label" id="lbl_losa_heq"
+                data-eq-title="Altura Equivalente Losa Maciza"
+                data-eq-body="H_{eq} = \left( \frac{12 \cdot I_t}{100} \right)^{1/3}">Altura losa maciza equiv.
+                (Heq)</span><span class="rv accent-v" id="r_losa_heq">—</span><span class="ru">cm</span></div>
+            <div class="mini-row" style="text-align:left;"><span class="rl clickable-label" id="lbl_losa_lmaxperm"
+                data-eq-title="Longitud Máx Permitida"
+                data-eq-body="L_{m\acute{a}x\,perm} = \frac{H_{eq}}{0.03 \cdot 100}">Longitud máxima para una losa de —
+                cm</span><span class="rv accent-v" id="r_losa_lmaxperm">—</span><span class="ru">m</span></div>
+          </div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-header"><span style="color:var(--accent2)">&#9658;</span> Peso del hormigón</div>
+          <div class="mini-body">
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_vtot" data-eq-title="Vol. Total"
+                data-eq-body="V_{tot} = \frac{100 \times 100}{10000} \times \frac{Hl}{100}">Volumen total en función de
+                geometría</span><span class="rv" id="r_losa_vtot">—</span><span class="ru">m³</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_vbloq" data-eq-title="Vol. Bloques"
+                data-eq-body="V_{bloq} = \frac{bb^2 \times (Hl-tc) \times 4}{10^6}">Volumen del bloque en función de
+                geometría</span><span class="rv" id="r_losa_vbloq">—</span><span class="ru">m³</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_vhorm" data-eq-title="Vol. Hormigón"
+                data-eq-body="V_{horm} = V_{tot} - V_{bloq}">Volumen del hormigón</span><span class="rv"
+                id="r_losa_vhorm">—</span><span class="ru">m³</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_peso" data-eq-title="Peso Hormigón"
+                data-eq-body="P_{h} = V_{horm} \times 2.4">Peso hormigón (γ = 2.4 t/m³)</span><span class="rv"
+                id="r_losa_peso">—</span><span class="ru">t</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_losa_area" data-eq-title="Área"
+                data-eq-body="A = \frac{100 \times 100}{10000}">Área unitaria</span><span class="rv"
+                id="r_losa_area">—</span><span class="ru">m²</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl" style="color:var(--accent3);font-weight:700">CARGA MUERTA DE LA
+                LOSA</span><span class="rv accent-v" id="r_losa_phorm_final">—</span><span class="ru">t/m²</span></div>
+          </div>
+        </div>
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--warn)">&#9658;</span> Cargas Muertas Adicionales y Totales
+          </div>
+          <div class="mini-body" style="padding:15px;">
+            <div class="mini-row"><span class="rl" id="lbl_losa_cpared">Paredes / Tabiquería equivalentes</span><span
+                class="rv" id="r_losa_cpared">—</span><span class="ru">t/m²</span></div>
+            <div class="mini-row"><span class="rl" id="lbl_losa_caliv">Alivianador de losa</span><span class="rv"
+                id="r_losa_caliv">—</span><span class="ru">t/m²</span></div>
+            <div class="mini-row"><span class="rl">Masillado</span><span class="rv" id="r_losa_cmasillado">—</span><span
+                class="ru">t/m²</span></div>
+            <div class="mini-row"><span class="rl">Acabados</span><span class="rv" id="r_losa_cacabados">—</span><span
+                class="ru">t/m²</span></div>
+            <div class="mini-row"><span class="rl">Instalaciones</span><span class="rv"
+                id="r_losa_cinstal">—</span><span class="ru">t/m²</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl" style="color:var(--accent2);font-weight:700">CARGAS MUERTAS
+                INSTALACIONES</span><span class="rv" id="r_losa_csuper">—</span><span class="ru">t/m²</span></div>
+            <div class="mini-row"><span class="rl" style="color:var(--accent2);font-weight:700">CARGA MUERTA
+                LOSA</span><span class="rv" id="r_losa_cmlosa">—</span><span class="ru">t/m²</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl" style="color:var(--warn);font-weight:800;font-size:13px">CARGA MUERTA
+                TOTAL</span><span class="rv" style="color:var(--warn);font-size:15px" id="r_losa_cm_total">—</span><span
+                class="ru">t/m²</span></div>
+            <div style="font-size:10px; color:var(--muted); text-align:right; margin-top:4px;">* Suma transferida
+              dinámicamente al módulo Vigas</div>
+          </div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-header"><span style="color:var(--accent2)">&#9658;</span> Cargas Vivas (NEC-SE-CG 2015)</div>
+          <div class="mini-body">
+            <div class="mini-row"><span class="rl">Uso seleccionado</span><span class="rv" id="r_losa_uso_txt"
+                style="font-size:11px;text-align:right;">—</span><span class="ru"></span></div>
+            <div class="mini-row"><span class="rl">Carga viva (CV)</span><span class="rv accent-v"
+                id="r_losa_cv">—</span><span class="ru">t/m²</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl" style="color:var(--accent2);font-weight:700">CARGA VIVA
+                TOTAL</span><span class="rv" id="r_losa_cv_total"
+                style="color:var(--accent2);font-size:15px;font-weight:700">—</span><span class="ru">t/m²</span></div>
+          </div>
+        </div>
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--accent)">&#9658;</span> Inercia Teorema Steiner (1m)</div>
+          <div class="mini-body" style="padding:10px;">
+            <table style="width:100%; text-align:right; font-size:11px; border-collapse:collapse; margin-top:5px;">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--muted);">
+                  <th style="padding-bottom:5px;text-align:center">Pieza</th>
+                  <th style="padding-bottom:5px">A</th>
+                  <th style="padding-bottom:5px">y</th>
+                  <th style="padding-bottom:5px">Ay</th>
+                  <th style="padding-bottom:5px">Io</th>
+                  <th style="padding-bottom:5px">d²</th>
+                  <th style="padding-bottom:5px; color:var(--accent)">It</th>
+                </tr>
+              </thead>
+              <tbody id="tb_steiner" style="color:var(--text);">
+                <!-- JS -->
+              </tbody>
+              <tfoot>
+                <tr style="border-top:1px solid rgba(255,255,255,0.1); font-weight:700;">
+                  <td style="padding-top:5px;text-align:center;color:var(--accent2)">∑</td>
+                  <td id="st_A_tot" style="padding-top:5px"></td>
+                  <td style="padding-top:5px"></td>
+                  <td id="st_Ay_tot" style="padding-top:5px"></td>
+                  <td style="padding-top:5px"></td>
+                  <td style="padding-top:5px"></td>
+                  <td id="st_It_tot" style="padding-top:5px; color:var(--accent)"></td>
+                </tr>
+              </tfoot>
+            </table>
+            <div
+              style="font-size:11px; color:var(--muted); text-align:right; margin-top:15px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:8px;">
+              Centroide Real (Yc) = <span id="st_Yc" style="color:var(--text);font-weight:700;font-size:13px"></span> cm
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-card" style="grid-row: span 1;">
+          <div class="mini-header"><span style="color:var(--accent)">&#9658;</span> Inercias</div>
+          <div class="mini-body"
+            style="padding:15px; display:flex; justify-content:center; align-items:flex-end; gap:25px; height:160px; padding-bottom:10px;">
+            <!-- Barra Requerida -->
+            <div
+              style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;">
+              <div id="val_i_req"
+                style="font-size:11px; font-family:var(--mono); color:var(--muted); margin-bottom:5px;"></div>
+              <div
+                style="height:100px; width:35px; background:rgba(255,255,255,0.05); border-radius:4px 4px 0 0; position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,0.2);">
+                <div id="bar_i_req"
+                  style="position:absolute; bottom:0; width:100%; height:50%; background:var(--muted); border-radius:4px 4px 0 0; transition:height 0.5s ease;">
+                </div>
+              </div>
+              <div style="font-size:10px; color:var(--label); margin-top:5px; font-weight:600;">Req.</div>
+            </div>
+
+            <!-- Barra Aportada -->
+            <div
+              style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;">
+              <div id="val_i_ast"
+                style="font-size:11px; font-family:var(--mono); color:var(--accent); font-weight:700; margin-bottom:5px;">
+              </div>
+              <div
+                style="height:200px; width:45px; background:rgba(255,255,255,0.05); border-radius:4px 4px 0 0; position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,0.2);">
+                <div id="bar_i_ast"
+                  style="position:absolute; bottom:0; width:100%; height:80%; background:linear-gradient(0deg, #0080aa, var(--accent)); border-radius:4px 4px 0 0; transition:height 0.5s ease; box-shadow: 0 -2px 10px rgba(0,229,255,0.4);">
+                </div>
+              </div>
+              <div style="font-size:10px; color:var(--label); margin-top:5px; font-weight:600;">Aliv.</div>
+            </div>
+          </div>
+          <div id="lbl_i_comp" style="font-size:11px; text-align:center; padding-bottom:15px; font-weight:600;"></div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+  <div id="tab-vigas" class="module-container layout">
+
 
     <!-- =================== INPUTS LEFT PANEL =================== -->
     <div class="inputs-panel">
@@ -809,66 +1480,53 @@
         </div>
 
         <!-- ARQUITECTÓNICOS -->
-        <div class="input-group">
-          <div class="input-group-title">
-            <span style="color:var(--accent)">◈</span> Datos Arquitectónicos
+        <div class="input-group arch-group">
+          <div class="input-group-title"><span style="color:var(--accent)">◈</span> Datos Coordinados (Globales)</div>
+          <div class="input-row"><label>Longitud en eje x (L1)</label>
+            <div class="input-wrap"><input type="number" id="L1" class="sync-L1" value="5.50" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
           </div>
-
-          <div class="input-row">
-            <label>Longitud en eje x (L1)</label>
-            <div class="input-wrap">
-              <input type="number" id="L1" value="5.50" step="0.01" min="0.1">
-              <span class="input-unit">m</span>
-            </div>
+          <div class="input-row"><label>Longitud en eje x (L2)</label>
+            <div class="input-wrap"><input type="number" id="L2" class="sync-L2" value="4.50" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
           </div>
-          <div class="input-row">
-            <label>Longitud en eje x (L2)</label>
-            <div class="input-wrap">
-              <input type="number" id="L2" value="4.50" step="0.01" min="0.1">
-              <span class="input-unit">m</span>
-            </div>
+          <div class="input-row"><label>Longitud en eje y (L3)</label>
+            <div class="input-wrap"><input type="number" id="L3" class="sync-L3" value="4.80" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
           </div>
-          <div class="input-row">
-            <label>Longitud en eje y (L3)</label>
-            <div class="input-wrap">
-              <input type="number" id="L3" value="4.80" step="0.01" min="0.1">
-              <span class="input-unit">m</span>
-            </div>
+          <div class="input-row"><label>Longitud en eje y (L4)</label>
+            <div class="input-wrap"><input type="number" id="L4" class="sync-L4" value="4.20" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
           </div>
-          <div class="input-row">
-            <label>Longitud en eje y (L4)</label>
-            <div class="input-wrap">
-              <input type="number" id="L4" value="4.20" step="0.01" min="0.1">
-              <span class="input-unit">m</span>
-            </div>
+          <div class="input-row"><label>Número de pisos (N°)</label>
+            <div class="input-wrap"><input type="number" id="pisos" class="sync-pisos" value="2" step="1" min="1"><span
+                class="input-unit">u</span></div>
           </div>
-          <div class="input-row">
-            <label>Número de pisos (N°)</label>
-            <div class="input-wrap">
-              <input type="number" id="pisos" value="2" step="1" min="1">
-              <span class="input-unit">u</span>
-            </div>
+          <div class="input-row"><label>Altura entrepiso</label>
+            <div class="input-wrap"><input type="number" id="He" class="sync-He" value="2.60" step="0.05" min="1"><span
+                class="input-unit">m</span></div>
           </div>
-          <div class="input-row">
-            <label>Altura entrepiso</label>
-            <div class="input-wrap">
-              <input type="number" id="He" value="2.60" step="0.05" min="1">
-              <span class="input-unit">m</span>
-            </div>
-          </div>
-          <div class="input-row">
-            <label>Uso</label>
-            <div class="input-wrap">
-              <select id="uso">
-                <option value="Vivienda">Vivienda</option>
-                <option value="Oficina">Oficina</option>
-                <option value="Pesada">Pesada</option>
-                <option value="Otro">Otro</option>
+          <div class="input-row"><label>Uso</label>
+            <div class="input-wrap" style="width:150px;">
+              <select id="uso" class="sync-uso" style="font-size:11px;">
+                <option value="0.200">Vivienda / Departamentos</option>
+                <option value="0.240">Oficinas</option>
+                <option value="0.480">Gimnasios / Áreas de baile</option>
+                <option value="0.480">Áreas de reunión / Teatros</option>
+                <option value="0.480">Comercial (Primer piso)</option>
+                <option value="0.360">Comercial (Pisos sup.)</option>
+                <option value="0.300">Escuelas (Aulas)</option>
+                <option value="0.480">Escuelas (Corredores p. sup)</option>
+                <option value="0.300">Garajes (Livianos < 4t)</option>
+                <option value="0.180">Cubierta accesible (Terrazas)</option>
+                <option value="0.070">Cubierta no accesible</option>
+                <option value="0.480">Balcones</option>
               </select>
             </div>
           </div>
+          <div style="font-size:10px; color:var(--muted); text-align:right; margin-top:5px; opacity:0.8;">(Catálogo
+            unificado NEC-SE-CG)</div>
         </div>
-
         <!-- CARGAS -->
         <div class="input-group">
           <div class="input-group-title">
@@ -1178,7 +1836,10 @@
 
         <!-- CORTANTE -->
         <div class="mini-card">
-          <div class="mini-header"><span style="color:var(--bad)">▸</span> Cortante</div>
+          <div class="mini-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span><span style="color:var(--bad)">▸</span> Cortante</span>
+            <button style="font-size:10px; padding:2px 8px; border-radius: 4px; border:1px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; font-family:var(--sans); transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="openCortanteModal()">VER ZONAS SÍSMICAS</button>
+          </div>
           <div class="mini-body">
             <div class="mini-row"><span class="rl clickable-label" id="lbl_vug" data-eq-title="Cortante por Gravedad"
                 data-eq-body="V_{ug} = \frac{(2 \cdot L_v - L_t) \cdot L_t \cdot C_u}{4}">Cortante gravedad
@@ -1311,11 +1972,440 @@
           <div class="mini-body" id="summaryChecks"></div>
         </div>
 
-      </div><!-- end results-row-wrap -->
+      </div>
+    </div>
+  </div>
 
-    </div><!-- end results-panel -->
-  </div><!-- end layout -->
+  <div id="tab-columnas" class="module-container layout">
+    <div class="inputs-panel">
+      <div class="inputs-body">
+        <div class="section-header">
+          <div class="section-dot"></div>
+          <h2>Columnas (Datos vienen de Vigas)</h2>
+        </div>
+        <!-- ARQUITECTÓNICOS -->
+        <div class="input-group arch-group">
+          <div class="input-group-title"><span style="color:var(--accent)">◈</span> Datos Coordinados (Globales)</div>
+          <div class="input-row"><label>Longitud en eje x (L1)</label>
+            <div class="input-wrap"><input type="number" id="col_L1" class="sync-L1" value="5.50" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Longitud en eje x (L2)</label>
+            <div class="input-wrap"><input type="number" id="col_L2" class="sync-L2" value="4.50" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Longitud en eje y (L3)</label>
+            <div class="input-wrap"><input type="number" id="col_L3" class="sync-L3" value="4.80" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Longitud en eje y (L4)</label>
+            <div class="input-wrap"><input type="number" id="col_L4" class="sync-L4" value="4.20" step="0.01"
+                min="0.1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Número de pisos (N°)</label>
+            <div class="input-wrap"><input type="number" id="col_pisos" class="sync-pisos" value="2" step="1"
+                min="1"><span class="input-unit">u</span></div>
+          </div>
+          <div class="input-row"><label>Altura entrepiso</label>
+            <div class="input-wrap"><input type="number" id="col_He" class="sync-He" value="2.60" step="0.05"
+                min="1"><span class="input-unit">m</span></div>
+          </div>
+          <div class="input-row"><label>Uso</label>
+            <div class="input-wrap" style="width:150px;">
+              <select id="col_uso" class="sync-uso" style="font-size:11px;">
+                <option value="0.200">Vivienda / Departamentos</option>
+                <option value="0.240">Oficinas</option>
+                <option value="0.480">Gimnasios / Áreas de baile</option>
+                <option value="0.480">Áreas de reunión / Teatros</option>
+                <option value="0.480">Comercial (Primer piso)</option>
+                <option value="0.360">Comercial (Pisos sup.)</option>
+                <option value="0.300">Escuelas (Aulas)</option>
+                <option value="0.480">Escuelas (Corredores p. sup)</option>
+                <option value="0.300">Garajes (Livianos < 4t)</option>
+                <option value="0.180">Cubierta accesible (Terrazas)</option>
+                <option value="0.070">Cubierta no accesible</option>
+                <option value="0.480">Balcones</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:10px; color:var(--muted); text-align:right; margin-top:5px; opacity:0.8;">(Catálogo
+            unificado NEC-SE-CG)</div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent)">◈</span> Geometría y Cargas (Vienen de Vigas)
+          </div>
+          <div class="input-row"><label>Área Tributaria (At)</label>
+            <div class="input-wrap"><input type="number" id="col_at" value="22.50" readonly style="color:#717b91; cursor:not-allowed;"><span class="input-unit">m2</span>
+            </div>
+          </div>
+          <div class="input-row"><label>Carga Mayorada (Cu)</label>
+            <div class="input-wrap"><input type="number" id="col_cu" value="1.16" style="color:var(--accent3)"><span
+                class="input-unit">t/m2</span></div>
+          </div>
+          <div class="input-row"><label>Viga ancho conectada</label>
+            <div class="input-wrap"><input type="number" id="col_bvig" value="30" readonly style="color:#717b91"><span
+                class="input-unit">cm</span></div>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--warn)">◈</span> Sección Columna</div>
+          <div class="input-row"><label>Perfil Ancho (b)</label>
+            <div class="input-wrap"><input type="number" id="col_bc" value="30"><span class="input-unit">cm</span></div>
+          </div>
+          <div class="input-row"><label>Perfil Prof. (h)</label>
+            <div class="input-wrap"><input type="number" id="col_hc" value="30"><span class="input-unit">cm</span></div>
+          </div>
+          <div class="input-row"><label>f'c</label>
+            <div class="input-wrap"><input type="number" id="col_fc" value="210"><span class="input-unit">kg/cm2</span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent3)">◈</span> Acero</div>
+          <div class="input-row"><label>Diám. long. (Øl)</label>
+            <div class="input-wrap"><input type="number" id="col_fil" value="16"><span class="input-unit">mm</span>
+            </div>
+          </div>
+          <div class="input-row"><label>Varillas Ancho (x)</label>
+            <div class="input-wrap"><input type="number" id="col_nx" value="3"><span class="input-unit">u</span></div>
+          </div>
+          <div class="input-row"><label>Varillas Prof. (y)</label>
+            <div class="input-wrap"><input type="number" id="col_ny" value="3"><span class="input-unit">u</span></div>
+          </div>
+          <div class="input-row"><label>Ramas int. (vinchas)</label>
+            <div class="input-wrap"><input type="number" id="col_vinc" value="1"><span class="input-unit">u</span></div>
+          </div>
+        </div>
 
+      </div>
+    </div>
+    <div class="results-panel">
+      <div class="results-row-wrap">
+
+        <div class="mini-card diagram-mini">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Sección Transversal de Columna</div>
+          <div class="mini-body" style="padding:15px; display:flex; flex-direction:column; align-items:center;">
+            <div style="display:flex;justify-content:center;width:100%;">
+              <svg id="colSvg" width="230" height="230" viewBox="0 0 230 230">
+                <defs>
+                  <pattern id="hatchCol" patternUnits="userSpaceOnUse" width="6" height="6"
+                    patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(0,229,255,0.06)" stroke-width="1.5" />
+                  </pattern>
+                </defs>
+                <g id="colDrawGroup" transform="translate(115, 115)">
+                  <!-- Concrete -->
+                  <rect id="svgColConc" x="-90" y="-90" width="180" height="180" rx="3" fill="url(#hatchCol)"
+                    stroke="#4a5568" stroke-width="2.5" />
+                  <!-- Stirrup -->
+                  <rect id="svgColStirrup" x="-75" y="-75" width="150" height="150" rx="3" fill="none" stroke="#ffb830"
+                    stroke-width="2.5" />
+                  <!-- Rebars injected by JS -->
+                  <g id="svgColBars"></g>
+                </g>
+
+                <!-- Dimension Labels -->
+                <text id="svgColB" x="115" y="225" text-anchor="middle" fill="#00e5ff" font-size="12"
+                  font-family="Arial" font-weight="700">30 cm</text>
+                <text id="svgColH" x="220" y="115" text-anchor="middle" fill="#00e5ff" font-size="12"
+                  font-family="Arial" font-weight="700" transform="rotate(90,220,115)">30 cm</text>
+              </svg>
+            </div>
+            <div style="font-size:11px; color:var(--muted); margin-top:10px;">Distribución geométrica de varillas (b x
+              h)</div>
+          </div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Predimensionamiento de Columnas</div>
+          <div class="mini-body" style="padding:15px;">
+            <div style="display:flex;gap:10px;">
+              <div id="status_col_cuant"
+                style="flex:1;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+                <div style="font-size:20px;font-weight:700;font-family:var(--sans);" id="r_col_cuant">—</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">CUANTIA (%)</div>
+              </div>
+              <div id="status_col_ag"
+                style="flex:1;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.3);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;">
+                <div style="font-size:20px;font-weight:700;font-family:var(--sans);" id="r_col_agnec">—</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">Ag NEC (req) cm2
+                </div>
+              </div>
+            </div>
+            <div class="mini-row"><span class="rl">Área Bruta Actual (Ac)</span><span class="rv accent-v"
+                id="r_col_ac">—</span><span class="ru">cm2</span></div>
+            <div class="mini-row"><span class="rl">Carga Última Axial (Pult)</span><span class="rv"
+                id="r_col_pult">—</span><span class="ru">t</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-row"><span class="rl">Acero Total Long. (As)</span><span class="rv accent-v"
+                id="r_col_as">—</span><span class="ru">cm2</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-header" style="color:#ff6b35;padding:0;margin-top:10px;"><span
+                style="color:#ff6b35;">▸</span> Nudo Fuerte - Viga Débil</div>
+            <div class="mini-row"><span class="rl">Cortante Resistido Nudo (Vj)</span><span class="rv accent2-v"
+                id="r_col_vj">—</span><span class="ru">t</span></div>
+            <div class="mini-row"><span class="rl">Cortante de diseño Nudo</span><span class="rv"
+                id="r_col_vhz">—</span><span class="ru">t</span></div>
+            <div class="mini-row"><span class="rl">Chequeo ∑Mcol >= 1.2 ∑Mvig</span><span class="rv"
+                id="r_col_nudo"></span></div>
+          </div>
+        </div>
+
+        </div>
+      </div>
+    </div>
+
+  <div id="tab-sismo" class="module-container layout">
+    <div class="inputs-panel">
+      <div class="inputs-body">
+        <div class="section-header">
+          <div class="section-dot"></div>
+          <h2>Análisis Sísmico</h2>
+        </div>
+
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent)">◈</span> Parámetros Terreno y Zona</div>
+
+
+
+          <div class="input-row"><label title="Aceleración máxima en roca madre esperada Z (NEC-15 Tabla 1)">Factor Zona (Z)</label>
+            <div class="input-wrap">
+              <input type="number" id="sis_Z" value="0.4">
+            </div>
+            <button onclick="abrirModalIrreg('zona')" class="irreg-btn" title="Tabla de valores Z por ciudades (NEC-15)">📋</button>
+          </div>
+          <div class="input-row"><label title="Perfil del subsuelo donde se cimentará la estructura (NEC-15 Sec. 3)">Tipo de Suelo</label>
+            <div class="input-wrap">
+              <select id="sis_suelo" style="text-align:center; font-size:12px;">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C" selected>C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+              </select>
+            </div>
+            <button onclick="abrirModalIrreg('suelo')" class="irreg-btn" title="Clasificación de perfiles de suelo (NEC-15)">📋</button>
+          </div>
+          <div class="input-row"><label title="Coeficiente de importancia de la estructura I (NEC-15 Sec. 4)">Importancia (I)</label>
+            <div class="input-wrap">
+              <select id="sis_I" style="font-size:12px; text-align:center;">
+                <option value="1.5">1.5</option>
+                <option value="1.3">1.3</option>
+                <option value="1.0" selected>1.0</option>
+              </select>
+            </div>
+            <button onclick="abrirModalIrreg('importancia')" class="irreg-btn" title="Categorías de importancia (NEC-15)">📋</button>
+          </div>
+          <div class="input-row"><label title="Coeficiente de reducción de resistencia sísmica R (NEC-15 Tabla 15)">Reducción R</label>
+            <div class="input-wrap">
+              <input type="number" id="sis_R" value="3" step="1">
+            </div>
+            <button onclick="abrirModalIrreg('reduccion')" class="irreg-btn" title="Factor de reducción R (NEC-15)">📋</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--warn)">◈</span> Irregularidades</div>
+          <div class="input-row"><label title="Coeficiente de configuración en planta ϕp (NEC-15 Sec. 5.1)">Planta (Øp)</label>
+            <div class="input-wrap">
+              <input type="number" id="sis_fip" value="1.0" step="0.05">
+            </div>
+            <button onclick="abrirModalIrreg('planta')" class="irreg-btn" title="Catálogo de irregularidades en planta">📋</button>
+          </div>
+          <div class="input-row" style="margin-top:8px;"><label title="Coeficiente de configuración en elevación ϕe (NEC-15 Sec. 5.2)">Elevación (Øe)</label>
+            <div class="input-wrap">
+              <input type="number" id="sis_fie" value="1.0" step="0.05">
+            </div>
+            <button onclick="abrirModalIrreg('elevacion')" class="irreg-btn" title="Catálogo de irregularidades en elevación">📋</button>
+          </div>
+          <div class="input-row"><label title="Relación entre aceleración espectral y Z. η (NEC-15 Sec. 3.3.1)">Factor η (eta)</label>
+            <div class="input-wrap">
+              <select id="sis_n" style="font-size:11px; text-align:center;">
+                <option value="2.48">2.48 (Sierra, Esmeraldas, Galápagos)</option>
+                <option value="1.80">1.80 (Costa (exc. Esmeraldas), Oriente)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-group-title"><span style="color:var(--accent2)">◈</span> Propiedades de la Estructura</div>
+          <div class="input-row"><label title="Periodo fundamental de vibración de la estructura T = Ct * h^α (NEC-15 Sec. 6.1.1)">Periodo Fundamental (T)</label>
+            <div class="input-wrap"><input type="number" id="sis_t_est" value="0.45" step="0.01"><span class="input-unit">s</span></div>
+          </div>
+          <div class="input-row"><label title="Deriva elástica máxima (Δe) del análisis estructural en dirección X">Deriva ETABS X</label>
+            <div class="input-wrap"><input type="number" id="sis_derx" value="0.0026" step="0.0001"></div>
+          </div>
+          <div class="input-row"><label title="Deriva elástica máxima (Δe) del análisis estructural en dirección Y">Deriva ETABS Y</label>
+            <div class="input-wrap"><input type="number" id="sis_dery" value="0.0022" step="0.0001"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="results-panel">
+      <div class="results-row-wrap" style="align-items: flex-start;">
+
+        <div class="mini-card diagram-mini" style="flex: 1 1 300px; min-width:300px;">
+          <div class="mini-header"><span style="color:var(--accent)">▸</span> Espectro Sísmico (NEC-15)</div>
+          <div class="mini-body" style="padding:15px;">
+            <div style="display:flex;gap:10px;">
+              <div class="clickable-label" id="lbl_sis_fa" data-eq-title="Coeficiente de Suelo Fa" data-eq-body="Fa = \text{Función de } (Z, \text{Suelo})"
+                style="flex:1;background:rgba(0,229,255,0.06);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;border:1px solid rgba(0,229,255,0.1);">
+                <div style="font-size:20px;font-weight:700;font-family:var(--sans);color:var(--accent)" id="r_sis_fa">—
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">Fa</div>
+              </div>
+              <div class="clickable-label" id="lbl_sis_fd" data-eq-title="Coeficiente de Suelo Fd" data-eq-body="Fd = \text{Función de } (Z, \text{Suelo})"
+                style="flex:1;background:rgba(0,229,255,0.06);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;border:1px solid rgba(0,229,255,0.1);">
+                <div style="font-size:20px;font-weight:700;font-family:var(--sans);color:var(--accent)" id="r_sis_fd">—
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">Fd</div>
+              </div>
+              <div class="clickable-label" id="lbl_sis_fs" data-eq-title="Coeficiente de Suelo Fs" data-eq-body="Fs = \text{Función de } (Z, \text{Suelo})"
+                style="flex:1;background:rgba(0,229,255,0.06);border-radius:8px;padding:10px;text-align:center;margin-bottom:15px;border:1px solid rgba(0,229,255,0.1);">
+                <div style="font-size:20px;font-weight:700;font-family:var(--sans);color:var(--accent)" id="r_sis_fs">—
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.1em">Fs</div>
+              </div>
+            </div>
+            <div class="mini-row"><span class="rl">Factor de Importancia (I)</span><span class="rv" id="r_sis_i_val" style="color:var(--accent); font-weight:700;">—</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_sis_tc" data-eq-title="Periodo Crítico Tc" data-eq-body="T_c = 0.55 \cdot F_s \cdot \frac{F_d}{F_a}">Periodo crítico Tc (s)</span><span class="rv accent-v"
+                id="r_sis_tc">—</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_sis_sael" data-eq-title="Espectro Elástico Máximo" data-eq-body="Sa_{max} = Z \cdot \eta \cdot F_a">Espectro Elástico Máximo (Sa max)</span><span class="rv"
+                id="r_sis_sael">—</span><span class="ru">g</span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_sis_saine" style="font-weight:700;color:var(--warn)" data-eq-title="Espectro Inelástico (Diseño)" data-eq-body="Sa_{ine} = \frac{Sa_{max} \cdot I}{R \cdot \phi_p \cdot \phi_e}">Espectro Inelástico (Sa de
+                diseño)</span><span class="rv accent2-v" id="r_sis_saine">—</span><span class="ru">g</span></div>
+            <div class="mini-sep"></div>
+            <div class="mini-header" style="color:#ff6b35;padding:0;margin-top:10px;"><span
+                style="color:#ff6b35;">▸</span> Verificación Derivas Inelásticas</div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_sis_inex" data-eq-title="Deriva Inelástica X" data-eq-body="\Delta_{i_X} = 0.75 \cdot R \cdot \Delta_{e_X}">Deriva Inelástica Calculada X</span><span class="rv accent-v"
+                id="r_sis_inex">—</span> <span id="r_sis_okx"></span></div>
+            <div class="mini-row"><span class="rl clickable-label" id="lbl_sis_iney" data-eq-title="Deriva Inelástica Y" data-eq-body="\Delta_{i_Y} = 0.75 \cdot R \cdot \Delta_{e_Y}">Deriva Inelástica Calculada Y</span><span class="rv accent-v"
+                id="r_sis_iney">—</span> <span id="r_sis_oky"></span></div>
+          </div>
+        </div>
+
+        <!-- GRÁFICO ESPECTRO SÍSMICO Y TABLA UNIFICADOS -->
+        <!-- Gráfico del Espectro (Caja 1) -->
+        <div class="mini-card" style="flex: 2 1 450px; display:flex; flex-direction:column;">
+          <div class="mini-header">
+            <span><span style="color:var(--accent)">▸</span> Gráfica del Espectro (NEC-15)</span>
+          </div>
+          <div class="mini-body" style="padding:15px; display:flex; flex-direction:column; flex-grow:1;">
+            <div style="background:rgba(0,0,0,0.15); border-radius:6px; border:1px solid var(--border); display:flex; flex-direction:column; flex-grow:1;">
+               <div id="svgEspectroContainer" style="width:100%; min-height:350px; overflow:hidden;"></div>
+               <!-- Leyenda Estilo App -->
+               <div style="padding:10px; display:flex; gap:15px; justify-content:center; font-size:11px; background:rgba(0,0,0,0.2); border-top:1px solid var(--border); border-radius:0 0 6px 6px;">
+                 <span style="color:var(--text); display:flex; align-items:center; gap:5px;"><span style="display:inline-block;width:12px;height:2px;background:#00e5ff;box-shadow:0 0 5px #00e5ff;"></span> Sa Elástico</span>
+                 <span style="color:var(--text); display:flex; align-items:center; gap:5px;"><span style="display:inline-block;width:12px;height:2px;background:#ff6b35;border-top:2px dashed #ff6b35;"></span> Sa Inelástico</span>
+                 <span style="color:var(--text); display:flex; align-items:center; gap:5px;"><span style="display:inline-block;width:2px;height:12px;background:var(--warn);"></span> T Est</span>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Valores (Caja 2) -->
+        <div class="mini-card" style="flex: 1 1 200px; display:flex; flex-direction:column;">
+          <div class="mini-header">
+            <span><span style="color:var(--accent)">▸</span> Valores Espectrales</span>
+          </div>
+          <div class="mini-body" style="padding:15px; display:flex; flex-direction:column; flex-grow:1;">
+            <div style="background:rgba(0,0,0,0.1); border-radius:6px; border:1px solid var(--border); max-height:360px; overflow-y:auto;" class="custom-scrollbar">
+               <table style="width:100%; border-collapse:collapse; text-align:center; font-size:11px;">
+                 <thead style="position:sticky; top:0; background:rgba(20,23,32,0.95); backdrop-filter:blur(5px); box-shadow:0 1px 0 var(--border); z-index:10;">
+                   <tr>
+                     <th style="padding:8px 4px; font-weight:600; color:var(--muted);">T (s)</th>
+                     <th style="padding:8px 4px; font-weight:600; color:#00e5ff;">Sa</th>
+                     <th style="padding:8px 4px; font-weight:600; color:#ff6b35;">Saine</th>
+                   </tr>
+                 </thead>
+                 <tbody id="mdl_tabla_espectro_inline">
+                 </tbody>
+               </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PESTAÑA RESUMEN GLOBAL ===== -->
+  <div id="tab-resumen" class="module-container" style="padding:20px; max-width:1200px; margin:0 auto; width:100%;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h2 style="font-family:var(--display);font-size:22px;color:var(--accent);margin-bottom:4px;">Resumen Global de la Estructura</h2>
+        <p style="color:var(--muted);font-size:13px;">Consolidacion de todos los resultados en tiempo real — ACI 318 / NEC-15</p>
+      </div>
+      <button class="btn-print" onclick="actualizarResumen()" style="background:rgba(0,229,255,0.1);border:1px solid var(--accent);color:var(--accent);">Actualizar</button>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;">
+      <!-- Losas -->
+      <div class="mini-card" style="border-top:3px solid var(--accent);">
+        <div class="mini-header" style="color:var(--accent);">Losas Alivianadas</div>
+        <div class="mini-body">
+          <div class="mini-row"><span class="rl">Lmax</span><span class="rv" id="res_lmax">--</span><span class="ru">m</span></div>
+          <div class="mini-row"><span class="rl">Luz efectiva (Lreal)</span><span class="rv" id="res_lreal">--</span><span class="ru">m</span></div>
+          <div class="mini-row"><span class="rl">Espesor minimo (hmin)</span><span class="rv" id="res_hmin_l">--</span><span class="ru">cm</span></div>
+          <div class="mini-row"><span class="rl">Inercia requerida</span><span class="rv" id="res_imin">--</span><span class="ru">cm4</span></div>
+          <div class="mini-row"><span class="rl">Inercia alivianada</span><span class="rv" id="res_isteiner">--</span><span class="ru">cm4</span></div>
+          <div class="mini-sep"></div>
+          <div class="mini-row"><span class="rl" style="font-weight:700;color:var(--warn)">Carga Muerta Total</span><span class="rv" style="color:var(--warn)" id="res_cm_total">--</span><span class="ru">t/m2</span></div>
+          <div class="mini-row"><span class="rl" style="font-weight:700;color:var(--accent2)">Carga Viva</span><span class="rv" style="color:var(--accent2)" id="res_cv_total">--</span><span class="ru">t/m2</span></div>
+        </div>
+      </div>
+      <!-- Vigas -->
+      <div class="mini-card" style="border-top:3px solid var(--accent2);">
+        <div class="mini-header" style="color:var(--accent2);">Viga Principal</div>
+        <div class="mini-body">
+          <div class="mini-row"><span class="rl">Lv (mayor luz)</span><span class="rv" id="res_Lv">--</span><span class="ru">m</span></div>
+          <div class="mini-row"><span class="rl">Seccion b x h</span><span class="rv" id="res_bh">--</span><span class="ru">cm</span></div>
+          <div class="mini-row"><span class="rl">h min requerido</span><span class="rv" id="res_hmin_v">--</span><span class="ru">cm</span></div>
+          <div class="mini-row"><span class="rl">Mdis</span><span class="rv" id="res_Mdis">--</span><span class="ru">t.m</span></div>
+          <div class="mini-row"><span class="rl">Mres</span><span class="rv" id="res_Mres">--</span><span class="ru">t.m</span></div>
+          <div class="mini-row"><span class="rl">As(-) negativo</span><span class="rv" id="res_Astotneg">--</span><span class="ru">cm2</span></div>
+          <div class="mini-row"><span class="rl">As(+) positivo</span><span class="rv" id="res_Astotpos">--</span><span class="ru">cm2</span></div>
+          <div class="mini-row"><span class="rl">Vu</span><span class="rv" id="res_Vu">--</span><span class="ru">t</span></div>
+          <div class="mini-sep"></div>
+          <div class="mini-row"><span class="rl" style="font-weight:800">D/C</span><span class="rv" id="res_DC" style="font-weight:800;font-size:16px;">--</span></div>
+        </div>
+      </div>
+      <!-- Columnas -->
+      <div class="mini-card" style="border-top:3px solid var(--accent3);">
+        <div class="mini-header" style="color:var(--accent3);">Columna</div>
+        <div class="mini-body">
+          <div class="mini-row"><span class="rl">Seccion b x h</span><span class="rv" id="res_col_bh">--</span><span class="ru">cm</span></div>
+          <div class="mini-row"><span class="rl">Pult</span><span class="rv" id="res_col_pult">--</span><span class="ru">t</span></div>
+          <div class="mini-row"><span class="rl">Ag requerido</span><span class="rv" id="res_col_ag">--</span><span class="ru">cm2</span></div>
+          <div class="mini-row"><span class="rl">Ag provisto</span><span class="rv" id="res_col_ac">--</span><span class="ru">cm2</span></div>
+          <div class="mini-row"><span class="rl">As total</span><span class="rv" id="res_col_as">--</span><span class="ru">cm2</span></div>
+          <div class="mini-row"><span class="rl">Cuantia</span><span class="rv" id="res_col_cuant">--</span><span class="ru">%</span></div>
+          <div class="mini-sep"></div>
+          <div class="mini-row"><span class="rl" style="font-weight:800">Nudo Viga-Col.</span><span class="rv" id="res_col_nudo">--</span></div>
+        </div>
+      </div>
+      <!-- Sismo -->
+      <div class="mini-card" style="border-top:3px solid var(--warn);">
+        <div class="mini-header" style="color:var(--warn);">Sismo (NEC-15)</div>
+        <div class="mini-body">
+          <div class="mini-row"><span class="rl">Factor Fa</span><span class="rv" id="res_sis_fa">--</span></div>
+          <div class="mini-row"><span class="rl">Sa Elastico (max)</span><span class="rv" id="res_sis_sael">--</span><span class="ru">g</span></div>
+          <div class="mini-row"><span class="rl">Sa Inelastico</span><span class="rv" id="res_sis_saine">--</span><span class="ru">g</span></div>
+          <div class="mini-row"><span class="rl">Tc</span><span class="rv" id="res_sis_tc">--</span><span class="ru">s</span></div>
+          <div class="mini-sep"></div>
+          <div class="mini-row"><span class="rl">Deriva Inel. X</span><span class="rv" id="res_sis_inex_r">--</span><span id="res_sis_okx_r" style="font-size:11px;margin-left:4px;"></span></div>
+          <div class="mini-row"><span class="rl">Deriva Inel. Y</span><span class="rv" id="res_sis_iney_r">--</span><span id="res_sis_oky_r" style="font-size:11px;margin-left:4px;"></span></div>
+        </div>
+      </div>
+      </div>
+  </div>
+
+  <div id="eqTooltip" class="eq-tooltip">
+    <div class="eq-tooltip-title">Ecuación</div>
+    <div class="eq-tooltip-formula"></div>
+    <div class="eq-tooltip-calc"></div>
+    <div class="eq-tooltip-status"></div>
+  </div>
   <script>
     // ============================================================
     // REACTIVE ENGINE — ALL CALCULATIONS
@@ -1467,6 +2557,21 @@
       setResult('r_dp', dp, 1);
       setResult('r_Cu', Cu, 2);
       const cuEl = document.getElementById('cu_display'); if (cuEl) cuEl.textContent = Cu.toFixed(2);
+      // MACRO: Push Cu to Columnas
+      const colCuInput = document.getElementById('col_cu');
+      if (colCuInput && Math.abs((parseFloat(colCuInput.value) || 0) - Cu) > 0.01) {
+        colCuInput.value = Cu.toFixed(2);
+        colCuInput.style.backgroundColor = "rgba(127,255,107,0.3)";
+        setTimeout(() => { colCuInput.style.backgroundColor = ""; }, 1000);
+        if (typeof recalcCol === 'function') recalcCol();
+      }
+
+      // MACRO: Push b to Columnas bvig
+      const colBvigInput = document.getElementById('col_bvig');
+      if (colBvigInput && colBvigInput.value != b) {
+        colBvigInput.value = b;
+      }
+
       setResult('r_Mdis', Mdis, 2);
       setResult('r_Mres', Mres, 2);
       setResult('r_Asmin', Asmin, 2);
@@ -1884,14 +2989,1537 @@
       initEquations();
       recalc(); // Initial calculation
     });
+
+    function recalcLosa() {
+      const lmax = Math.max(getVal('losa_L1'), getVal('losa_L2'), getVal('losa_L3'), getVal('losa_L4'));
+      const vint = getVal('losa_vint');
+      const lreal = lmax / (vint + 1);
+      const hl = getVal('losa_hl'), bn = getVal('losa_bn'), bb = getVal('losa_bb'), tc = getVal('losa_tc');
+
+      const hmin = lreal * 100 * 0.03;
+
+      const wr = 1.16 * 0.5;
+      const mu = wr * lreal * lreal / 12;
+      const As = 30 * mu / (hl - 3) * 0.75;
+
+      const b_tot = bn + bb;
+      const hw = hl - tc;
+
+      const num_bloques_1m2 = 10000 / ((b_tot) * (b_tot));
+      const vtot_1m2 = 1.0 * (hl / 100);
+      const vbloq_1m2 = (bb / 100) * (bb / 100) * (hw / 100) * num_bloques_1m2;
+      const vhorm_1m2 = vtot_1m2 - vbloq_1m2;
+      const Peso_horm = vhorm_1m2 * 2.4;
+      const Area_1m2 = 1.0;
+      const Phorm_final = Peso_horm / Area_1m2;
+
+      const paredSel = document.getElementById('losa_paredes');
+      const paredText = paredSel ? paredSel.options[paredSel.selectedIndex].text : '';
+      const c_pared = parseFloat(paredSel.value) || 0;
+
+      const alivSel = document.getElementById('losa_alivian');
+      const alivText = alivSel ? alivSel.options[alivSel.selectedIndex].text : '';
+      const c_aliv = parseFloat(alivSel.value) || 0;
+
+      const c_mas = parseFloat(document.getElementById('losa_masillado').value) || 0;
+      const c_aca = parseFloat(document.getElementById('losa_acabados').value) || 0;
+      const c_inst = parseFloat(document.getElementById('losa_instalaciones').value) || 0;
+
+      const C_superimpuesta = c_pared + c_aliv + c_mas + c_aca + c_inst;
+      const P_eq = Phorm_final + C_superimpuesta;
+
+      const width_m = 100;
+      const I_min = (width_m * Math.pow(hmin, 3)) / 12;
+
+      // Steiner: Sección T per 1m
+      const numNervios = width_m / b_tot;
+
+      let rowsData = [];
+      for (let i = 0; i < Math.floor(numNervios); i++) {
+        rowsData.push({ name: String(i + 1), A: bn * hw, y: hw / 2, Io: bn * Math.pow(hw, 3) / 12 });
+      }
+      const partial = numNervios - Math.floor(numNervios);
+      if (partial > 0.001) {
+        const w = bn * partial;
+        rowsData.push({ name: String(Math.floor(numNervios) + 1), A: w * hw, y: hw / 2, Io: w * Math.pow(hw, 3) / 12 });
+      }
+      rowsData.push({ name: String(Math.ceil(numNervios) + 1), A: width_m * tc, y: hw + tc / 2, Io: width_m * Math.pow(tc, 3) / 12 });
+
+      let sumA = 0, sumAy = 0;
+      rowsData.forEach(r => {
+        sumA += r.A;
+        sumAy += r.A * r.y;
+      });
+      const Yc = sumA > 0 ? sumAy / sumA : 0;
+
+      let sumIt = 0;
+      let htmlRows = '';
+      let itVals = [];
+      rowsData.forEach(r => {
+        const d = Math.abs(r.y - Yc);
+        const d2 = d * d;
+        const It = r.Io + r.A * d2;
+        sumIt += It;
+        itVals.push(It.toFixed(0));
+        htmlRows += `<tr>
+            <td style="padding:4px 0; text-align:center; color:var(--muted)">${r.name}</td>
+            <td style="padding:4px 0">${r.A.toFixed(0)}</td>
+            <td style="padding:4px 0">${r.y.toFixed(2)}</td>
+            <td style="padding:4px 0">${(r.A * r.y).toFixed(0)}</td>
+            <td style="padding:4px 0">${r.Io.toFixed(0)}</td>
+            <td style="padding:4px 0">${d2.toFixed(2)}</td>
+            <td style="padding:4px 0; color:var(--accent)">${It.toFixed(0)}</td>
+          </tr>`;
+      });
+
+      const tb = document.getElementById('tb_steiner');
+      if (tb) tb.innerHTML = htmlRows;
+      setResult('st_A_tot', sumA, 0);
+      setResult('st_Ay_tot', sumAy, 0);
+      setResult('st_It_tot', sumIt, 0);
+      setResult('st_Yc', Yc, 2);
+
+      const I_steiner = sumIt;
+
+      setResult('r_losa_lmax', lmax, 2);
+      setResult('r_losa_lreal', lreal, 2);
+      setResult('r_losa_hmin', hmin, 1);
+
+      // Chequeo espesor min e inercia
+      const stateBox = document.getElementById('status_losa_check');
+      const txtBox = document.getElementById('r_losa_ok');
+      if (hmin > hl || I_min > I_steiner) {
+        stateBox.style.background = 'rgba(255,113,113,0.1)';
+        stateBox.style.borderColor = 'rgba(255,71,87,0.4)';
+        txtBox.style.color = 'var(--bad)';
+        txtBox.textContent = 'Suba h o añada vigas interm.';
+        txtBox.style.fontSize = '12px';
+      } else {
+        stateBox.style.background = 'rgba(127,255,107,0.1)';
+        stateBox.style.borderColor = 'rgba(127,255,107,0.4)';
+        txtBox.style.color = 'var(--accent3)';
+        txtBox.textContent = 'OK';
+        txtBox.style.fontSize = '18px';
+      }
+
+      setResult('r_losa_imin', I_min, 0);
+      setResult('r_losa_isteiner', I_steiner, 0);
+
+      const heq = Math.pow((12 * I_steiner) / 100, 1 / 3);
+      setResult('r_losa_heq', heq, 2);
+
+      // --- LOGIC FOR COMPARISON BARS ---
+      const max_i = Math.max(I_min, I_steiner);
+      const minP = max_i > 0 ? (I_min / max_i) * 100 : 0;
+      const actP = max_i > 0 ? (I_steiner / max_i) * 100 : 0;
+
+      const bar_i_req = document.getElementById('bar_i_req');
+      const val_i_req = document.getElementById('val_i_req');
+      if (bar_i_req) {
+        bar_i_req.style.height = Math.min(100, minP) + '%';
+        val_i_req.innerText = I_min.toFixed(0);
+      }
+
+      const bar_i_ast = document.getElementById('bar_i_ast');
+      const val_i_ast = document.getElementById('val_i_ast');
+      const lbl_i_comp = document.getElementById('lbl_i_comp');
+      if (bar_i_ast) {
+        bar_i_ast.style.height = Math.min(100, actP) + '%';
+        val_i_ast.innerText = I_steiner.toFixed(0);
+
+        if (I_steiner < I_min) {
+          bar_i_ast.style.background = 'linear-gradient(0deg, #aa0000, var(--bad))';
+          bar_i_ast.style.boxShadow = '0 -2px 10px rgba(255,71,87,0.4)';
+          lbl_i_comp.innerHTML = '<span style="color:var(--bad)">⚠️ Faltan ' + (I_min - I_steiner).toFixed(0) + ' cm4</span>';
+        } else {
+          bar_i_ast.style.background = 'linear-gradient(0deg, #0080aa, var(--accent))';
+          bar_i_ast.style.boxShadow = '0 -2px 10px rgba(0,229,255,0.4)';
+          const sobra = ((I_steiner - I_min) / I_min * 100).toFixed(1);
+          lbl_i_comp.innerHTML = '<span style="color:var(--accent3)">✅ Cumple (+' + sobra + '%)</span>';
+        }
+      }
+      // ---------------------------------
+
+      const lmaxperm = heq / (0.03 * 100);
+      setResult('r_losa_lmaxperm', lmaxperm, 2);
+
+      setResult('r_losa_vtot', vtot_1m2, 2);
+      setResult('r_losa_vbloq', vbloq_1m2, 2);
+      setResult('r_losa_vhorm', vhorm_1m2, 2);
+      setResult('r_losa_peso', Peso_horm, 2);
+      setResult('r_losa_area', Area_1m2, 2);
+      setResult('r_losa_phorm_final', Phorm_final, 2);
+
+      setResult('r_losa_cpared', c_pared, 2);
+      setResult('r_losa_caliv', c_aliv, 2);
+      setResult('r_losa_cmasillado', c_mas, 2);
+      setResult('r_losa_cacabados', c_aca, 2);
+      setResult('r_losa_cinstal', c_inst, 2);
+
+      setResult('r_losa_csuper', C_superimpuesta, 2);
+      setResult('r_losa_cmlosa', Phorm_final, 2);
+      setResult('r_losa_cm_total', P_eq, 2);
+
+      const L1 = getVal('losa_L1'), L2 = getVal('losa_L2'), L3 = getVal('losa_L3'), L4 = getVal('losa_L4');
+      var _lbl_losa_lmax = document.getElementById('lbl_losa_lmax');
+      if (_lbl_losa_lmax) _lbl_losa_lmax.setAttribute('data-eq-calc', '\\max(' + L1 + ', ' + L2 + ', ' + L3 + ', ' + L4 + ') = ' + lmax.toFixed(2) + ' \\text{ m}');
+      var _lbl_losa_lreal = document.getElementById('lbl_losa_lreal');
+      if (_lbl_losa_lreal) _lbl_losa_lreal.setAttribute('data-eq-calc', '\\frac{' + lmax.toFixed(2) + '}{' + vint + ' + 1} = ' + lreal.toFixed(2) + ' \\text{ m}');
+      var _lbl_losa_imin = document.getElementById('lbl_losa_imin');
+      if (_lbl_losa_imin) _lbl_losa_imin.setAttribute('data-eq-calc', '\\frac{100 \\cdot ' + hmin.toFixed(1) + '^3}{12} = ' + I_min.toFixed(0) + ' \\text{ cm}^4/m');
+      var _lbl_losa_isteiner = document.getElementById('lbl_losa_isteiner');
+      if (_lbl_losa_isteiner) _lbl_losa_isteiner.setAttribute('data-eq-calc', itVals.join(' + ') + ' = ' + I_steiner.toFixed(0) + ' \\text{ cm}^4/m');
+      var _lbl_losa_heq = document.getElementById('lbl_losa_heq');
+      if (_lbl_losa_heq) _lbl_losa_heq.setAttribute('data-eq-calc', '\\left( \\frac{12 \\cdot ' + I_steiner.toFixed(0) + '}{100} \\right)^{1/3} = ' + heq.toFixed(2) + ' \\text{ cm}');
+      var _lbl_losa_lmaxperm = document.getElementById('lbl_losa_lmaxperm');
+      if (_lbl_losa_lmaxperm) _lbl_losa_lmaxperm.setAttribute('data-eq-calc', '\\frac{' + heq.toFixed(2) + '}{0.03 \\cdot 100} = ' + lmaxperm.toFixed(2) + ' \\text{ m}');
+
+      var _lbl_losa_vtot = document.getElementById('lbl_losa_vtot');
+      if (_lbl_losa_vtot) _lbl_losa_vtot.setAttribute('data-eq-calc', '1.0 \\times \\frac{' + hl + '}{100} = ' + vtot_1m2.toFixed(4) + ' \\text{ m}^3');
+      var _lbl_losa_vbloq = document.getElementById('lbl_losa_vbloq');
+      if (_lbl_losa_vbloq) _lbl_losa_vbloq.setAttribute('data-eq-calc', '(' + bb + '/100)^2 \\times \\frac{' + hw + '}{100} \\times ' + num_bloques_1m2.toFixed(1) + ' = ' + vbloq_1m2.toFixed(4) + ' \\text{ m}^3');
+      var _lbl_losa_vhorm = document.getElementById('lbl_losa_vhorm');
+      if (_lbl_losa_vhorm) _lbl_losa_vhorm.setAttribute('data-eq-calc', vtot_1m2.toFixed(4) + ' - ' + vbloq_1m2.toFixed(4) + ' = ' + vhorm_1m2.toFixed(4) + ' \\text{ m}^3');
+      var _lbl_losa_peso = document.getElementById('lbl_losa_peso');
+      if (_lbl_losa_peso) _lbl_losa_peso.setAttribute('data-eq-calc', vhorm_1m2.toFixed(4) + ' \\times 2.4 = ' + Peso_horm.toFixed(4) + ' \\text{ t}');
+      var _lbl_losa_area = document.getElementById('lbl_losa_area');
+      if (_lbl_losa_area) _lbl_losa_area.setAttribute('data-eq-calc', '1.00 \\text{ m}^2');
+
+      const txtSteiner = document.getElementById('lbl_losa_isteiner');
+      if (txtSteiner) txtSteiner.innerText = `Inercia de la losa alivianada de espesor ${hl} cm`;
+
+      const txtLmaxPerm = document.getElementById('lbl_losa_lmaxperm');
+      if (txtLmaxPerm) txtLmaxPerm.innerText = `Longitud máxima para una losa de ${hl} cm`;
+
+      const lblCpared = document.getElementById('lbl_losa_cpared');
+      if (lblCpared) lblCpared.innerText = `Paredes (${paredText})`;
+
+      const lblCaliv = document.getElementById('lbl_losa_caliv');
+      if (lblCaliv) lblCaliv.innerText = `Alivianador (${alivText})`;
+
+      const lblGra = document.getElementById('lbl_losa_graf_title');
+      if (lblGra) lblGra.innerText = `LOSA ALIVIANADA DE ${hl} CM`;
+
+      const cont = document.getElementById('dib_nervios_container');
+      const dib_tabla = document.getElementById('dib_tabla');
+      const vlbl = document.getElementById('dib_labels');
+      const dib_h_cota = document.getElementById('dib_h_cota');
+      const dib_h_val = document.getElementById('dib_h_val');
+
+      if (cont && dib_tabla && vlbl) {
+        const h_tc = Math.max(tc * 2, 16);
+        const h_hw = Math.max(hw * 2, 30);
+        dib_tabla.innerText = `Tabla de compresión (${tc} cm)`;
+        dib_tabla.style.height = h_tc + 'px';
+
+        if (dib_h_cota && dib_h_val) {
+          dib_h_cota.style.height = (h_tc + h_hw) + 'px';
+          dib_h_val.innerText = `Hl = ${hl} cm`;
+        }
+
+        let nerviosHtml = '';
+        let currentWidth = 0;
+        let isBlock = true;
+        // Interleave blocks and ribs up to 100cm width (1m profile)
+        let safetyBatch = 0;
+        while (currentWidth < 100 && safetyBatch < 25) {
+          const pieceW = isBlock ? bb : bn;
+          let wToDraw = Math.max(pieceW, 1); // Forzar al menos 1cm para evitar bucle infinito
+          if (currentWidth + wToDraw > 100) wToDraw = 100 - currentWidth;
+
+          if (isBlock) {
+            nerviosHtml += `<div style="width:${wToDraw}%; background:rgba(255,200,50,0.15); border:1px dashed rgba(255,200,50,0.4); border-top:none; box-sizing:border-box; border-radius:0 0 3px 3px; color:rgba(255,200,50,0.8); font-size:10px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; height:${h_hw}px;">${wToDraw >= 15 ? 'Bloque<br>(' + bb + 'x' + hw + 'cm)' : ''}</div>`;
+          } else {
+            nerviosHtml += `<div style="background:var(--accent); width:${wToDraw}%; height:${h_hw}px; border-radius:0 0 3px 3px; box-shadow:inset 0px 4px 0px rgba(0,0,0,0.15); display:flex; justify-content:center; align-items:center; color:rgba(0,0,0,0.7); font-size:10px; font-weight:800;"><span style="writing-mode:vertical-rl; transform:rotate(180deg); white-space:nowrap;">${wToDraw >= 5 ? 'nervio' : ''}</span></div>`;
+          }
+          currentWidth += wToDraw;
+          isBlock = !isBlock;
+          safetyBatch++;
+        }
+
+        cont.innerHTML = nerviosHtml;
+        vlbl.innerHTML = `<span style="color:var(--accent);font-weight:bold;font-size:13px">Losa alivianada de ${hl} cm</span> <br> <span style="display:inline-block;margin-top:4px;font-size:11px">Nervio: <span style="color:var(--white);font-weight:700">${bn}</span> x <span style="color:var(--white);font-weight:700">${hw}</span> cm &nbsp;|&nbsp; Bloque: <span style="color:var(--white);font-weight:700">${bb}</span> x <span style="color:var(--white);font-weight:700">${hw}</span> cm</span>`;
+      }
+
+      // MACRO LINK: Transferir a Vigas
+      const vigaCm = document.getElementById('Cm');
+      if (vigaCm && Math.abs((parseFloat(vigaCm.value) || 0) - P_eq) > 0.01) {
+        vigaCm.value = P_eq.toFixed(3);
+        vigaCm.style.backgroundColor = "rgba(127,255,107,0.3)";
+        setTimeout(() => { vigaCm.style.backgroundColor = ""; }, 1000);
+        if (typeof recalc === 'function') recalc(); // Actualiza viga
+      }
+
+      // === CARGA VIVA NEC-SE-CG 2015 ===
+      const cvSel = document.getElementById('losa_uso');
+      if (cvSel) {
+        const cv_val = parseFloat(cvSel.value);
+        const cv_uso = cvSel.options[cvSel.selectedIndex].text;
+        const elCv = document.getElementById('r_losa_cv');
+        const elCvTot = document.getElementById('r_losa_cv_total');
+        const elUso = document.getElementById('r_losa_uso_txt');
+        if (elCv) elCv.textContent = cv_val.toFixed(2);
+        if (elCvTot) elCvTot.textContent = cv_val.toFixed(2);
+        if (elUso) elUso.textContent = cv_uso;
+      }
+    }
+    document.querySelectorAll('[id^=losa_]').forEach(el => el.addEventListener('input', recalcLosa));
+    document.querySelectorAll('[id^=losa_]').forEach(el => el.addEventListener('change', recalcLosa));
+
+    function recalcCol() {
+      const L1 = getVal('col_L1') || 0;
+      const L2 = getVal('col_L2') || 0;
+      const L3 = getVal('col_L3') || 0;
+      const L4 = getVal('col_L4') || 0;
+      
+      // Área Tributaria
+      const computedAt = ((L1 / 2) + (L2 / 2)) * ((L3 / 2) + (L4 / 2));
+      const colAtInput = document.getElementById('col_at');
+      if (colAtInput && parseFloat(colAtInput.value).toFixed(2) !== computedAt.toFixed(2)) {
+        colAtInput.value = computedAt.toFixed(2);
+        // Resaltar visualmente que fue calculado (opcional)
+        colAtInput.style.backgroundColor = "rgba(127,255,107,0.3)";
+        setTimeout(() => { colAtInput.style.backgroundColor = ""; }, 1000);
+      }
+
+      const at = computedAt; 
+      const pisos = getVal('pisos') || 2, cu = getVal('col_cu');
+      const b = getVal('col_bc'), h = getVal('col_hc'), fc = getVal('col_fc');
+      const fy = 4200;
+      const fil = getVal('col_fil'), nx = getVal('col_nx'), ny = getVal('col_ny');
+      const rec = 2.5;
+
+      const pult = at * pisos * cu * 1.3 / 0.85;
+      const ag_nec = (pult * 1000) / (0.85 * fc + 0.012 * fy);
+      const ac = b * h;
+
+      const num_var = nx * 2 + (ny - 2) * 2;
+      const As = num_var * Math.PI * (fil / 20) ** 2;
+      const cuant = (As / ac) * 100;
+
+      setResult('r_col_ac', ac, 0);
+      setResult('r_col_agnec', ag_nec, 0);
+      setResult('r_col_pult', pult, 1);
+      setResult('r_col_as', As, 2);
+      setResult('r_col_cuant', cuant, 2);
+
+      const ind_c = document.getElementById('status_col_cuant');
+      if (ind_c) {
+        if (cuant >= 1.0 && cuant <= 12.0) { ind_c.style.background = 'rgba(127,255,107,0.1)'; ind_c.style.borderColor = 'rgba(127,255,107,0.4)'; }
+        else { ind_c.style.background = 'rgba(255,71,87,0.1)'; ind_c.style.borderColor = 'rgba(255,71,87,0.4)'; }
+      }
+      const ind_ag = document.getElementById('status_col_ag');
+      if (ind_ag) {
+        if (ac >= ag_nec) { ind_ag.style.background = 'rgba(127,255,107,0.1)'; ind_ag.style.borderColor = 'rgba(127,255,107,0.4)'; }
+        else { ind_ag.style.background = 'rgba(255,71,87,0.1)'; ind_ag.style.borderColor = 'rgba(255,71,87,0.4)'; }
+      }
+
+      const d = h - rec - 1 - fil / 20;
+      const vcol = (1.25 * As * fy * (h - d) / 100000) * 2 / 3.4;
+      const vhz = (1.25 * As * fy / 1000) - vcol;
+      const vj = 3.3 * Math.sqrt(fc) * b * h / 1000;
+
+      setResult('r_col_vj', vj, 2);
+      setResult('r_col_vhz', vhz, 2);
+      setStatus('r_col_nudo', vj >= vhz, vj >= vhz ? 'CUMPLE V j > V hz' : 'AUMENTAR SECCIÓN');
+
+      // --- DRAW COLUMN SVG ---
+      updateColDiagram(b, h, rec, fil, nx, ny);
+    }
+
+    function updateColDiagram(b, h, rec, fil, nx, ny) {
+      const MAX_SIZE = 170; // Espaciado max para que entre
+      const scale = Math.min(MAX_SIZE / b, MAX_SIZE / h);
+
+      const px_b = b * scale;
+      const px_h = h * scale;
+      const px_rec = rec * scale;
+
+      const rectConc = document.getElementById('svgColConc');
+      if (rectConc) {
+        rectConc.setAttribute('x', -px_b / 2);
+        rectConc.setAttribute('y', -px_h / 2);
+        rectConc.setAttribute('width', px_b);
+        rectConc.setAttribute('height', px_h);
+      }
+
+      const rectStirrup = document.getElementById('svgColStirrup');
+      if (rectStirrup) {
+        rectStirrup.setAttribute('x', -px_b / 2 + px_rec);
+        rectStirrup.setAttribute('y', -px_h / 2 + px_rec);
+        rectStirrup.setAttribute('width', px_b - 2 * px_rec);
+        rectStirrup.setAttribute('height', px_h - 2 * px_rec);
+      }
+
+      const labelB = document.getElementById('svgColB');
+      if (labelB) labelB.textContent = b + ' cm';
+      const labelH = document.getElementById('svgColH');
+      if (labelH) labelH.textContent = h + ' cm';
+
+      const barsGroup = document.getElementById('svgColBars');
+      if (barsGroup) {
+        barsGroup.innerHTML = '';
+        const r_bar = Math.min((fil / 10) * scale * 0.45, 6);
+        const drawCircle = (cx, cy) => {
+          const ns = 'http://www.w3.org/2000/svg';
+          const glow = document.createElementNS(ns, 'circle');
+          glow.setAttribute('cx', cx); glow.setAttribute('cy', cy);
+          glow.setAttribute('r', r_bar + 1.5);
+          glow.setAttribute('fill', 'rgba(127,255,107,0.2)');
+          barsGroup.appendChild(glow);
+
+          const c = document.createElementNS(ns, 'circle');
+          c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r_bar);
+          c.setAttribute('fill', '#7fff6b');
+          c.setAttribute('stroke', '#fff');
+          c.setAttribute('stroke-width', '1');
+          barsGroup.appendChild(c);
+        };
+
+        // Coordenadas locales respecto al centro (0,0) del grupo
+        // El limite para ubicar las varillas es el estribo
+        const limit_x = px_b / 2 - px_rec;
+        const limit_y = px_h / 2 - px_rec;
+
+        // Arriba y Abajo (anchura nx)
+        if (nx > 0) {
+          const dx = (nx > 1) ? (2 * limit_x) / (nx - 1) : 0;
+          for (let i = 0; i < nx; i++) {
+            const x = -limit_x + i * dx;
+            drawCircle(x, -limit_y); // Arriba
+
+            if (ny > 0) { // Si hay grosor en Y
+              drawCircle(x, limit_y); // Abajo
+            }
+          }
+        }
+
+        // Costados izquierdo y derecho (profundidad ny, sin tocar esquinas ya dibujadas)
+        if (ny > 2) {
+          const dy = (2 * limit_y) / (ny - 1);
+          for (let j = 1; j < ny - 1; j++) {
+            const y = -limit_y + j * dy;
+            drawCircle(-limit_x, y); // Izquierda
+            drawCircle(limit_x, y);  // Derecha
+          }
+        }
+      }
+    }
+
+    document.querySelectorAll('[id^=col_]').forEach(el => el.addEventListener('input', recalcCol));
+
+    // ============================================================
+    // TABLAS NEC-15: Fa, Fd, Fs  (Tablas 3, 4, 5)
+    // Filas: Z = 0.15 | 0.25 | 0.30 | 0.35 | 0.40 | 0.50
+    // Columnas: Suelo A | B | C | D | E
+    // (Suelo F requiere estudio geotécnico específico → usa E como mínimo)
+    // ============================================================
+    const NEC_Z   = [0.15, 0.25, 0.30, 0.35, 0.40, 0.50];
+    const NEC_FA = {
+      A: [0.90, 0.90, 0.90, 0.90, 0.90, 0.90],
+      B: [1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
+      C: [1.40, 1.30, 1.25, 1.23, 1.20, 1.18],
+      D: [1.60, 1.40, 1.30, 1.25, 1.20, 1.12],  // NEC-15 Tabla 3
+      E: [1.80, 1.50, 1.30, 1.25, 0.90, 0.90]
+    };
+    const NEC_FD = {
+      A: [0.90, 0.90, 0.90, 0.90, 0.90, 0.90],
+      B: [1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
+      C: [1.36, 1.28, 1.19, 1.19, 1.19, 1.19],  // NEC-15 Tabla 4
+      D: [1.62, 1.45, 1.36, 1.28, 1.11, 1.11],
+      E: [2.10, 1.75, 1.70, 1.65, 0.90, 0.90]
+    };
+    const NEC_FS = {
+      A: [0.75, 0.75, 0.75, 0.75, 0.75, 0.75],
+      B: [0.75, 0.75, 0.75, 0.75, 0.75, 0.75],
+      C: [1.28, 1.28, 1.28, 1.28, 1.28, 1.28],  // NEC-15 Tabla 5
+      D: [1.48, 1.36, 1.28, 1.28, 1.20, 1.20],
+      E: [2.40, 2.00, 1.80, 1.65, 1.00, 1.00]
+    };
+
+    // Interpolación lineal entre dos valores de Z tabulados
+    function interpNEC(table, suelo, Z) {
+      const key = (suelo === 'F') ? 'E' : suelo; // F → usar E (req. estudio)
+      const row = table[key];
+      if (!row) return 1.0;
+      const Zs = NEC_Z;
+      if (Z <= Zs[0]) return row[0];
+      if (Z >= Zs[Zs.length - 1]) return row[row.length - 1];
+      for (let i = 0; i < Zs.length - 1; i++) {
+        if (Z >= Zs[i] && Z <= Zs[i + 1]) {
+          const t = (Z - Zs[i]) / (Zs[i + 1] - Zs[i]);
+          return row[i] + t * (row[i + 1] - row[i]);
+        }
+      }
+      return 1.0;
+    }
+
+    function recalcSis() {
+      const Z = getVal('sis_Z'), suelo = document.getElementById('sis_suelo').value;
+      const I = getVal('sis_I'), R = getVal('sis_R');
+      const fip = getVal('sis_fip'), fie = getVal('sis_fie'), n = getVal('sis_n');
+
+      // Obtener Fa, Fd, Fs usando interpolación NEC-15
+      const fa = interpNEC(NEC_FA, suelo, Z);
+      const fd = interpNEC(NEC_FD, suelo, Z);
+      const fs = interpNEC(NEC_FS, suelo, Z);
+
+      const tc = 0.55 * fs * fd / fa;
+      const sa_max = Z * fa * n;
+      const sa_ine_max = sa_max * I / (R * fip * fie);
+
+      setResult('r_sis_fa', fa, 2); setResult('r_sis_fd', fd, 2); setResult('r_sis_fs', fs, 2);
+      setResult('r_sis_tc', tc, 3);
+      setResult('r_sis_i_val', I, 1);
+      setResult('r_sis_sael', sa_max, 3);
+      setResult('r_sis_saine', sa_ine_max, 4);
+
+      // Advertencia especial para suelo F
+      const warnF = document.getElementById('r_sis_fa');
+      if (suelo === 'F' && warnF) {
+        warnF.style.color = 'var(--warn)';
+        warnF.title = 'Suelo F requiere estudio geotécnico. Valores estimados con perfil E.';
+      } else if (warnF) {
+        warnF.style.color = '';
+        warnF.title = '';
+      }
+
+      const dx = getVal('sis_derx'), dy = getVal('sis_dery');
+      const dx_ine = dx * 0.75 * R, dy_ine = dy * 0.75 * R;
+
+      setResult('r_sis_inex', dx_ine, 4);
+      setResult('r_sis_iney', dy_ine, 4);
+      setStatus('r_sis_okx', dx_ine <= 0.02, dx_ine <= 0.02 ? 'OK (< 2%)' : 'RECHAZA');
+      setStatus('r_sis_oky', dy_ine <= 0.02, dy_ine <= 0.02 ? 'OK (< 2%)' : 'RECHAZA');
+
+      // Actualizar ecuaciones en tooltip (hover)
+      let lblFa = document.getElementById('lbl_sis_fa');
+      if(lblFa) lblFa.setAttribute('data-eq-calc', `\\text{Z}=${Z} \\,,\\text{Suelo}=${suelo} \\Rightarrow Fa=${fa.toFixed(2)}`);
+      
+      let lblFd = document.getElementById('lbl_sis_fd');
+      if(lblFd) lblFd.setAttribute('data-eq-calc', `\\text{Z}=${Z} \\,,\\text{Suelo}=${suelo} \\Rightarrow Fd=${fd.toFixed(2)}`);
+      
+      let lblFs = document.getElementById('lbl_sis_fs');
+      if(lblFs) lblFs.setAttribute('data-eq-calc', `\\text{Z}=${Z} \\,,\\text{Suelo}=${suelo} \\Rightarrow Fs=${fs.toFixed(2)}`);
+      
+      let lblTc = document.getElementById('lbl_sis_tc');
+      if(lblTc) lblTc.setAttribute('data-eq-calc', `0.55 \\cdot ${fs.toFixed(2)} \\cdot \\frac{${fd.toFixed(2)}}{${fa.toFixed(2)}} = ${tc.toFixed(3)} \\text{ s}`);
+      
+      let lblSaEl = document.getElementById('lbl_sis_sael');
+      if(lblSaEl) lblSaEl.setAttribute('data-eq-calc', `${Z} \\cdot ${n} \\cdot ${fa.toFixed(2)} = ${sa_max.toFixed(3)} \\text{ g}`);
+
+      let lblSaIne = document.getElementById('lbl_sis_saine');
+      if(lblSaIne) lblSaIne.setAttribute('data-eq-calc', `\\frac{${sa_max.toFixed(3)} \\cdot ${I}}{${R} \\cdot ${fip} \\cdot ${fie}} = ${sa_ine_max.toFixed(3)} \\text{ g}`);
+
+      let lblInex = document.getElementById('lbl_sis_inex');
+      if(lblInex) {
+        lblInex.setAttribute('data-eq-calc', `0.75 \\cdot ${R} \\cdot ${dx.toFixed(4)} = ${dx_ine.toFixed(4)}`);
+        lblInex.setAttribute('data-eq-status', dx_ine <= 0.02 ? 'ok' : 'no');
+      }
+
+      let lblIney = document.getElementById('lbl_sis_iney');
+      if(lblIney) {
+        lblIney.setAttribute('data-eq-calc', `0.75 \\cdot ${R} \\cdot ${dy.toFixed(4)} = ${dy_ine.toFixed(4)}`);
+        lblIney.setAttribute('data-eq-status', dy_ine <= 0.02 ? 'ok' : 'no');
+      }
+
+      // Dibujar espectro en SVG (el mini y el modal)
+      const t_est = getVal('sis_t_est') || 0;
+      generarEspectroSVG('svgEspectroContainer', Z, fa, fd, fs, I, R, fip, fie, n, t_est, false);
+      if(document.getElementById('svgEspectroModal')) {
+        generarEspectroSVG('svgEspectroModal', Z, fa, fd, fs, I, R, fip, fie, n, t_est, true);
+        const infoTc = 0.55 * fs * fd / fa;
+        const sa_el = calcSa(t_est, infoTc, Z, fa, n, fs, fd);
+        const sa_in = sa_el * I / (R * fip * fie);
+        document.getElementById('mdl_T').textContent = t_est.toFixed(2);
+        document.getElementById('mdl_SaEl').textContent = sa_el.toFixed(3);
+        document.getElementById('mdl_SaIn').textContent = sa_in.toFixed(3);
+      }
+    }
+
+    function calcSa(t, Tc, Z, fa, n, fs, fd) {
+      const Sa_max = Z * fa * n;
+      const TL = 2.4; 
+      const To = 0.1 * Tc;
+      let sa = 0;
+      if (t < To) sa = Sa_max * (1 + (n - 1) * t / To);
+      else if (t <= Tc) sa = Sa_max;
+      else if (t <= TL) sa = Sa_max * Math.pow(Tc / t, 1);
+      else sa = Sa_max * Tc * TL / (t * t);
+      return sa;
+    }
+
+    document.querySelectorAll('[id^=sis_]').forEach(el => el.addEventListener('input', recalcSis));
+
+    // ============================================================
+    // ZONA SÍSMICA — TABLA 19 NEC (Dataset completo)
+    // ============================================================
+    const ZONA_SISMICA_DATA = [
+      ["CUENCA","CUENCA","CUENCA","AZUAY",0.25],["CHORDELEG","CHORDELEG","CHORDELEG","AZUAY",0.25],
+      ["GUALACEO","GUALACEO","GUALACEO","AZUAY",0.25],["SEVILLA DE ORO","SEVILLA DE ORO","SEVILLA DE ORO","AZUAY",0.25],
+      ["EL PAN","EL PAN","EL PAN","AZUAY",0.25],["PAUTE","CHICAN (GUILLERMO ORTEGA)","PAUTE","AZUAY",0.25],
+      ["GUARANDA","GUARANDA","GUARANDA","BOLIVAR",0.35],["SAN LORENZO","SAN LORENZO","GUARANDA","BOLIVAR",0.35],
+      ["SANTIAGO","SANTIAGO","SAN MIGUEL","BOLIVAR",0.35],["SAN JOSE DEL TAMBO","SAN JOSE DEL TAMBO","CHILLANES","BOLIVAR",0.35],
+      ["SAN SIMON","SAN SIMON (YACOTO)","GUARANDA","BOLIVAR",0.35],["SAN MIGUEL DE BOLIVAR","SAN MIGUEL","SAN MIGUEL","BOLIVAR",0.35],
+      ["SAN JOSE DE CHIMBO","SAN JOSE DE CHIMBO","CHIMBO","BOLIVAR",0.35],["SIMIATUG","SIMIATUG","GUARANDA","BOLIVAR",0.30],
+      ["SAN LUIS DE PAMBIL","SAN LUIS DE PAMBIL","GUARANDA","BOLIVAR",0.30],["FACUNDO VELA","FACUNDO VELA","GUARANDA","BOLIVAR",0.30],
+      ["LAS MERCEDES","LAS NAVES","LAS NAVES","BOLIVAR",0.30],["LAS NAVES","LAS NAVES","LAS NAVES","BOLIVAR",0.30],
+      ["SAN LUIS DE LAS MERCEDES","SAN LUIS DE PAMBIL","GUARANDA","BOLIVAR",0.30],["ECHEANDIA","ECHEANDIA","ECHEANDIA","BOLIVAR",0.30],
+      ["CHILLANES","CHILLANES","CHILLANES","BOLIVAR",0.40],["CAÑAR","CAÑAR","CAÑAR","CAÑAR",0.30],
+      ["EL TAMBO","EL TAMBO","EL TAMBO","CAÑAR",0.30],["LA PUNTILLA","PANCHO NEGRO","LA TRONCAL","CAÑAR",0.40],
+      ["LA TRONCAL","LA TRONCAL","LA TRONCAL","CAÑAR",0.40],["DELEG","DELEG","DELEG","CAÑAR",0.25],
+      ["AZOGUES","AZOGUES","AZOGUES","CAÑAR",0.25],["BIBLIAN","BIBLIAN","BIBLIAN","CAÑAR",0.25],
+      ["HUACA","HUACA","SAN PEDRO DE HUACA","CARCHI",0.40],["EL PLAYON DE SAN FRANCISCO","EL CARMELO (EL PUN)","TULCAN","CARCHI",0.40],
+      ["MARISCAL SUCRE","MARISCAL SUCRE","SAN PEDRO DE HUACA","CARCHI",0.40],["TULCAN","TULCAN","TULCAN","CARCHI",0.40],
+      ["EL ANGEL","EL ANGEL","ESPEJO","CARCHI",0.40],["SAN GABRIEL","SAN GABRIEL","MONTUFAR","CARCHI",0.40],
+      ["EL CARMELO","EL CARMELO (EL PUN)","TULCAN","CARCHI",0.40],["LA LIBERTAD","LA LIBERTAD (ALIZO)","ESPEJO","CARCHI",0.40],
+      ["JULIO ANDRADE","JULIO ANDRADE (OREJUELA)","TULCAN","CARCHI",0.40],["LA PAZ","LA PAZ","MONTUFAR","CARCHI",0.40],
+      ["SAN ISIDRO","SAN ISIDRO","ESPEJO","CARCHI",0.40],["SAN JOSE DE TINAJILLAS","GARCIA MORENO","BOLIVAR","CARCHI",0.40],
+      ["SANTA MARTHA DE CUBA","SANTA MARTHA DE CUBA","TULCAN","CARCHI",0.40],["GARCIA MORENO","GARCIA MORENO","BOLIVAR","CARCHI",0.40],
+      ["MONTE OLIVO","MONTE OLIVO","BOLIVAR","CARCHI",0.40],["PIQUIUCHO","LOS ANDES","BOLIVAR","CARCHI",0.40],
+      ["PUEBLO NUEVO","SAN RAFAEL","BOLIVAR","CARCHI",0.40],["PUSIR","SAN VICENTE DE PUSIR","BOLIVAR","CARCHI",0.40],
+      ["LOS ANDES","LOS ANDES","BOLIVAR","CARCHI",0.40],["FERNANDEZ SALVADOR","FERNANDEZ SALVADOR","MONTUFAR","CARCHI",0.40],
+      ["SAN VICENTE DE PUSIR","SAN VICENTE DE PUSIR","BOLIVAR","CARCHI",0.40],["MIRA","MIRA (CHONTAHUASI)","MIRA","CARCHI",0.40],
+      ["BOLIVAR","BOLIVAR","BOLIVAR","CARCHI",0.40],["TUFIÑO","TUFIÑO","TULCAN","CARCHI",0.40],
+      ["CALPI","CALPI","COLTA","CHIMBORAZO",0.35],["PALLATANGA","PALLATANGA","PALLATANGA","CHIMBORAZO",0.40],
+      ["PUNGAL GRANDE","GUANO","GUANO","CHIMBORAZO",0.40],["GUANO","GUANO","GUANO","CHIMBORAZO",0.40],
+      ["PENIPE","PENIPE","PENIPE","CHIMBORAZO",0.40],["SAN ANDRES","SAN ANDRES","GUANO","CHIMBORAZO",0.40],
+      ["SAN ISIDRO DE PATULU","SAN ISIDRO DE PATULU","GUANO","CHIMBORAZO",0.40],["VALPARAISO","VALPARAISO","GUANO","CHIMBORAZO",0.40],
+      ["SAN JOSE DE CHAZO","SAN JOSE DEL CHAZO","GUANO","CHIMBORAZO",0.40],["GUANANDO","GUANANDO","GUANO","CHIMBORAZO",0.40],
+      ["LICIN","RIOBAMBA","RIOBAMBA","CHIMBORAZO",0.40],["QUIMIAG","QUIMIAG","RIOBAMBA","CHIMBORAZO",0.40],
+      ["RIOBAMBA","GUANO","GUANO","CHIMBORAZO",0.40],["ILAPO","ILAPO","GUANO","CHIMBORAZO",0.40],
+      ["SAN GERARDO","SAN GERARDO DE PACAICAGUAN","GUANO","CHIMBORAZO",0.40],["SAN ANTONIO DE BAYUSHIG","SAN ANTONIO DE BAYUSHIG","PENIPE","CHIMBORAZO",0.40],
+      ["SANTA FE DE GALAN","SANTA FE DE GALAN","GUANO","CHIMBORAZO",0.40],["CHAMBO","CHAMBO","CHAMBO","CHIMBORAZO",0.40],
+      ["PUNIN","PUNIN","RIOBAMBA","CHIMBORAZO",0.40],["LICTO","LICTO","RIOBAMBA","CHIMBORAZO",0.40],
+      ["PUNGALA","PUNGALA","RIOBAMBA","CHIMBORAZO",0.40],["SAN LUIS","SAN LUIS","RIOBAMBA","CHIMBORAZO",0.40],
+      ["CEBADAS","CEBADAS","GUAMOTE","CHIMBORAZO",0.40],["CAJABAMBA","VILLA LA UNION (CAJABAMBA)","COLTA","CHIMBORAZO",0.40],
+      ["CUBIJIES","GUANO","GUANO","CHIMBORAZO",0.40],["SAN JUAN","SAN JUAN","RIOBAMBA","CHIMBORAZO",0.40],
+      ["COLUMBE","COLUMBE","COLTA","CHIMBORAZO",0.40],["VILLA LA UNION","VILLA LA UNION (CAJABAMBA)","COLTA","CHIMBORAZO",0.40],
+      ["GUAMOTE","GUAMOTE","GUAMOTE","CHIMBORAZO",0.40],["CHUNCHI","CHUNCHI","CHUNCHI","CHIMBORAZO",0.35],
+      ["ALAUSI","SIBAMBE","ALAUSI","CHIMBORAZO",0.35],["ANGAMARCA","ANGAMARCA","PUJILI","COTOPAXI",0.30],
+      ["LA MANA","LA MANA","LA MANA","COTOPAXI",0.30],["ZUMBAHUA","ZUMBAHUA","PUJILI","COTOPAXI",0.30],
+      ["EL CORAZON","EL CORAZON","PANGUA","COTOPAXI",0.30],["MORASPUNGO","MORASPUNGO","PANGUA","COTOPAXI",0.30],
+      ["SIGCHOS","SIGCHOS","SIGCHOS","COTOPAXI",0.30],["CUSUBAMBA","CUSUBAMBA","SALCEDO","COTOPAXI",0.40],
+      ["ALAQUES","ALAQUES (ALAQUEZ)","LATACUNGA","COTOPAXI",0.40],["MULALILLO","MULALILLO","SALCEDO","COTOPAXI",0.40],
+      ["PANSALEO","PANSALEO","SALCEDO","COTOPAXI",0.40],["GUAITACAMA","GUAITACAMA (GUAYTACAMA)","LATACUNGA","COTOPAXI",0.40],
+      ["MULLIQUINDIL","MULLIQUINDIL (SANTA ANA)","SALCEDO","COTOPAXI",0.40],["SAQUISILI","CHANTILIN","SAQUISILI","COTOPAXI",0.40],
+      ["LATACUNGA","LATACUNGA","LATACUNGA","COTOPAXI",0.40],["SAN JUAN DE PASTOCALLE","SAN JUAN DE PASTOCALLE","LATACUNGA","COTOPAXI",0.40],
+      ["TANICUCHA","TANICUCHI","LATACUNGA","COTOPAXI",0.40],["TOACASO","TOACASO","LATACUNGA","COTOPAXI",0.40],
+      ["MULALO","MULALO","LATACUNGA","COTOPAXI",0.40],["PUJILI","PUJILI","PUJILI","COTOPAXI",0.40],
+      ["SAN MIGUEL DE SALCEDO","SAN MIGUEL","SALCEDO","COTOPAXI",0.40],["PORTOVELO","PORTOVELO","PORTOVELO","EL ORO",0.30],
+      ["CHILLA","CHILLA","CHILLA","EL ORO",0.30],["PACCHA","PACCHA","ATAHUALPA","EL ORO",0.30],
+      ["PIÑAS","PIÑAS","PIÑAS","EL ORO",0.30],["ZARUMA","MALVAS","ZARUMA","EL ORO",0.30],
+      ["HUAQUILLAS","HUAQUILLAS","HUAQUILLAS","EL ORO",0.40],["SANTA ROSA","SANTA ROSA","SANTA ROSA","EL ORO",0.40],
+      ["ARENILLAS","ARENILLAS","ARENILLAS","EL ORO",0.40],["MACHALA","MACHALA","MACHALA","EL ORO",0.40],
+      ["BALSAS","BALSAS","BALSAS","EL ORO",0.35],["MARCABELI","MARCABELI","MARCABELI","EL ORO",0.35],
+      ["PASAJE","PASAJE","PASAJE","EL ORO",0.35],["EL GUABO","EL GUABO","EL GUABO","EL ORO",0.40],
+      ["VICHE","VICHE","QUININDE","ESMERALDAS",0.50],["MONTANA","ROSA ZARATE (QUININDE)","QUININDE","ESMERALDAS",0.50],
+      ["ATACAMES","ATACAMES","ATACAMES","ESMERALDAS",0.50],["ROSA ZARATE","ROSA ZARATE (QUININDE)","QUININDE","ESMERALDAS",0.50],
+      ["ESMERALDAS","ESMERALDAS","ESMERALDAS","ESMERALDAS",0.50],["SAN LORENZO","SAN LORENZO","SAN LORENZO","ESMERALDAS",0.50],
+      ["LA CONCORDIA","LA CONCORDIA","LA CONCORDIA","ESMERALDAS",0.50],["PLAN PILOTO","LA CONCORDIA","LA CONCORDIA","ESMERALDAS",0.40],
+      ["MUISNE","MUISNE","MUISNE","ESMERALDAS",0.50],["GUAYAQUIL","GUAYAQUIL","GUAYAQUIL","GUAYAS",0.40],
+      ["MILAGRO","MILAGRO","MILAGRO","GUAYAS",0.35],["SAMBORONDON","SAMBORONDON","SAMBORONDON","GUAYAS",0.35],
+      ["NARANJITO","NARANJITO","NARANJITO","GUAYAS",0.35],["DAULE","DAULE","DAULE","GUAYAS",0.40],
+      ["BALZAR","BALZAR","BALZAR","GUAYAS",0.40],["SANTA LUCIA","SANTA LUCIA","SANTA LUCIA","GUAYAS",0.40],
+      ["PEDRO CARBO","PEDRO CARBO","PEDRO CARBO","GUAYAS",0.40],["NARANJAL","NARANJAL","NARANJAL","GUAYAS",0.40],
+      ["EL TRIUNFO","EL TRIUNFO","EL TRIUNFO","GUAYAS",0.40],["BABAHOYO","BABAHOYO","BABAHOYO","LOS RIOS",0.30],
+      ["QUEVEDO","QUEVEDO","QUEVEDO","LOS RIOS",0.35],["VINCES","VINCES","VINCES","LOS RIOS",0.35],
+      ["BABA","BABA","BABA","LOS RIOS",0.35],["PUEBLOVIEJO","PUEBLOVIEJO","PUEBLOVIEJO","LOS RIOS",0.30],
+      ["VENTANAS","VENTANAS","VENTANAS","LOS RIOS",0.30],["CATARAMA","CATARAMA","URDANETA","LOS RIOS",0.30],
+      ["PATRICIA PILAR","PATRICIA PILAR","BUENA FE","LOS RIOS",0.40],["PORTOVIEJO","PORTOVIEJO","PORTOVIEJO","MANABI",0.50],
+      ["CHONE","CHONE","CHONE","MANABI",0.50],["JIPIJAPA","JIPIJAPA","JIPIJAPA","MANABI",0.50],
+      ["MANTA","MONTECRISTI","MONTECRISTI","MANABI",0.50],["BAHIA DE CARAQUEZ","BAHIA DE CARAQUEZ","SUCRE","MANABI",0.50],
+      ["MONTECRISTI","MONTECRISTI","MONTECRISTI","MANABI",0.50],["PEDERNALES","PEDERNALES","PEDERNALES","MANABI",0.50],
+      ["PUERTO LOPEZ","PUERTO LOPEZ","PUERTO LOPEZ","MANABI",0.50],["JAMA","JAMA","JAMA","MANABI",0.50],
+      ["EL CARMEN","EL CARMEN","EL CARMEN","MANABI",0.40],["TOSAGUA","TOSAGUA","TOSAGUA","MANABI",0.50],
+      ["PAJAN","PAJAN","PAJAN","MANABI",0.50],["OLMEDO","OLMEDO","OLMEDO","MANABI",0.50],
+      ["PICHINCHA","PICHINCHA","PICHINCHA","MANABI",0.40],["PALORA","PALORA (METZERA)","PALORA","MORONA SANTIAGO",0.30],
+      ["MACAS","MACAS","MORONA","MORONA SANTIAGO",0.30],["SUCUA","SUCUA","SUCUA","MORONA SANTIAGO",0.30],
+      ["EL CHACO","EL CHACO","EL CHACO","NAPO",0.40],["BAEZA","BAEZA","QUIJOS","NAPO",0.40],
+      ["PAPALLACTA","PAPALLACTA","QUIJOS","NAPO",0.40],["TENA","TENA","TENA","NAPO",0.35],
+      ["ARCHIDONA","ARCHIDONA","ARCHIDONA","NAPO",0.35],["LA JOYA DE LOS SACHAS","LA JOYA DE LOS SACHAS","LA JOYA DE LOS SACHAS","ORELLANA",0.15],
+      ["NUEVA LOJA","NUEVA LOJA","LAGO AGRIO","SUCUMBIOS",0.15],["PUERTO FRANCISCO DE ORELLANA","PUERTO FRANCISCO DE ORELLANA","ORELLANA","ORELLANA",0.25],
+      ["PUYO","PUYO","PASTAZA","PASTAZA",0.30],["SHELL","SHELL","MERA","PASTAZA",0.30],["MERA","MERA","MERA","PASTAZA",0.35],
+      ["QUITO","POMASQUI","QUITO","PICHINCHA",0.40],["SANGOLQUI","SANGOLQUI","RUMIÑAHUI","PICHINCHA",0.40],
+      ["CAYAMBE","CAYAMBE","CAYAMBE","PICHINCHA",0.40],["MACHACHI","MACHACHI","MEJIA","PICHINCHA",0.40],
+      ["TUMBACO","TUMBACO","QUITO","PICHINCHA",0.40],["SAN ANTONIO DE PICHINCHA","SAN ANTONIO","QUITO","PICHINCHA",0.40],
+      ["EL QUINCHE","EL QUINCHE","QUITO","PICHINCHA",0.40],["CALDERON","CALDERON (CARAPUNGO)","QUITO","PICHINCHA",0.40],
+      ["GUAYLLABAMBA","GUAYLLABAMBA","QUITO","PICHINCHA",0.40],["TABACUNDO","TABACUNDO","PEDRO MONCAYO","PICHINCHA",0.40],
+      ["PEDRO VICENTE MALDONADO","PEDRO VICENTE MALDONADO","PEDRO VICENTE MALDONADO","PICHINCHA",0.40],
+      ["AMAGUAÑA","AMAGUAÑA","QUITO","PICHINCHA",0.40],["CONOCOTO","CONOCOTO","QUITO","PICHINCHA",0.40],
+      ["PUERTO QUITO","PUERTO QUITO","PUERTO QUITO","PICHINCHA",0.40],["SAN MIGUEL DE LOS BANCOS","SAN MIGUEL DE LOS BANCOS","SAN MIGUEL DE LOS BANCOS","PICHINCHA",0.40],
+      ["SANTA ELENA","SANTA ELENA","SANTA ELENA","SANTA ELENA",0.50],["SALINAS","SALINAS","SALINAS","SANTA ELENA",0.50],
+      ["MANGLARALTO","MANGLARALTO","SANTA ELENA","SANTA ELENA",0.50],["LA LIBERTAD","SALINAS","SALINAS","SANTA ELENA",0.50],
+      ["AYANGUE","COLONCHE","SANTA ELENA","SANTA ELENA",0.50],["MONTAÑITA","MANGLARALTO","SANTA ELENA","SANTA ELENA",0.50],
+      ["SANTO DOMINGO DE LOS COLORADOS","STO. DOMINGO DE LOS COLORADOS","SANTO DOMINGO","STO. DOMINGO DE LOS TSACHILAS",0.40],
+      ["SANTA MARIA DEL TOACHI","SANTA MARIA DEL TOACHI","SANTO DOMINGO","STO. DOMINGO DE LOS TSACHILAS",0.35],
+      ["LUZ DE AMERICA","LUZ DE AMERICA","SANTO DOMINGO","STO. DOMINGO DE LOS TSACHILAS",0.40],
+      ["VALLE HERMOSO","VALLE HERMOSO","SANTO DOMINGO","STO. DOMINGO DE LOS TSACHILAS",0.40],
+      ["SHUSHUFINDI","SHUSHUFINDI","SHUSHUFINDI","SUCUMBIOS",0.15],["EL ENO","EL ENO","LAGO AGRIO","SUCUMBIOS",0.15],
+      ["SEVILLA","SEVILLA","CASCALES","SUCUMBIOS",0.25],["EL DORADO DE CASCALES","EL DORADO DE CASCALES","CASCALES","SUCUMBIOS",0.30],
+      ["AMBATO","AMBATO","AMBATO","TUNGURAHUA",0.40],["BAÑOS DE AGUA SANTA","BAÑOS DE AGUA SANTA","BAÑOS DE AGUA SANTA","TUNGURAHUA",0.40],
+      ["PELILEO","PELILEO","SAN PEDRO DE PELILEO","TUNGURAHUA",0.40],["PILLARO","PILLARO","SANTIAGO DE PILLARO","TUNGURAHUA",0.40],
+      ["PATATE","PATATE","PATATE","TUNGURAHUA",0.40],["CEVALLOS","CEVALLOS","CEVALLOS","TUNGURAHUA",0.40],
+      ["QUERO","QUERO","QUERO","TUNGURAHUA",0.40],["TISALEO","TISALEO","TISALEO","TUNGURAHUA",0.40],
+      ["MOCHA","MOCHA","MOCHA","TUNGURAHUA",0.40],["TOTORAS","TOTORAS","AMBATO","TUNGURAHUA",0.40],
+      ["GUAYZIMI","GUAYZIMI","NANGARITZA","ZAMORA CHINCHIPE",0.30],["YANTZAZA","YANTZAZA (YANZATZA)","YANTZAZA","ZAMORA CHINCHIPE",0.30],
+      ["ZUMBA","ZUMBA","CHINCHIPE","ZAMORA CHINCHIPE",0.25],["ZAMORA","ZAMORA","ZAMORA","ZAMORA CHINCHIPE",0.25],
+      ["LAS GOLONDRINAS","LAS GOLONDRINAS","LAS GOLONDRINAS","ZONA NO DELIMITADA",0.50],
+      ["MANGA DEL CURA","MANGA DEL CURA","MANGA DEL CURA","ZONA NO DELIMITADA",0.40],
+      // IMBABURA
+      ["IBARRA","SAN MIGUEL DE IBARRA","IBARRA","IMBABURA",0.40],["OTAVALO","DOCTOR MIGUEL EGAS CABEZAS","OTAVALO","IMBABURA",0.40],
+      ["COTACACHI","COTACACHI","COTACACHI","IMBABURA",0.40],["PIMAMPIRO","PIMAMPIRO","PIMAMPIRO","IMBABURA",0.40],
+      ["ATUNTAQUI","SAN JOSE DE CHALTURA","ANTONIO ANTE","IMBABURA",0.40],["URCUQUI","URCUQUI","SAN MIGUEL DE URCUQUI","IMBABURA",0.40],
+      // LOJA
+      ["LOJA","LOJA","LOJA","LOJA",0.25],["CARIAMANGA","CARIAMANGA","CALVAS","LOJA",0.25],
+      ["CATAMAYO","CATAMAYO (LA TOMA)","CATAMAYO","LOJA",0.25],["MACARA","MACARA","MACARA","LOJA",0.35],
+      ["CELICA","CELICA","CELICA","LOJA",0.35],["ALAMOR","ALAMOR","PUYANGO","LOJA",0.40],
+      ["CATACOCHA","CATACOCHA","PALTAS","LOJA",0.30],["CHAGUARPAMBA","CHAGUARPAMBA","CHAGUARPAMBA","LOJA",0.30],
+    ];
+
+    function normalizarTexto(t) {
+      return (t || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    }
+
+    function filtrarCiudades(q) {
+      const list = document.getElementById('sis_ciudad_list');
+      const info = document.getElementById('sis_ciudad_info');
+      if (!q || q.length < 2) { list.style.display = 'none'; return; }
+      const qn = normalizarTexto(q);
+      const results = ZONA_SISMICA_DATA.filter(r => {
+        return normalizarTexto(r[0]).includes(qn) ||
+               normalizarTexto(r[1]).includes(qn) ||
+               normalizarTexto(r[2]).includes(qn) ||
+               normalizarTexto(r[3]).includes(qn);
+      }).slice(0, 20);
+
+      if (!results.length) { list.style.display = 'none'; info.style.display = 'none'; return; }
+
+      list.innerHTML = '';
+      results.forEach(r => {
+        const li = document.createElement('li');
+        li.style.cssText = 'padding:7px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:11px;color:var(--text);transition:background 0.15s;display:flex;justify-content:space-between;align-items:center;gap:8px;';
+        li.innerHTML = `<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+          <b style="color:var(--accent)">${r[0]}</b> <span style="color:var(--muted)">— ${r[2]}, ${r[3]}</span>
+        </span>
+        <span style="background:rgba(0,229,255,0.15);color:var(--accent);font-weight:700;font-family:var(--mono);padding:2px 7px;border-radius:4px;white-space:nowrap;">Z=${r[4]}</span>`;
+        li.addEventListener('mouseenter', () => li.style.background = 'rgba(0,229,255,0.08)');
+        li.addEventListener('mouseleave', () => li.style.background = '');
+        li.addEventListener('mousedown', () => {
+          document.getElementById('sis_ciudad_search').value = r[0] + ' — ' + r[2] + ', ' + r[3];
+          const zInput = document.getElementById('sis_Z');
+          zInput.value = r[4];
+          zInput.style.transition = 'box-shadow 0.3s';
+          zInput.style.boxShadow = '0 0 0 3px rgba(0,229,255,0.4)';
+          setTimeout(() => zInput.style.boxShadow = '', 1000);
+          list.style.display = 'none';
+          info.style.display = 'block';
+          info.innerHTML = `📍 <b>${r[0]}</b> | Parroquia: ${r[1]} | Cantón: ${r[2]} | Provincia: <b>${r[3]}</b> | Z = <b style="color:var(--warn)">${r[4]}</b> <span style="color:var(--muted)">(Tabla 19 NEC)</span>`;
+          recalcSis();
+          saveAllData();
+        });
+        list.appendChild(li);
+      });
+      list.style.display = 'block';
+    }
+
+    // ============================================================
+    // EXPORT TO WORD ENGINE
+    // ============================================================
+    function export2Word() {
+      let html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>";
+      html += "<head><meta charset='utf-8'><title>Memoria Estructural</title>";
+      html += "<style>";
+      html += "body { font-family: 'Calibri', 'Segoe UI', sans-serif; color: #000; background: #fff; }";
+      html += "h1 { color: #2b579a; border-bottom: 2px solid #2b579a; margin-bottom: 5px; font-size: 24px;}";
+      html += "h2 { color: #333; margin-top: 25px; border-bottom: 1px solid #ccc; padding-bottom: 5px; font-size: 18px;}";
+      html += "table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size:14px; }";
+      html += "th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }";
+      html += "th { background-color: #f2f2f2; color: #333; }";
+      html += "td:nth-child(2) { font-weight: bold; color: #2b579a; width: 30%; }";
+      html += ".date { color: #666; font-size: 12px; margin-bottom: 20px; }";
+      html += "</style></head><body>";
+
+      html += "<h1>Memoria de Cálculo Estructural</h1>";
+      html += "<div class='date'>Generado automáticamente desde la Suite Estructural Unificada (ACI 318 / NEC) — Fecha: " + new Date().toLocaleDateString() + "</div>";
+
+      const tabs = [
+        { id: 'tab-losas', title: '1. Diseño de Losas Alivianadas' },
+        { id: 'tab-vigas', title: '2. Diseño de Vigas (Flexión y Cortante)' },
+        { id: 'tab-columnas', title: '3. Chequeo de Columnas y Nudo' },
+        { id: 'tab-sismo', title: '4. Análisis Sísmico y Derivas' }
+      ];
+
+      tabs.forEach(tab => {
+        let container = document.getElementById(tab.id);
+        if (!container) return;
+
+        html += `<h2>${tab.title}</h2>`;
+        html += "<table><tr><th>Parámetro Calculado / Verificación</th><th>Valor Obtenido</th></tr>";
+
+        // Extraemos los datos de todas las filas "mini-row"
+        container.querySelectorAll('.mini-row').forEach(row => {
+          // Solo consideramos los que tengan data dentro de .rv (el valor final)
+          let rv = row.querySelector('.rv');
+          if (!rv) return;
+
+          let val = rv.innerText.trim();
+          if (!val || val === '—') return; // Ignorar si está vacío
+
+          let lbl = row.querySelector('.rl')?.innerText.trim().replace(/Chequeo|Verificación/gi, '<b>Verificación</b>') || 'Parámetro';
+          let uni = row.querySelector('.ru')?.innerText.trim() || '';
+
+          // Casos particulares donde el 'ok' está fuera de la clase rv/ru
+          let okStatus = "";
+          if (row.querySelector('.status-ok')) okStatus = " ✓ CUMPLE";
+          if (row.querySelector('.status-no')) okStatus = " ✗ NO CUMPLE";
+
+          html += `<tr><td>${lbl}</td><td>${val} ${uni}${okStatus}</td></tr>`;
+        });
+        html += "</table>";
+      });
+
+      html += "<br><p style='text-align:center; color:#999; font-size:11px;'><hr>Reporte generado por Ingeniería de Software Estructural.</p>";
+      html += "</body></html>";
+
+      // Usamos un Blob con el MIME Type de Word antiguo para que lo intercepte MS Word.
+      let blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+      let url = URL.createObjectURL(blob);
+      let link = document.createElement('a');
+      link.href = url;
+      link.download = 'Memoria_Calculo_Estructural.doc';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // ============================================================
+    // MODO CLARO / OSCURO
+    // ============================================================
+    function toggleTheme() {
+      var body = document.body;
+      var btn = document.getElementById('btnTheme');
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        if (btn) btn.textContent = '\uD83C\uDF19';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        body.classList.add('light-mode');
+        if (btn) btn.textContent = '\u2600\uFE0F';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    // Aplicar tema guardado al cargar
+    (function() {
+      var saved = localStorage.getItem('theme');
+      if (saved === 'light') {
+        document.body.classList.add('light-mode');
+        var btn = document.getElementById('btnTheme');
+        if (btn) btn.textContent = '\u2600\uFE0F';
+      }
+    })();
+
+    // ============================================================
+    // GRÁFICO ESPECTRO SÍSMICO Sa vs T (SVG + TABLA)
+    // ============================================================
+    function generarEspectroSVG(containerId, Z, fa, fd, fs, I, R, fip, fie, n, T_est, isModal) {
+      var container = document.getElementById(containerId);
+      if (!container) return;
+
+      // Calcular espectro base NEC-15
+      var Tc = 0.55 * fs * fd / fa;
+      var To = 0.1 * Tc;
+      var TL = 2.4 * fd;
+      var Sa_max = Z * fa * n;
+      var factor = I / (R * fip * fie);
+
+      // Limites calculados segun los parametros
+      var Tmax = Math.max(TL * 1.5, Math.ceil(T_est)+0.5, 3.0);
+      var Sa_y_max = Math.max(Sa_max * 1.25, 0.5);
+
+      // Generar puntos estructurales estrictos cada 0.1s para la tabla,
+      // pero para el gráfico usamos saltos más finos (0.02s) para no perder la curva.
+      var steps = Math.ceil(Tmax / 0.02);
+      var pts_grafico = [];
+      for (var s = 0; s <= steps; s++) {
+        var t = s * 0.02;
+        if(t <= Tmax) pts_grafico.push(t);
+      }
+      
+      // Puntos críticos para precisión (se insertan si no existen en el paso de barrido)
+      var pt_criticos = [0, To, Tc, TL, T_est].filter(t => t <= Tmax);
+      pt_criticos.forEach(t => { if(!pts_grafico.some(v => Math.abs(v-t) < 0.001)) pts_grafico.push(t); });
+      pts_grafico.sort((a,b) => a - b);
+
+      // Calculamos datos para graficar
+      var pts_el = [];
+      pts_grafico.forEach(t => {
+        var sa;
+        if (t < To) { sa = Sa_max * (1 + (n - 1) * t / To); }
+        else if (t <= Tc) { sa = Sa_max; }
+        else if (t <= TL) { sa = Sa_max * Math.pow(Tc / t, 1); } // T > Tc => r=1
+        else { sa = Sa_max * Tc * TL / (t * t); } // T > TL
+        
+        var saine = sa * factor;
+        pts_el.push({ t, sa, saine });
+      });
+
+      // Crear tabla estrictamente cada 0.1s + Puntos críticos
+      var data_table = [];
+      var t_table_array = pt_criticos.slice();
+      for (let t_i = 0.0; t_i <= Tmax + 0.01; t_i += 0.1) {
+        if(!t_table_array.some(v => Math.abs(v-t_i) < 0.005)) t_table_array.push(t_i);
+      }
+      t_table_array.sort((a,b) => a - b);
+
+      t_table_array.forEach(t => {
+        var sa;
+        if (t < To) { sa = Sa_max * (1 + (n - 1) * t / To); }
+        else if (t <= Tc) { sa = Sa_max; }
+        else if (t <= TL) { sa = Sa_max * Math.pow(Tc / t, 1); }
+        else { sa = Sa_max * Tc * TL / (t * t); }
+        var saine = sa * factor;
+        let isCrit = pt_criticos.some(c => Math.abs(c-t) < 0.005);
+        data_table.push({ t, sa, saine, isCrit });
+      });
+
+      // Llenar tabla en-vivo (inline) y modal
+      var tbody = isModal ? document.getElementById('mdl_tabla_espectro') : document.getElementById('mdl_tabla_espectro_inline');
+      if (tbody) {
+        tbody.innerHTML = '';
+        data_table.forEach(d => {
+          let tr = document.createElement('tr');
+          let isTest = Math.abs(d.t - T_est) < 0.005;
+          let isZeroStep = Math.abs((d.t*10)%1) < 0.005 || Math.abs((d.t*10)%1 - 1) < 0.005;
+
+          if (isTest) {
+            // Fila remarcada del periodo estructural
+            tr.style.background = 'rgba(255,184,48,0.15)';
+            tr.style.fontWeight = 'bold';
+          } else if (d.isCrit && !isZeroStep) {
+            // Fila de Tc o TL o To que caen en un intermedio de la grilla 0.1s
+            tr.style.background = 'rgba(0,229,255,0.05)';
+          } else if(d.isCrit) {
+             tr.style.background = 'rgba(255,255,255,0.03)';
+          }
+          tr.style.borderBottom = '1px solid var(--border)';
+          
+          tr.innerHTML = `
+            <td style="padding:4px; color:var(--text); border-right:1px solid var(--border);">${d.t.toFixed(2)}</td>
+            <td style="padding:4px; color:#00e5ff; border-right:1px solid var(--border);">${d.sa.toFixed(3)}</td>
+            <td style="padding:4px; color:#ff6b35;">${d.saine.toFixed(3)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Proporciones flexibles según espacio del padre para evitar que se vea squished
+      // Se utiliza solo el viewBox nativo escalable
+      var W = 600, H = 350;
+      var padL = 40, padR = 20, padT = 20, padB = 30;
+      var gW = W - padL - padR;
+      var gH = H - padT - padB;
+
+      function txX(t) { return padL + (t / Tmax) * gW; }
+      function saY(s) { return padT + gH - (s / Sa_y_max) * gH; }
+
+      // Ajustes estéticos (Solo Tema Oscuro Cyberpunk)
+      var gridColor = "rgba(255,255,255,0.08)";
+      var axColor   = "rgba(255,255,255,0.15)";
+      var txColor   = "var(--muted)";
+      
+      var svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:100%; font-family:sans-serif; background:transparent;">`;
+
+      // Cuadrícula Horizontal (Eje Y -> Sa) en 5 o 6 subdivisiones 
+      var stepYn = 5;
+      for(var i = 0; i <= stepYn; i++) {
+        var vY = (Sa_y_max / stepYn) * i;
+        var yg = saY(vY);
+        svg += `<line x1="${padL}" y1="${yg}" x2="${padL+gW}" y2="${yg}" stroke="${gridColor}" stroke-width="1" />`;
+        svg += `<text x="${padL-5}" y="${yg+4}" fill="${txColor}" font-size="11" text-anchor="end">${vY.toFixed(2)}</text>`;
+      }
+      
+      // Cuadrícula Vertical (Eje X -> T) en pasos de ~0.5s dinámicos
+      var stepXval = Tmax > 3.5 ? 1.0 : 0.5;
+      var stepsX = Math.ceil(Tmax / stepXval); 
+      for(var j=0; j<=stepsX; j++) {
+        var vX = j * stepXval;
+        if(vX > Tmax) break;
+        var xg = txX(vX);
+        svg += `<line x1="${xg}" y1="${padT}" x2="${xg}" y2="${padT+gH}" stroke="${gridColor}" stroke-width="1" />`;
+        svg += `<text x="${xg}" y="${padT+gH+16}" fill="${txColor}" font-size="11" text-anchor="middle">${vX.toFixed(2)}</text>`;
+      }
+      
+      // Ejes Rectangulares
+      svg += `<rect x="${padL}" y="${padT}" width="${gW}" height="${gH}" fill="none" stroke="${axColor}" stroke-width="1" />`;
+
+      // Trazados de las envolventes
+      var pathEl = pts_el.map((p,i) => `${i===0?'M':'L'} ${txX(p.t)} ${saY(p.sa)}`).join(' ');
+      var pathIn = pts_el.map((p,i) => `${i===0?'M':'L'} ${txX(p.t)} ${saY(p.saine)}`).join(' ');
+
+      var colEl = '#00e5ff';
+      var colIn = '#ff6b35';
+
+      // Filtros de brillo siempre aplicados
+      svg += `<defs>
+                <filter id="glowEl${containerId}" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>`;
+      svg += `<path d="${pathEl}" fill="none" stroke="${colEl}" stroke-width="2.5" filter="url(#glowEl${containerId})" />`;
+      svg += `<path d="${pathIn}" fill="none" stroke="${colIn}" stroke-width="1.8" stroke-dasharray="4,3" />`;
+
+      // Marcador del Periodo Estructural T
+      if(T_est && T_est > 0 && T_est <= Tmax) {
+        svg += `<line x1="${txX(T_est)}" y1="${padT}" x2="${txX(T_est)}" y2="${padT+gH}" stroke="var(--warn)" stroke-width="1.5" />`;
+      }
+
+      svg += `</svg>`;
+      container.innerHTML = svg;
+    }
+
+    // ============================================================
+    // RESUMEN GLOBAL
+    // ============================================================
+    function actualizarResumen() {
+      // Losa
+      var _set = function(id, srcId) {
+        var src = document.getElementById(srcId);
+        var dst = document.getElementById(id);
+        if (src && dst) dst.textContent = src.textContent;
+      };
+      _set('res_lmax',    'r_losa_lmax');
+      _set('res_lreal',   'r_losa_lreal');
+      _set('res_hmin_l',  'r_losa_hmin');
+      _set('res_imin',    'r_losa_imin');
+      _set('res_isteiner','r_losa_isteiner');
+      _set('res_cm_total','r_losa_cm_total');
+      _set('res_cv_total','r_losa_cv_total');
+
+      // Vigas
+      var Lv = document.getElementById('r_Lv');
+      var b_v = document.getElementById('b');
+      var h_v = document.getElementById('hdef');
+      var res_bh = document.getElementById('res_bh');
+      if (Lv) { var el = document.getElementById('res_Lv'); if (el) el.textContent = Lv.textContent; }
+      if (b_v && h_v && res_bh) res_bh.textContent = b_v.value + ' x ' + h_v.value;
+      _set('res_hmin_v',   'r_hmin');
+      _set('res_Mdis',     'r_Mdis');
+      _set('res_Mres',     'r_Mres');
+      _set('res_Astotneg', 'r_Astot_neg');
+      _set('res_Astotpos', 'r_Astot_pos');
+      _set('res_Vu',       'r_Vu');
+
+      // D/C con color
+      var dc_src = document.getElementById('dcValue');
+      var dc_dst = document.getElementById('res_DC');
+      if (dc_src && dc_dst) {
+        dc_dst.textContent = dc_src.textContent;
+        var dcVal = parseFloat(dc_src.textContent);
+        dc_dst.style.color = dcVal <= 1.0 ? 'var(--accent3)' : 'var(--bad)';
+      }
+
+      // Columnas
+      var bc = document.getElementById('col_bc');
+      var hc = document.getElementById('col_hc');
+      var res_col_bh = document.getElementById('res_col_bh');
+      if (bc && hc && res_col_bh) res_col_bh.textContent = bc.value + ' x ' + hc.value;
+      _set('res_col_pult', 'r_col_pult');
+      _set('res_col_ag',   'r_col_agnec');
+      _set('res_col_ac',   'r_col_ac');
+      _set('res_col_as',   'r_col_as');
+      _set('res_col_cuant','r_col_cuant');
+      var nudo_src = document.getElementById('r_col_nudo');
+      var nudo_dst = document.getElementById('res_col_nudo');
+      if (nudo_src && nudo_dst) { nudo_dst.textContent = nudo_src.textContent; nudo_dst.style.color = nudo_src.style.color; }
+
+      // Sismo
+      _set('res_sis_fa',   'r_sis_fa');
+      _set('res_sis_sael', 'r_sis_sael');
+      _set('res_sis_saine','r_sis_saine');
+      _set('res_sis_tc',   'r_sis_tc');
+      _set('res_sis_inex_r','r_sis_inex');
+      _set('res_sis_iney_r','r_sis_iney');
+      var okx_src = document.getElementById('r_sis_okx');
+      var okx_dst = document.getElementById('res_sis_okx_r');
+      if (okx_src && okx_dst) { okx_dst.innerHTML = okx_src.innerHTML; }
+      var oky_src = document.getElementById('r_sis_oky');
+      var oky_dst = document.getElementById('res_sis_oky_r');
+      if (oky_src && oky_dst) { oky_dst.innerHTML = oky_src.innerHTML; }
+    }
+
+    // --- MODAL CONTROL ---
+    function openCortanteModal() {
+      const modal = document.getElementById('modal_zonas_viga');
+      if(modal) {
+        // Actualizar valores dinámicamente
+        const h = document.getElementById('hdef') ? document.getElementById('hdef').value : '0';
+        const bcol = document.getElementById('bcol') ? document.getElementById('bcol').value : '0';
+        const fi_est = document.getElementById('fi_est') ? document.getElementById('fi_est').value : '10'; // Diámetro del estribo
+        
+        const Lv_el = document.getElementById('r_Lv');
+        const Zprot_el = document.getElementById('r_Zprot');
+        const Zcentral_el = document.getElementById('r_Zcentral');
+        const sprot_el = document.getElementById('r_s_adopt_prot');
+        const scent_el = document.getElementById('r_s_adopt_cent');
+
+        const Lv = Lv_el ? parseFloat(Lv_el.textContent) || 0 : 0;
+        const ln = Lv - (parseFloat(bcol)/100);
+
+        const zprot_val = parseFloat(Zprot_el ? Zprot_el.textContent : '0') || 0;
+        const zcent_val = parseFloat(Zcentral_el ? Zcentral_el.textContent : '0') || 0;
+        const sprot_val = parseFloat(sprot_el ? sprot_el.textContent : '1') || 1;
+        const scent_val = parseFloat(scent_el ? scent_el.textContent : '1') || 1;
+
+        // Calculamos la cantidad de estribos por zona (Redondeo hacia arriba para asegurar cubrir la longitud)
+        const n_prot = Math.ceil(zprot_val / sprot_val);
+        const n_cent = Math.ceil(zcent_val / scent_val);
+
+        if(document.getElementById('svg_zp_izq')) document.getElementById('svg_zp_izq').textContent = `≥ 2h (${zprot_val} cm)`;
+        if(document.getElementById('svg_zp_der')) document.getElementById('svg_zp_der').textContent = `≥ 2h (${zprot_val} cm)`;
+        if(document.getElementById('svg_z_cent')) document.getElementById('svg_z_cent').textContent = `Z. central = ${zcent_val} cm`;
+        if(document.getElementById('svg_ln')) document.getElementById('svg_ln').textContent = `Luz libre (ln) = ${ln > 0 ? ln.toFixed(2) : '0.00'} m`;
+        if(document.getElementById('svg_h')) document.getElementById('svg_h').textContent = `h = ${h} cm`;
+        
+        // Aplicamos el formato de planos en dos líneas separadas (Longitud arriba, armado abajo)
+        if(document.getElementById('svg_s_prot_izq_L')) document.getElementById('svg_s_prot_izq_L').textContent = `L=${zprot_val}cm`;
+        if(document.getElementById('svg_s_prot_izq_A')) document.getElementById('svg_s_prot_izq_A').textContent = `${n_prot}∅${fi_est} @ S=${sprot_val}cm`;
+        
+        if(document.getElementById('svg_s_prot_der_L')) document.getElementById('svg_s_prot_der_L').textContent = `L=${zprot_val}cm`;
+        if(document.getElementById('svg_s_prot_der_A')) document.getElementById('svg_s_prot_der_A').textContent = `${n_prot}∅${fi_est} @ S=${sprot_val}cm`;
+        
+        if(document.getElementById('svg_s_cent_L')) document.getElementById('svg_s_cent_L').textContent = `L=${zcent_val}cm`;
+        if(document.getElementById('svg_s_cent_A')) document.getElementById('svg_s_cent_A').textContent = `${n_cent}∅${fi_est} @ S=${scent_val}cm`;
+
+        modal.style.display = 'flex';
+        // force reflow
+        void modal.offsetWidth;
+        modal.classList.add('active');
+      }
+    }
+    function closeCortanteModal() {
+      const modal = document.getElementById('modal_zonas_viga');
+      if(modal) {
+        modal.classList.remove('active');
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+      }
+    }
   </script>
 
-  <div id="eqTooltip" class="eq-tooltip">
-    <div class="eq-tooltip-title">Ecuación</div>
-    <div class="eq-tooltip-formula"></div>
-    <div class="eq-tooltip-calc"></div>
-    <div class="eq-tooltip-status"></div>
+  <!-- MODAL: ZONAS SISMICAS -->
+  <div class="svg-modal-overlay" id="modal_zonas_viga" onclick="if(event.target===this) closeCortanteModal()">
+    <div class="svg-modal-content">
+      <button class="svg-modal-close" onclick="closeCortanteModal()">✖</button>
+      <div style="font-family:var(--display); font-size:18px; color:var(--text); margin-bottom: 25px; text-align:center; font-weight:600;">Zonas de una viga sísmica — NEC-SE-HM</div>
+      
+      <div style="display:flex; justify-content:center; overflow-x:auto;">
+        <svg width="100%" viewBox="0 0 680 300" style="max-width:680px; min-width:400px; display:block; margin:0 auto;">
+          <defs>
+            <marker id="arrowZ" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+
+          <!-- Columna izquierda -->
+          <rect x="30" y="80" width="60" height="140" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>
+          <text font-family="var(--sans)" font-size="10" fill="var(--text)" x="60" y="152" text-anchor="middle">Col.</text>
+
+          <!-- Columna derecha -->
+          <rect x="590" y="80" width="60" height="140" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>
+          <text font-family="var(--sans)" font-size="10" fill="var(--text)" x="620" y="152" text-anchor="middle">Col.</text>
+
+          <!-- Zona protegida izquierda -->
+          <rect x="90" y="110" width="110" height="80" rx="4" fill="rgba(255,71,87,0.15)" stroke="var(--bad)" stroke-width="0.5"/>
+
+          <!-- Zona central -->
+          <rect x="200" y="110" width="280" height="80" rx="4" fill="rgba(0,229,255,0.1)" stroke="var(--accent)" stroke-width="0.5"/>
+
+          <!-- Zona protegida derecha -->
+          <rect x="480" y="110" width="110" height="80" rx="4" fill="rgba(255,71,87,0.15)" stroke="var(--bad)" stroke-width="0.5"/>
+
+          <!-- Etiquetas dentro de zonas -->
+          <text font-family="var(--sans)" font-size="12" font-weight="bold" fill="var(--text)" x="145" y="147" text-anchor="middle">Zona</text>
+          <text font-family="var(--sans)" font-size="12" font-weight="bold" fill="var(--text)" x="145" y="163" text-anchor="middle">protegida</text>
+
+          <text font-family="var(--sans)" font-size="12" font-weight="bold" fill="var(--text)" x="340" y="147" text-anchor="middle">Zona</text>
+          <text font-family="var(--sans)" font-size="12" font-weight="bold" fill="var(--text)" x="340" y="163" text-anchor="middle">central</text>
+
+          <text font-family="var(--sans)" font-size="12" font-weight="bold" fill="var(--text)" x="535" y="147" text-anchor="middle">Zona</text>
+          <text font-family="var(--sans)" font-size="12" font-weight="bold" fill="var(--text)" x="535" y="163" text-anchor="middle">protegida</text>
+
+          <!-- Cotas zona protegida izq -->
+          <line x1="90" y1="220" x2="200" y2="220" stroke="var(--muted)" stroke-width="0.8" marker-end="url(#arrowZ)" marker-start="url(#arrowZ)"/>
+          <text id="svg_zp_izq" font-family="var(--sans)" font-size="10" fill="var(--text)" x="145" y="238" text-anchor="middle">≥ 2h</text>
+
+          <!-- Cotas zona central -->
+          <line x1="200" y1="220" x2="480" y2="220" stroke="var(--muted)" stroke-width="0.8" marker-end="url(#arrowZ)" marker-start="url(#arrowZ)"/>
+          <text id="svg_z_cent" font-family="var(--sans)" font-size="10" fill="var(--text)" x="340" y="238" text-anchor="middle">ln - 2×(zona prot.) = zona central</text>
+
+          <!-- Cotas zona protegida der -->
+          <line x1="480" y1="220" x2="590" y2="220" stroke="var(--muted)" stroke-width="0.8" marker-end="url(#arrowZ)" marker-start="url(#arrowZ)"/>
+          <text id="svg_zp_der" font-family="var(--sans)" font-size="10" fill="var(--text)" x="535" y="238" text-anchor="middle">≥ 2h</text>
+
+          <!-- Cota ln total -->
+          <line x1="90" y1="260" x2="590" y2="260" stroke="var(--muted)" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arrowZ)" marker-start="url(#arrowZ)"/>
+          <text id="svg_ln" font-family="var(--sans)" font-size="10" fill="var(--text)" x="340" y="278" text-anchor="middle">ln = luz libre de la viga</text>
+
+          <!-- Estribos zona protegida izquierda -->
+          <line x1="105" y1="108" x2="105" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="120" y1="108" x2="120" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="135" y1="108" x2="135" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="150" y1="108" x2="150" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="165" y1="108" x2="165" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="180" y1="108" x2="180" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="195" y1="108" x2="195" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+
+          <!-- Estribos zona central -->
+          <line x1="230" y1="108" x2="230" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="280" y1="108" x2="280" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="340" y1="108" x2="340" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="400" y1="108" x2="400" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="450" y1="108" x2="450" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+
+          <!-- Estribos zona protegida derecha -->
+          <line x1="490" y1="108" x2="490" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="505" y1="108" x2="505" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="520" y1="108" x2="520" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="535" y1="108" x2="535" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="550" y1="108" x2="550" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="565" y1="108" x2="565" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+          <line x1="580" y1="108" x2="580" y2="80" stroke="var(--muted)" stroke-width="0.7"/>
+
+          <!-- Anotaciones separación estribos -->
+          <!-- Izquierda -->
+          <text id="svg_s_prot_izq_L" font-family="var(--sans)" font-size="10" x="145" y="60" text-anchor="middle" fill="var(--text)">L = 0 cm</text>
+          <text id="svg_s_prot_izq_A" font-family="var(--sans)" font-size="10" x="145" y="74" text-anchor="middle" fill="var(--bad)">0∅10 @ 0 cm</text>
+          
+          <!-- Central -->
+          <text id="svg_s_cent_L" font-family="var(--sans)" font-size="10" x="340" y="60" text-anchor="middle" fill="var(--text)">L = 0 cm</text>
+          <text id="svg_s_cent_A" font-family="var(--sans)" font-size="10" x="340" y="74" text-anchor="middle" fill="var(--accent)">0∅10 @ 0 cm</text>
+          
+          <!-- Derecha -->
+          <text id="svg_s_prot_der_L" font-family="var(--sans)" font-size="10" x="535" y="60" text-anchor="middle" fill="var(--text)">L = 0 cm</text>
+          <text id="svg_s_prot_der_A" font-family="var(--sans)" font-size="10" x="535" y="74" text-anchor="middle" fill="var(--bad)">0∅10 @ 0 cm</text>
+
+          <!-- Peralte h -->
+          <line x1="18" y1="110" x2="18" y2="190" stroke="var(--muted)" stroke-width="0.8" marker-end="url(#arrowZ)" marker-start="url(#arrowZ)"/>
+          <text id="svg_h" font-family="var(--sans)" font-size="10" fill="var(--text)" x="12" y="155" text-anchor="middle">h</text>
+        </svg>
+      </div>
+    </div>
   </div>
+
+  <!-- MODAL: DETALLE ESPECTRO SÍSMICO -->
+  <div class="svg-modal-overlay" id="modal_espectro" onclick="if(event.target===this) closeEspectroModal()">
+    <div class="svg-modal-content" style="max-width: 900px;">
+      <button class="svg-modal-close" onclick="closeEspectroModal()">✖</button>
+      <div style="font-family:var(--display); font-size:18px; color:var(--text); margin-bottom: 5px; text-align:center; font-weight:600;">Espectro de Respuesta — NEC-15</div>
+      <div style="text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 20px;">Análisis de la intersección del Periodo Estructural T</div>
+      
+      <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px;">
+        <!-- Gráfico SVG -->
+        <div style="flex: 1 1 500px; display:flex; justify-content:center; align-items:flex-start;">
+          <div id="svgEspectroModal" style="width:100%; max-width:550px; aspect-ratio: 5/3; border:1px solid var(--border); border-radius:6px; background:rgba(0,0,0,0.1);"></div>
+        </div>
+        <!-- Panel Lateral: Puntos y Tabla -->
+        <div style="flex: 1 1 250px; display:flex; flex-direction: column; gap: 15px;">
+          <div class="card" style="margin: 0; min-height: unset; padding: 15px;">
+            <div class="card-title">Intersección Actual</div>
+            <div class="result-row">
+              <span>Periodo T (s)</span>
+              <div class="res-badge" id="mdl_T" style="color: var(--warn); border-color: rgba(255,184,48,0.2); background: rgba(255,184,48,0.05);">0.00</div>
+            </div>
+            <div class="result-row">
+              <span>Sa Elástico (g)</span>
+              <div class="res-badge" id="mdl_SaEl" style="color: #00e5ff; border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.05);">0.000</div>
+            </div>
+            <div class="result-row" style="margin-top:5px;">
+              <span>Sa Inelástico (g)</span>
+              <div class="res-badge" id="mdl_SaIn" style="color: #ff6b35; border-color: rgba(255,107,53,0.2); background: rgba(255,107,53,0.05);">0.000</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin: 0; padding: 15px; flex-grow: 1; display:flex; flex-direction:column; max-height:200px;">
+            <div class="card-title" style="margin-bottom:8px; font-size:12px;">Tabla del Espectro (T vs Sa)</div>
+            <div style="overflow-y:auto; font-size:11px; padding-right:5px;" class="custom-scrollbar">
+              <table style="width:100%; border-collapse: collapse; text-align:center;">
+                <thead style="position:sticky; top:0; background:var(--bg); box-shadow: 0 1px 0 var(--border);">
+                  <tr>
+                    <th style="padding:4px; color:var(--muted); font-weight:normal;">T (s)</th>
+                    <th style="padding:4px; color:#00e5ff; font-weight:normal;">Sa Elástico</th>
+                    <th style="padding:4px; color:#ff6b35; font-weight:normal;">Sa Inelást.</th>
+                  </tr>
+                </thead>
+                <tbody id="mdl_tabla_espectro">
+                  <!-- JS Injects here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openEspectroModal() {
+      const modal = document.getElementById('modal_espectro');
+      if (modal) {
+        // Ejecutamos cálculo para dibujar ambos
+        recalcSis(); 
+        
+        modal.style.display = 'flex';
+        void modal.offsetWidth; // force reflow
+        modal.classList.add('active');
+      }
+    }
+    
+    function closeEspectroModal() {
+      const modal = document.getElementById('modal_espectro');
+      if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+      }
+    }
+  </script>
+
+  <div id="modalIrreg" class="svg-modal-overlay">
+    <div class="svg-modal-content" style="max-width: 850px;">
+      <button class="svg-modal-close" onclick="cerrarModalIrreg()">✕</button>
+      <h3 id="modalIrregTitle" style="font-family:var(--display); color:var(--accent); margin-bottom:10px;">Catálogo de Irregularidades</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Seleccione la opción predominante según la NEC-15.</p>
+      
+      <!-- Filtros en cascada -->
+      <div id="modalFilterContainer" style="display:none; margin-bottom:15px; border:1px solid var(--border); border-radius:8px; padding:10px; background:rgba(255,255,255,0.03);">
+        <div style="font-size:10px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; letter-spacing:0.05em;">Filtros de Ubicación (NEC-15)</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:150px;">
+            <select id="modal_province_filter" style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:8px; color:var(--accent); font-size:12px; outline:none;">
+              <option value="">— Seleccionar Provincia —</option>
+            </select>
+          </div>
+          <div style="flex:1; min-width:150px;">
+            <select id="modal_canton_filter" style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:8px; color:var(--accent); font-size:12px; outline:none;">
+              <option value="">— Seleccionar Cantón —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buscador interno opcional -->
+      <div id="modalSearchContainer" style="display:none; margin-bottom:15px; position:relative;">
+        <input type="text" id="modalSearchInput" placeholder="🔍 O busque por nombre de ciudad..." 
+          style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); font-size:14px; outline:none;">
+      </div>
+
+      <div style="max-height: 450px; overflow-y: auto;" class="custom-scrollbar">
+        <table class="irreg-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th id="th_title">Categoría</th>
+              <th id="th_desc">Descripción</th>
+              <th style="width: 80px; text-align: center;" id="th_val">Valor</th>
+            </tr>
+          </thead>
+          <tbody id="irregTableBody">
+            <!-- JS dynamic content -->
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="margin-top:25px; display:flex; justify-content:flex-end;">
+        <button class="btn-theme" onclick="cerrarModalIrreg()" style="padding:10px 20px; font-size:13px; font-weight:700;">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- LÓGICA MODAL IRREGULARIDADES ---
+    const irregPlanta = [
+      { t: "Regularidad en Planta", d: "La altura de entrepiso y la configuración horizontal de sistemas aporticados, es constante.", v: 1.0 },
+      { t: "Irregularidad Torsional", d: "El desplazamiento máximo de un piso es > 1.2 veces el desplazamiento promedio.", v: 0.9 },
+      { t: "Retrocesos en Esquinas", d: "Dimensiones de la reentrada estructural son > 15% de la dimensión total en planta.", v: 0.9 },
+      { t: "Discontinuidad del Diafragma", d: "Áreas abiertas o variaciones de rigidez del diafragma > 50% de su área bruta.", v: 0.9 },
+      { t: "Ejes No Paralelos", d: "Los elementos resistentes no son paralelos ni simétricos respecto a ejes ortogonales.", v: 0.9 }
+    ];
+
+    const irregElev = [
+      { t: "Regularidad en Elevación", d: "La configuración vertical carece de cambios bruscos de rigidez, masa o geometría.", v: 1.0 },
+      { t: "Piso Flexible", d: "Rigidez lateral de un piso < 70% de la rigidez lateral del piso superior.", v: 0.9 },
+      { t: "Distribución de Masa", d: "Masa de cualquier piso > 1.5 veces la masa de uno de los pisos adyacentes.", v: 0.9 },
+      { t: "Irregularidad Geométrica", d: "Dimensión en planta > 1.3 veces la misma dimensión de un piso adyacente.", v: 0.9 },
+      { t: "Discontinuidad Vertical", d: "Desalineamiento de elementos verticales del sistema resistente a cargas laterales.", v: 0.8 }
+    ];
+
+    const catalogoSuelos = [
+      { t: "Tipo A: Roca Dura", d: "Roca sana o competente. Velocidad de onda de corte Vs > 1500 m/s. Sin amplificación.", v: "A" },
+      { t: "Tipo B: Roca Media", d: "Roca de rigidez media o suelos muy densos. 760 < Vs ≤ 1500 m/s.", v: "B" },
+      { t: "Tipo C: Suelo Denso", d: "Suelos muy densos o roca blanda. 360 < Vs ≤ 760 m/s. Perfil firme.", v: "C" },
+      { t: "Tipo D: Suelo Rígido", d: "Perfiles de suelos rígidos. 180 < Vs ≤ 360 m/s. Muy común en zonas de valle.", v: "D" },
+      { t: "Tipo E: Suelo Blando", d: "Perfil de suelo blando o arcilla. Vs < 180 m/s. Alta respuesta sísmica.", v: "E" },
+      { t: "Tipo F: Suelo Especial", d: "Suelos licuables, colapsables o arcillas sensibles. Requiere estudio geotécnico.", v: "F" }
+    ];
+
+    const catalogoImportancia = [
+      { t: "Edificaciones Esenciales (1.5)", d: "Hospitales, centros de salud, bomberos, estaciones de policía, refugios de emergencia.", v: "1.5" },
+      { t: "Ocupación Especial (1.3)", d: "Escuelas, museos, iglesias, centros comerciales (>300 pers), cines, estadios.", v: "1.3" },
+      { t: "Otras Estructuras (1.0)", d: "Viviendas unifamiliares, edificios de oficinas, hoteles, comercios estándar.", v: "1.0" }
+    ];
+
+    const catalogoReduccion = [
+      { t: "Pórticos especiales sismo resistentes, de hormigón armado con vigas descolgadas y con muros estructurales de hormigón armado o con diagonales rigidizadoras (sistemas duales).", d: "Capacidad Especial (DES).", v: "8" },
+      { t: "Pórticos especiales sismo resistentes de acero laminado en caliente, sea con diagonales rigidizadoras (excéntricas o concéntricas) o con muros estructurales de hormigón armado.", d: "Capacidad Especial (DES).", v: "8" },
+      { t: "Pórticos con columnas de hormigón armado y vigas de acero laminado en caliente con diagonales rigidizadoras (excéntricas o concéntricas).", d: "Capacidad Especial (DES).", v: "8" },
+      { t: "Pórticos especiales sismo resistentes, de hormigón armado con vigas banda, con muros estructurales de hormigón armado o con diagonales rigidizadoras.", d: "Capacidad Especial (DES) con vigas banda.", v: "7" },
+      { t: "Pórticos especiales sismo resistentes, de hormigón armado con vigas descolgadas.", d: "Sistemas aporticados de ductilidad alta.", v: "8" },
+      { t: "Pórticos especiales sismo resistentes, de acero laminado en caliente o con elementos armados de placas.", d: "Ductilidad alta en acero.", v: "8" },
+      { t: "Pórticos con columnas de hormigón armado y vigas de acero laminado en caliente.", d: "Pórticos mixtos sismorresistentes.", v: "8" },
+      { t: "Sistemas de muros estructurales dúctiles de hormigón armado.", d: "Diseño basado puramente en muros (DES).", v: "5" },
+      { t: "Pórticos especiales sismo resistentes de hormigón armado con vigas banda.", d: "Limitación de ductilidad por espesor de viga.", v: "5" }
+    ];
+
+    let currentIrregType = '';
+
+    function abrirModalIrreg(type) {
+      currentIrregType = type;
+      const modal = document.getElementById('modalIrreg');
+      const title = document.getElementById('modalIrregTitle');
+      const modalPara = modal.querySelector('p');
+      const searchContainer = document.getElementById('modalSearchContainer');
+      const filterContainer = document.getElementById('modalFilterContainer');
+      const searchInput = document.getElementById('modalSearchInput');
+      
+      let data = [];
+      let currentVal = '';
+
+      searchContainer.style.display = 'none';
+      filterContainer.style.display = 'none';
+
+      if (type === 'planta') {
+        title.innerText = 'Irregularidades en Planta (ϕp)';
+        data = irregPlanta;
+        currentVal = getVal('sis_fip');
+      } else if (type === 'elevacion') {
+        title.innerText = 'Irregularidades en Elevación (ϕe)';
+        data = irregElev;
+        currentVal = getVal('sis_fie');
+      } else if (type === 'suelo') {
+        title.innerText = 'Catálogo de Perfiles de Suelo (NEC-15)';
+        data = catalogoSuelos;
+        currentVal = document.getElementById('sis_suelo').value;
+      } else if (type === 'importancia') {
+        title.innerText = 'Coeficiente de Importancia (I)';
+        data = catalogoImportancia;
+        currentVal = document.getElementById('sis_I').value;
+      } else if (type === 'reduccion') {
+        title.innerText = 'Sistemas Estructurales y Factor R';
+        modalPara.innerText = 'Seleccione el sistema sismorresistente según limitaciones NEC-15.';
+        data = catalogoReduccion;
+        currentVal = getVal('sis_R');
+      } else if (type === 'zona') {
+        title.innerText = 'Catálogo Maestro de Zonas Sísmicas (Z)';
+        searchContainer.style.display = 'block';
+        filterContainer.style.display = 'block';
+        
+        data = ZONA_SISMICA_DATA.map(r => ({ t: r[0], d: `${r[2]}, ${r[3]}`, v: r[4], p: r[3], c: r[2] }));
+        currentVal = getVal('sis_Z');
+        
+        const provSelect = document.getElementById('modal_province_filter');
+        const cantSelect = document.getElementById('modal_canton_filter');
+
+        // Poblar Provincias
+        const provinces = [...new Set(ZONA_SISMICA_DATA.map(r => r[3]))].sort();
+        provSelect.innerHTML = '<option value="">— Todas las Provincias —</option>';
+        provinces.forEach(p => {
+          provSelect.innerHTML += `<option value="${p}">${p}</option>`;
+        });
+        cantSelect.innerHTML = '<option value="">— Seleccionar Cantón —</option>';
+        cantSelect.disabled = true;
+
+        provSelect.onchange = () => {
+          const selectedProv = provSelect.value;
+          cantSelect.innerHTML = '<option value="">— Todos los Cantones —</option>';
+          if (selectedProv) {
+            cantSelect.disabled = false;
+            const cantons = [...new Set(ZONA_SISMICA_DATA.filter(r => r[3] === selectedProv).map(r => r[2]))].sort();
+            cantons.forEach(c => {
+               cantSelect.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+          } else {
+            cantSelect.disabled = true;
+          }
+          filterAndRender();
+        };
+
+        cantSelect.onchange = filterAndRender;
+        searchInput.oninput = filterAndRender;
+
+        function filterAndRender() {
+          const q = normalizarTexto(searchInput.value);
+          const p = provSelect.value;
+          const c = cantSelect.value;
+
+          const filtered = data.filter(item => {
+            const matchQ = !q || normalizarTexto(item.t).includes(q) || normalizarTexto(item.d).includes(q);
+            const matchP = !p || item.p === p;
+            const matchC = !c || item.c === c;
+            return matchQ && matchP && matchC;
+          });
+          renderModalRows(filtered, currentVal);
+        }
+
+        searchInput.value = ''; // Limpiar previo
+      }
+
+      renderModalRows(data, currentVal);
+      modal.classList.add('active');
+    }
+
+    function renderModalRows(data, currentVal) {
+      const tbody = document.getElementById('irregTableBody');
+      tbody.innerHTML = '';
+      data.forEach((item) => {
+        const isSelected = (String(item.v) === String(currentVal));
+        const tr = document.createElement('tr');
+        tr.onclick = () => seleccionarIrreg(item.v);
+        tr.innerHTML = `
+          <td style="text-align:center;"><input type="radio" name="irreg_opt" class="irreg-radio" ${isSelected ? 'checked' : ''}></td>
+          <td style="font-weight:600; color:var(--text);">${item.t}</td>
+          <td style="color:var(--muted); font-size:12px; line-height:1.4;">${item.d}</td>
+          <td class="irreg-val" style="text-align:center; color:var(--accent); font-weight:700;">${item.v}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function cerrarModalIrreg() {
+      document.getElementById('modalIrreg').classList.remove('active');
+    }
+
+    function seleccionarIrreg(val) {
+      let id = '';
+      if (currentIrregType === 'planta') id = 'sis_fip';
+      else if (currentIrregType === 'elevacion') id = 'sis_fie';
+      else if (currentIrregType === 'suelo') id = 'sis_suelo';
+      else if (currentIrregType === 'importancia') id = 'sis_I';
+      else if (currentIrregType === 'zona') id = 'sis_Z';
+      else if (currentIrregType === 'reduccion') id = 'sis_R';
+
+      const input = document.getElementById(id);
+      input.value = val;
+      
+      // Efecto Visual de Impacto
+      input.style.backgroundColor = "rgba(0,229,255,0.2)";
+      setTimeout(() => input.style.backgroundColor = "", 600);
+      
+      recalcSis(); 
+      saveAllData();
+      cerrarModalIrreg();
+    }
+  </script>
 </body>
 
 </html>

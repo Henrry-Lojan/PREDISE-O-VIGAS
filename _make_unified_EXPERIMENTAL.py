@@ -1,6 +1,6 @@
 import re
 
-viga_path = r'D:\Users\USUARIO 2023\Desktop\INTERFAZ\Predimensionamiento_vigas.html'
+viga_path = 'Predimensionamiento_vigas.html'
 with open(viga_path, 'r', encoding='utf-8') as f:
     viga_content = f.read()
 
@@ -11,8 +11,29 @@ if head_match:
 else:
     head_html = ""
 
-layout_match = re.search(r'<div class="layout">(.*?)</div><!-- end layout -->', viga_content, re.DOTALL)
-viga_layout = layout_match.group(1) if layout_match else ""
+def build_module(name, content, active=False):
+    # Buscar el inicio del layout
+    start_tag = '<div class="layout">'
+    start_index = content.find(start_tag)
+    if start_index == -1: return ""
+    
+    # Buscar el final: ya sea el tooltip interactivo o el cierre del body
+    end_markers = ['<!-- Interactive Equation Tooltip -->', '</body>', '</html>']
+    end_index = len(content)
+    for marker in end_markers:
+        pos = content.find(marker)
+        if pos != -1 and pos < end_index:
+            end_index = pos
+            
+    # Extraer el bloque completo
+    inner_html = content[start_index + len(start_tag) : end_index].strip()
+    
+    # Quitar el último </div> que pertenece al layout original
+    if inner_html.endswith('</div>'):
+        inner_html = inner_html[:-6].strip()
+
+    active_class = "active" if active else ""
+    return f'<div id="tab-{name}" class="module-container layout {active_class}">{inner_html}</div>'
 
 def build_arch_block(prefix=''):
     return f"""        <!-- ARQUITECTÓNICOS -->
@@ -44,6 +65,16 @@ def build_arch_block(prefix=''):
         </div>"""
 
 import re
+vig_arch_regex = r'<!-- ARQUITECTÓNICOS -->.*?<!-- CARGAS -->'
+# Extraer el layout de Vigas de forma robusta
+start_tag = '<div class="layout">'
+v_start = viga_content.find(start_tag)
+v_end = viga_content.find('<!-- Interactive Equation Tooltip -->')
+if v_end == -1: v_end = viga_content.find('</body>')
+viga_layout = viga_content[v_start + len(start_tag) : v_end].strip()
+if viga_layout.endswith('</div>'):
+    viga_layout = viga_layout[:-6].strip()
+
 vig_arch_regex = r'<!-- ARQUITECTÓNICOS -->.*?<!-- CARGAS -->'
 viga_layout = re.sub(vig_arch_regex, build_arch_block('') + "\n        <!-- CARGAS -->", viga_layout, flags=re.DOTALL)
 
@@ -812,7 +843,72 @@ tooltip_html = """
 """
 
 full_html = head_html + "<body><header style='margin-bottom:0;border-bottom:none'>" + head_match.string[head_match.string.find('<div class="logo-badge">'):head_match.string.find('</header>')] + "</header>" + tabs_html + "<div>" + modules_html + "</div>" + tooltip_html + "<script>" + viga_script + losa_js + col_js + sismo_js + "</script></body></html>"
-with open(r'D:\Users\USUARIO 2023\Desktop\INTERFAZ\Suite_Estructural_Unificada.html', 'w', encoding='utf-8') as f:
-    f.write(full_html)
+with open('Suite_Estructural_Unificada.html', 'w', encoding='utf-8') as f:
+    # Inyectar catálogos NEC-15 y Modales antes de cerrar el body
+    catalogs_html = """
+    <!-- CATALOG MODALS -->
+    <div id="modal-container" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+        <div style="background:var(--panel); border:1px solid var(--accent); border-radius:12px; width:90%; max-width:700px; max-height:85vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 0 50px rgba(0,229,255,0.2);">
+            <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="modal-title" style="color:var(--accent); font-family:var(--display); font-size:16px;">CATÁLOGO NEC-15</h3>
+                <button onclick="closeSismoModal()" style="background:transparent; border:none; color:var(--muted); font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+            <div id="modal-body" style="padding:15px; overflow-y:auto; font-size:13px; color:var(--text);">
+                <!-- Table injected via JS -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    const CATALOGS = {
+        importance: [
+            { category: "EDIFICACIONES ESENCIALES", desc: "Hospitales, centros de salud, estaciones de bomberos, policía, centrales eléctricas, etc.", factor: 1.5 },
+            { category: "ESTRUCTURAS ESPECIALES", desc: "Museos, iglesias, escuelas, centros comerciales, o lugares con alta concentración de personas.", factor: 1.3 },
+            { category: "OTRAS ESTRUCTURAS", desc: "Viviendas, oficinas, hoteles, o cualquier otra estructura no incluida arriba.", factor: 1.0 }
+        ],
+        soil: [
+            { type: "A", desc: "Perfil de roca competente.", s: 1.0 },
+            { type: "B", desc: "Roca de rigidez media.", s: 1.0 },
+            { type: "C", desc: "Perfiles de suelos muy densos.", s: 1.2 },
+            { type: "D", desc: "Perfiles de suelos rígidos.", s: 1.4 },
+            { type: "E", desc: "Perfiles de suelos blandos.", s: 1.5 }
+        ]
+    };
+
+    function openSismoModal(type) {
+        const modal = document.getElementById('modal-container');
+        const title = document.getElementById('modal-title');
+        const body = document.getElementById('modal-body');
+        modal.style.display = 'flex';
+        
+        let html = '<table style="width:100%; border-collapse:collapse; margin-top:10px;">';
+        if(type === 'I') {
+            title.innerText = 'FACTOR DE IMPORTANCIA (I) - NEC-15';
+            html += '<tr style="border-bottom:2px solid var(--border); color:var(--muted); text-align:left;"><th style="padding:10px;">Categoría</th><th style="padding:10px;">Descripción</th><th style="padding:10px;">Factor</th><th style="padding:10px;">Acción</th></tr>';
+            CATALOGS.importance.forEach(item => {
+                html += `<tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px; font-weight:700; color:var(--accent);">${item.category}</td>
+                    <td style="padding:12px;">${item.desc}</td>
+                    <td style="padding:12px; font-family:var(--mono); text-align:center;">${item.factor}</td>
+                    <td style="padding:12px;"><button onclick="selectSismoValue('sis_i', ${item.factor})" style="background:var(--accent); color:#000; border:none; padding:5px 10px; border-radius:4px; font-weight:700; cursor:pointer;">Elegir</button></td>
+                </tr>`;
+            });
+        }
+        html += '</table>';
+        body.innerHTML = html;
+    }
+
+    function closeSismoModal() { document.getElementById('modal-container').style.display = 'none'; }
+    function selectSismoValue(id, val) {
+        const input = document.getElementById(id);
+        if(input) {
+            input.value = val;
+            input.dispatchEvent(new Event('input'));
+        }
+        closeSismoModal();
+    }
+    </script>
+    """
+    f.write(full_html.replace('</body>', catalogs_html + '</body>'))
 
 print("Unified SPA created")
