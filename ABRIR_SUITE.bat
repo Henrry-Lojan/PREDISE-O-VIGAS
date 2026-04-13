@@ -11,7 +11,8 @@ start /b python -m http.server 3000
 timeout /t 2 /nobreak >nul
 echo.
 echo Lanzando Suite en Chrome...
-start chrome http://localhost:3000/Suite_Estructural_Unificada.html
+:: Ahora apuntamos simplemente al servidor, que abrirá el index.html automáticamente
+start chrome http://localhost:3000/
 echo.
 echo [LISTO] No cierres esta ventana mientras uses la Suite.
 echo ==========================================
